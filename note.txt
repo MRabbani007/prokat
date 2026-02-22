@@ -1,0 +1,15 @@
+card navigation:
+context.push(
+  Uri(
+    path: '/home/search',
+    queryParameters: {'category': 'Excavators', 'city': 'San Francisco'},
+  ).toString(),
+);
+
+search bar navigation:
+context.push(
+  Uri(
+    path: '/home/search',
+    queryParameters: {'q': _searchController.text},
+  ).toString(),
+);
