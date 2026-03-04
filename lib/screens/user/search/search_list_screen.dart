@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:prokat/models/equipment_item.dart';
+import 'package:prokat/models/equipment.dart';
 import 'package:prokat/screens/user/search/equipment_card.dart';
 
 class SearchListScreen extends StatefulWidget {
@@ -17,7 +17,7 @@ class SearchListScreen extends StatefulWidget {
 class _SearchListScreenState extends State<SearchListScreen> {
   final ScrollController _scrollController = ScrollController();
 
-  final List<EquipmentItem> _items = [];
+  final List _items = [];
   bool _isLoading = false;
   int _currentPage = 1;
 
@@ -38,16 +38,20 @@ class _SearchListScreenState extends State<SearchListScreen> {
     // Simulate network delay
     await Future.delayed(const Duration(seconds: 2));
 
-    List<EquipmentItem> newItems = List.generate(10, (i) {
+    List newItems = List.generate(10, (i) {
       int itemNum = ((_currentPage - 1) * 10) + i + 1;
-      return EquipmentItem(
+      return EquipmentModel(
+        id: "$itemNum",
         name: "Heavy Duty Excavator",
         model: "CAT 320EL $itemNum",
-        price: "\$${(350 + i * 5)}/day",
+        price: 350, //"\$${(350 + i * 5)}/day",
         location: widget.city ?? 'Site A, Kulsary', // Uses the passed city
         owner: "Smith & Co.",
-        capacity: "20 Ton Capacity",
-        imageUrl: "https://picsum.photos/200",
+        capacity: 20, //"20 Ton Capacity",
+        imageUrl: "assets/images/categories/septic_truck.jpg",
+        available: true,
+        latitude: 0,
+        longitude: 0,
       );
     });
 
@@ -101,6 +105,13 @@ class _SearchListScreenState extends State<SearchListScreen> {
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(20),
                   ),
+                ),
+
+                //  Map Shortcut Button
+                IconButton(
+                  icon: const Icon(Icons.map_outlined, color: Colors.blue),
+                  tooltip: "View on Map",
+                  onPressed: () => context.push('/search/map'),
                 ),
 
                 // 2. Category Filter (e.g., Forklifts)

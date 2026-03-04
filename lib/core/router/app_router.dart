@@ -11,8 +11,8 @@ import 'package:prokat/screens/user/landing/landing_screen.dart';
 
 // User
 import 'package:prokat/screens/user/main/main_screen.dart';
+import 'package:prokat/screens/user/map/map_screen.dart';
 import 'package:prokat/screens/user/search/search_list_screen.dart';
-import 'package:prokat/screens/user/search/search_map_screen.dart';
 import 'package:prokat/screens/user/equipment/equipment_id_screen.dart';
 import 'package:prokat/screens/user/booking/booking_screen.dart';
 import 'package:prokat/screens/user/booking/my_rentals_screen.dart';
@@ -80,7 +80,7 @@ final GoRouter appRouter = GoRouter(
             ),
             GoRoute(
               path: AppRoutes.searchMap,
-              builder: (_, _) => const SearchMapScreen(),
+              builder: (context, state) => const MapScreen(),
             ),
             GoRoute(
               path: '/equipment/:id',

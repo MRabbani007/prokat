@@ -1,10 +1,10 @@
 // In your search page (or main page), replace the 'EquipmentListTile' with this:
 
 import 'package:flutter/material.dart';
-import 'package:prokat/models/equipment_item.dart';
+import 'package:prokat/models/equipment.dart';
 
 class EquipmentCard extends StatelessWidget {
-  final EquipmentItem item;
+  final EquipmentModel item;
   final VoidCallback onTap;
 
   const EquipmentCard({super.key, required this.item, required this.onTap});
@@ -63,7 +63,7 @@ class EquipmentCard extends StatelessWidget {
                         ),
                       ),
                       Text(
-                        item.price,
+                        item.price.toString(),
                         style: const TextStyle(
                           fontSize: 18.0,
                           fontWeight: FontWeight.bold,
@@ -87,7 +87,10 @@ class EquipmentCard extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       _buildInfoChip(Icons.location_on, item.location),
-                      _buildInfoChip(Icons.straighten, item.capacity),
+                      _buildInfoChip(
+                        Icons.straighten,
+                        item.capacity.toString(),
+                      ),
                     ],
                   ),
                   const SizedBox(height: 12.0),

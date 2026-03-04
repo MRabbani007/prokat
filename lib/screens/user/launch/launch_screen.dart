@@ -40,7 +40,7 @@ class _LaunchScreenState extends State<LaunchScreen>
 
     // Navigate after splash
     Future.delayed(const Duration(seconds: 3), () {
-      if (mounted) context.go(AppRoutes.main);
+      if (mounted) context.go(AppRoutes.searchMap);
     });
   }
 

@@ -5,6 +5,8 @@ class EquipmentIdScreen extends StatelessWidget {
   final String equipmentId;
   const EquipmentIdScreen({super.key, required this.equipmentId});
 
+  final bool useLocalImage = true;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -22,10 +24,12 @@ class EquipmentIdScreen extends StatelessWidget {
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              background: Image.network(
-                "https://picsum.photos/200",
-                fit: BoxFit.cover,
-              ),
+              background: useLocalImage
+                  ? Image.asset(
+                      'assets/images/categories/excavator.png',
+                      fit: BoxFit.cover,
+                    )
+                  : Image.network('', fit: BoxFit.cover),
             ),
           ),
 

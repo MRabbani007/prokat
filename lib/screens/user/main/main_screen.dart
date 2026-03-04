@@ -55,13 +55,13 @@ class MainScreen extends StatelessWidget {
             const EquipmentCard(
               name: "Caterpillar 320 Excavator",
               price: "\$450/day",
-              imageUrl: "https://picsum.photos/200",
+              imageUrl: "assets/images/categories/septic_truck.jpg",
               rating: "4.8",
             ),
             const EquipmentCard(
               name: "JLG 450AJ Boom Lift",
               price: "\$220/day",
-              imageUrl: "https://picsum.photos/200",
+              imageUrl: "assets/images/categories/septic_truck.jpg",
               rating: "4.5",
             ),
           ],
@@ -139,7 +139,7 @@ class EquipmentCard extends StatelessWidget {
             borderRadius: const BorderRadius.horizontal(
               left: Radius.circular(16),
             ),
-            child: Image.network(
+            child: Image.asset(
               imageUrl,
               width: 100,
               height: 100,
