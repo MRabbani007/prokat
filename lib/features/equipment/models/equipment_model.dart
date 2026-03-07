@@ -1,4 +1,9 @@
+import 'package:json_annotation/json_annotation.dart';
+part 'equipment_model.g.dart';
+
 // Placeholder for your data model - replace with your actual model
+
+@JsonSerializable()
 class EquipmentModel {
   final String id;
   final String name;
@@ -25,4 +30,9 @@ class EquipmentModel {
     required this.imageUrl,
     required this.available,
   });
+
+  factory EquipmentModel.fromJson(Map<String, dynamic> json) =>
+      _$EquipmentModelFromJson(json);
+
+  Map<String, dynamic> toJson() => _$EquipmentModelToJson(this);
 }

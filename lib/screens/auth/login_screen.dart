@@ -7,100 +7,197 @@ class LoginScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 80),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Icon(
-              Icons.precision_manufacturing_rounded,
-              size: 60,
-              color: Colors.orange,
+    return DefaultTabController(
+      length: 2,
+      child: Scaffold(
+        backgroundColor: Colors.white,
+        appBar: AppBar(
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          leading: IconButton(
+            icon: const Icon(
+              Icons.arrow_back_ios_new,
+              color: Colors.black,
+              size: 20,
             ),
-            const SizedBox(height: 32),
-            const Text(
-              "Welcome back,",
-              style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
-            ),
-            const Text(
-              "Sign in to continue renting",
-              style: TextStyle(color: Colors.grey, fontSize: 16),
-            ),
-            const SizedBox(height: 48),
-
-            TextField(
-              decoration: InputDecoration(
-                labelText: "Email Address",
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                prefixIcon: const Icon(Icons.email_outlined),
-              ),
-            ),
-            const SizedBox(height: 20),
-            TextField(
-              obscureText: true,
-              decoration: InputDecoration(
-                labelText: "Password",
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                prefixIcon: const Icon(Icons.lock_outline),
-                suffixIcon: const Icon(Icons.visibility_off_outlined),
-              ),
-            ),
-
-            Align(
-              alignment: Alignment.centerRight,
-              child: TextButton(
-                onPressed: () {},
-                child: const Text(
-                  "Forgot Password?",
-                  style: TextStyle(color: Colors.orange),
-                ),
-              ),
-            ),
-
-            const SizedBox(height: 32),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.orange,
-                minimumSize: const Size(double.infinity, 56),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-              ),
-              onPressed: () => context.go(AppRoutes.main), // Navigate to Home
-              child: const Text(
-                "SIGN IN",
-                style: TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-
-            const SizedBox(height: 24),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Text("Don't have an account?"),
-                TextButton(
-                  onPressed: () => context.push(AppRoutes.register),
-                  child: const Text(
-                    "Register",
-                    style: TextStyle(
-                      color: Colors.orange,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ],
+            onPressed: () {
+              if (context.canPop()) {
+                context.pop();
+              } else {
+                // Fallback if there is no history, e.g., go to a specific route
+                context.push(AppRoutes.login);
+              }
+            },
+          ),
         ),
+        body: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 24),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                "Welcome Back",
+                style: TextStyle(
+                  fontSize: 32,
+                  fontWeight: FontWeight.bold,
+                  letterSpacing: -1,
+                ),
+              ),
+              const Text(
+                "Pick up where you left off",
+                style: TextStyle(color: Colors.grey, fontSize: 16),
+              ),
+              const SizedBox(height: 32),
+
+              // Segmented Control Style TabBar
+              Container(
+                height: 50,
+                padding: const EdgeInsets.all(4),
+                decoration: BoxDecoration(
+                  color: Colors.grey[100],
+                  borderRadius: BorderRadius.circular(14),
+                ),
+                child: TabBar(
+                  indicator: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(10),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.05),
+                        blurRadius: 10,
+                      ),
+                    ],
+                  ),
+                  labelColor: Colors.black,
+                  unselectedLabelColor: Colors.grey,
+                  indicatorSize: TabBarIndicatorSize.tab,
+                  tabs: const [
+                    Tab(text: "Phone"),
+                    Tab(text: "Username"),
+                  ],
+                ),
+              ),
+
+              Expanded(
+                child: TabBarView(
+                  children: [
+                    _buildPhoneLogin(context),
+                    _buildUserLogin(context),
+                  ],
+                ),
+              ),
+
+              // Sign Up Link
+              Padding(
+                padding: const EdgeInsets.only(bottom: 40),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Text("New to Prokat? "),
+                    GestureDetector(
+                      onTap: () => context.pop(), // Goes back to Register
+                      child: const Text(
+                        "Create Account",
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: Colors.blueAccent,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  // PHONE LOGIN VIEW
+  Widget _buildPhoneLogin(BuildContext context) {
+    return Column(
+      children: [
+        const SizedBox(height: 40),
+        _buildLoginField(
+          "Phone Number",
+          Icons.phone_android_outlined,
+          prefixText: "+1 ",
+        ),
+        const SizedBox(height: 24),
+        _buildActionButton(
+          "CONTINUE WITH OTP",
+          () => context.push('/otp-verification'),
+        ),
+      ],
+    );
+  }
+
+  // USERNAME LOGIN VIEW
+  Widget _buildUserLogin(BuildContext context) {
+    return SingleChildScrollView(
+      child: Column(
+        children: [
+          const SizedBox(height: 40),
+          _buildLoginField("Username or Email", Icons.alternate_email),
+          const SizedBox(height: 16),
+          _buildLoginField("Password", Icons.lock_outline, isPassword: true),
+          Align(
+            alignment: Alignment.centerRight,
+            child: TextButton(
+              onPressed: () {},
+              child: const Text(
+                "Forgot Password?",
+                style: TextStyle(color: Colors.grey),
+              ),
+            ),
+          ),
+          const SizedBox(height: 16),
+          _buildActionButton("SIGN IN", () => context.push(AppRoutes.main)),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildLoginField(
+    String label,
+    IconData icon, {
+    bool isPassword = false,
+    String? prefixText,
+  }) {
+    return TextField(
+      obscureText: isPassword,
+      decoration: InputDecoration(
+        labelText: label,
+        prefixText: prefixText,
+        prefixIcon: Icon(icon, size: 20, color: Colors.black87),
+        filled: true,
+        fillColor: Colors.grey[50],
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(16),
+          borderSide: BorderSide(color: Colors.grey[200]!),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(16),
+          borderSide: const BorderSide(color: Colors.black, width: 1.5),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildActionButton(String text, VoidCallback onPressed) {
+    return ElevatedButton(
+      style: ElevatedButton.styleFrom(
+        backgroundColor: Colors.black,
+        foregroundColor: Colors.white,
+        minimumSize: const Size(double.infinity, 60),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        elevation: 0,
+      ),
+      onPressed: onPressed,
+      child: Text(
+        text,
+        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
       ),
     );
   }

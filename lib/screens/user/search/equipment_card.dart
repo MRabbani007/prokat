@@ -1,7 +1,7 @@
 // In your search page (or main page), replace the 'EquipmentListTile' with this:
 
 import 'package:flutter/material.dart';
-import 'package:prokat/models/equipment.dart';
+import 'package:prokat/features/equipment/models/equipment_model.dart';
 
 class EquipmentCard extends StatelessWidget {
   final EquipmentModel item;

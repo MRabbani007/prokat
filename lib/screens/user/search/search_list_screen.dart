@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:prokat/models/equipment.dart';
+import 'package:prokat/features/equipment/models/equipment_model.dart';
 import 'package:prokat/screens/user/search/equipment_card.dart';
 
 class SearchListScreen extends StatefulWidget {

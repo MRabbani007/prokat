@@ -1,23 +1,29 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:prokat/core/router/app_routes.dart';
+import 'package:prokat/features/auth/providers/auth_provider.dart';
+import 'package:prokat/features/auth/providers/auth_state.dart';
 
-class SidebarDrawer extends StatelessWidget {
+class SidebarDrawer extends ConsumerWidget {
   const SidebarDrawer({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final auth = ref.watch(authProvider);
+
+    final isLoggedIn = auth.status == AuthStatus.authenticated;
+    final user = auth.session?.user;
+
     return Drawer(
-      // Changed to a clean light background to match the main pages
       backgroundColor: Colors.white,
       child: Column(
         children: [
-          // 1. Branding Header
-          _buildHeader(),
+          _buildHeader(isLoggedIn, user?.displayName, user?.username),
 
           const SizedBox(height: 12),
 
-          // 2. Navigation Items
+          /// MAIN NAVIGATION
           _item(
             context,
             icon: Icons.home_rounded,
@@ -38,35 +44,72 @@ class SidebarDrawer extends StatelessWidget {
           ),
           _item(
             context,
-            icon: Icons.local_shipping_rounded, // Changed for "Rentals" feel
+            icon: Icons.local_shipping_rounded,
             label: 'My Rentals',
             route: AppRoutes.myRentals,
           ),
 
           const Spacer(),
-
           const Divider(height: 1, color: Colors.black12),
 
-          // 3. Footer Items
-          _item(
-            context,
-            icon: Icons.person_rounded,
-            label: 'Profile',
-            route: AppRoutes.profile,
-          ),
-          _item(
-            context,
-            icon: Icons.settings_rounded,
-            label: 'Settings',
-            route: AppRoutes.settings,
-          ),
+          /// AUTH AREA
+          if (isLoggedIn) ...[
+            _item(
+              context,
+              icon: Icons.person_rounded,
+              label: 'Profile',
+              route: AppRoutes.profile,
+            ),
+            _item(
+              context,
+              icon: Icons.settings_rounded,
+              label: 'Settings',
+              route: AppRoutes.settings,
+            ),
+
+            /// LOGOUT
+            ListTile(
+              leading: const Icon(Icons.logout_rounded, color: Colors.red),
+              title: const Text(
+                'Logout',
+                style: TextStyle(
+                  fontWeight: FontWeight.w600,
+                  color: Colors.red,
+                ),
+              ),
+              onTap: () async {
+                Navigator.pop(context);
+
+                await ref.read(authProvider.notifier).logout();
+
+                if (context.mounted) {
+                  context.go(AppRoutes.login);
+                }
+              },
+            ),
+          ] else ...[
+            _item(
+              context,
+              icon: Icons.login_rounded,
+              label: 'Sign In',
+              route: AppRoutes.login,
+            ),
+            _item(
+              context,
+              icon: Icons.rocket_launch_rounded,
+              label: 'Get Started',
+              route: AppRoutes.register,
+            ),
+          ],
+
           const SizedBox(height: 12),
         ],
       ),
     );
   }
 
-  Widget _buildHeader() {
+  /// HEADER
+  Widget _buildHeader(bool isLoggedIn, String? name, String? username) {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.only(top: 60, bottom: 24, left: 20, right: 20),
@@ -79,7 +122,7 @@ class SidebarDrawer extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Dummy Logo
+          /// APP ICON
           Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
@@ -92,8 +135,10 @@ class SidebarDrawer extends StatelessWidget {
               size: 32,
             ),
           ),
+
           const SizedBox(height: 16),
-          // App Name
+
+          /// APP NAME
           const Text(
             'PROKAT',
             style: TextStyle(
@@ -103,26 +148,42 @@ class SidebarDrawer extends StatelessWidget {
               color: Colors.black87,
             ),
           ),
-          const Text(
-            'Heavy Equipment Rentals',
-            style: TextStyle(
-              fontSize: 12,
-              color: Colors.grey,
-              fontWeight: FontWeight.w500,
+
+          const SizedBox(height: 6),
+
+          /// USER INFO
+          if (isLoggedIn) ...[
+            Text(
+              name ?? "User",
+              style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
             ),
-          ),
+            if (username != null)
+              Text(
+                "@$username",
+                style: const TextStyle(fontSize: 12, color: Colors.grey),
+              ),
+          ] else ...[
+            const Text(
+              'Heavy Equipment Rentals',
+              style: TextStyle(
+                fontSize: 12,
+                color: Colors.grey,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ],
         ],
       ),
     );
   }
 
+  /// NAV ITEM
   Widget _item(
     BuildContext context, {
     required IconData icon,
     required String label,
     required String route,
   }) {
-    // Check if this is the current route to highlight it (Optional logic)
     return ListTile(
       leading: Icon(icon, color: Colors.orange, size: 24),
       title: Text(
@@ -133,11 +194,10 @@ class SidebarDrawer extends StatelessWidget {
           fontSize: 15,
         ),
       ),
-      // Added a subtle hover/press color
-      hoverColor: Colors.orange.withOpacity(0.1),
+      hoverColor: Colors.orange.withAlpha(10),
       onTap: () {
-        Navigator.pop(context); // close drawer
-        context.go(route);
+        Navigator.pop(context);
+        context.push(route);
       },
     );
   }

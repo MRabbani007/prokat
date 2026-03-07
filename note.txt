@@ -13,3 +13,19 @@ context.push(
     queryParameters: {'q': _searchController.text},
   ).toString(),
 );
+
+API communication
+Auth session management
+Local persistence
+State management
+Offline/refresh logic
+
+flutter pub run build_runner build --delete-conflicting-outputs
+flutter pub run build_runner watch --delete-conflicting-outputs
+
+dart run build_runner watch --delete-conflicting-outputs
+
+
+DTO + Domain Model pattern with typed API envelopes
+
+Riverpod + Repository + Controller pattern

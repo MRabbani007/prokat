@@ -1,4 +1,4 @@
-import "../models/equipment.dart";
+import "../features/equipment/models/equipment_model.dart";
 
 const mockEquipment = [
   EquipmentModel(

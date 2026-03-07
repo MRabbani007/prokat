@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../../../../models/equipment.dart';
+import '../../../../features/equipment/models/equipment_model.dart';
 import 'package:go_router/go_router.dart';
 
 class EquipmentSheet extends StatelessWidget {

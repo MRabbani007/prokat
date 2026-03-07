@@ -4,7 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:geolocator/geolocator.dart' as geo;
 import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart';
 import 'package:prokat/data/mock_equipment.dart';
-import '../../../models/equipment.dart';
+import '../../../features/equipment/models/equipment_model.dart';
 import 'widgets/equipment_sheet.dart';
 import 'widgets/map_controls.dart';
 
