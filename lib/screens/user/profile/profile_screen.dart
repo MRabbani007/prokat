@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:prokat/features/auth/widgets/logout_button.dart';
 
 // [Full implementation code provided in source 1.1.6]
 class ProfileScreen extends StatelessWidget {
@@ -18,12 +19,7 @@ class ProfileScreen extends StatelessWidget {
             _buildSectionHeader("Payment Methods"),
             _buildProfileTile(Icons.credit_card, "Saved Card", "**** 4421"),
             _buildSectionHeader("Support"),
-            _buildProfileTile(
-              Icons.logout,
-              "Logout",
-              "Sign out",
-              textColor: Colors.red,
-            ),
+            LogoutButton(),
           ],
         ),
       ),

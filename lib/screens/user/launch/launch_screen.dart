@@ -83,15 +83,15 @@ class _LaunchScreenState extends State<LaunchScreen>
                       height: 120,
                       width: 120,
                       decoration: BoxDecoration(
-                        color: Colors.orange.withOpacity(0.1),
+                        color: Colors.orange.withAlpha(10),
                         shape: BoxShape.circle,
                         border: Border.all(
-                          color: Colors.orange.withOpacity(0.5),
+                          color: Colors.orange.withAlpha(50),
                           width: 2,
                         ),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.orange.withOpacity(0.2),
+                            color: Colors.orange.withAlpha(20),
                             blurRadius: 30,
                             spreadRadius: 5,
                           ),
@@ -149,7 +149,7 @@ class _LaunchScreenState extends State<LaunchScreen>
                   child: LinearProgressIndicator(
                     backgroundColor: Colors.white10,
                     valueColor: AlwaysStoppedAnimation<Color>(
-                      Colors.orange.withOpacity(0.8),
+                      Colors.orange.withAlpha(80),
                     ),
                     minHeight: 2,
                   ),
@@ -159,7 +159,7 @@ class _LaunchScreenState extends State<LaunchScreen>
                   'SYNCING INVENTORY...',
                   style: TextStyle(
                     fontSize: 10,
-                    color: Colors.white.withOpacity(0.3),
+                    color: Colors.white.withAlpha(30),
                     letterSpacing: 2,
                   ),
                 ),

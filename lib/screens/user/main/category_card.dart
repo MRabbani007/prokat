@@ -24,7 +24,7 @@ class CategoryCard extends StatelessWidget {
                 height: 72, // 👈 image limit only
                 category.imagePath,
                 fit: BoxFit.contain,
-                errorBuilder: (_, __, ___) => const Icon(
+                errorBuilder: (_, _, _) => const Icon(
                   Icons.image_not_supported,
                   size: 48,
                   color: Colors.grey,

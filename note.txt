@@ -53,6 +53,19 @@ Owner vs user role visibility
 2️⃣ Build EquipmentPreviewSheet (Book / Request buttons)
 3️⃣ Wire capacity filters → map markers
 
-Auth
+Auth:
 3️⃣ Add deep-link support
 4️⃣ Add token expiration auto-logout
+
+If you want, I can also show a very slick OTP UX used by Uber / WhatsApp style apps, including:
+auto-focus OTP boxes
+auto SMS reading
+resend countdown
+paste OTP support
+
+Owner:
+EquipmentCard
+RequestCard
+BookingCard
+PriceDisplay
+EquipmentStatusBadge

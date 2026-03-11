@@ -170,7 +170,7 @@ class _MobileMapScreenState extends ConsumerState<MobileMapScreen> {
           ),
           iconImage: 'equipment-icon',
           iconSize: iconSizeForZoom(_zoom),
-          iconOpacity: equipment.status == EquipmentStatus.AVAILABLE
+          iconOpacity: equipment.status == EquipmentStatus.available
               ? 1.0
               : 0.5,
           customData: {'id': equipment.id},

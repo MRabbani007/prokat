@@ -13,6 +13,7 @@ class AuthSecureStorage {
 
   Future<AuthSession?> readSession() async {
     final value = await _storage.read(key: _key);
+
     if (value == null) return null;
 
     return AuthSession.fromJson(jsonDecode(value));

@@ -64,7 +64,7 @@ class MyRentalsScreen extends StatelessWidget {
                 leading: Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: Colors.orange.withOpacity(0.1),
+                    color: Colors.orange.withAlpha(10),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: const Icon(Icons.local_shipping, color: Colors.orange),

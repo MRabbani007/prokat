@@ -8,7 +8,7 @@ class RegisterTabViews extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return TabBarView(
-      children: [RegisterWithUsernameForm(), RegisterWithPhoneForm()],
+      children: [RegisterWithPhoneForm(), RegisterWithUsernameForm()],
     );
   }
 }

@@ -1,13 +1,14 @@
 // features/equipment/models/equipment.dart
 
 import 'package:prokat/features/equipment/models/equipment_location.dart';
+import 'package:prokat/features/equipment/models/price_entry_model.dart';
 
-enum EquipmentStatus { AVAILABLE, UNAVAILABLE, BOOKED }
+enum EquipmentStatus { available, unavailable, booked }
 
 EquipmentStatus equipmentStatusFromString(String value) {
   return EquipmentStatus.values.firstWhere(
     (e) => e.name == value,
-    orElse: () => EquipmentStatus.AVAILABLE,
+    orElse: () => EquipmentStatus.available,
   );
 }
 
@@ -21,6 +22,8 @@ class Equipment {
   final EquipmentStatus status;
   final bool isVisible;
   final String ownerId;
+  final String? imageUrl;
+  final List<PriceEntry> prices;
 
   final List<EquipmentLocation> locations;
 
@@ -32,10 +35,28 @@ class Equipment {
     this.ownerComment,
     required this.rentCondition,
     required this.status,
+    required this.imageUrl,
     required this.isVisible,
     required this.ownerId,
     required this.locations,
+    required this.prices,
   });
+
+  Map<String, dynamic> toJson() {
+    return {
+      "id": id,
+      "name": name,
+      "model": model,
+      "capacity": capacity,
+      "ownerComment": ownerComment,
+      "rentCondition": rentCondition,
+      "status": status.name,
+      "imageUrl": imageUrl,
+      "isVisible": isVisible,
+      "ownerId": ownerId,
+      // "locations": locations.map((e) => e.toJson()).toList(),
+    };
+  }
 
   factory Equipment.fromJson(Map<String, dynamic> json) {
     return Equipment(
@@ -46,6 +67,8 @@ class Equipment {
       ownerComment: json["ownerComment"],
       rentCondition: json["rentCondition"],
       status: equipmentStatusFromString(json["status"]),
+      prices: [],
+      imageUrl: json["imageUrl"],
       isVisible: json["isVisible"],
       ownerId: json["ownerId"],
 

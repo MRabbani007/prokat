@@ -32,7 +32,7 @@ class _BookingScreenState extends State<BookingScreen> {
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: Colors.orange.withOpacity(0.1),
+                color: Colors.orange.withAlpha(10),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Row(
@@ -94,7 +94,7 @@ class _BookingScreenState extends State<BookingScreen> {
               title: const Text("Request Site Delivery"),
               subtitle: const Text("Additional \$150.00 for transport"),
               value: _includeDelivery,
-              activeColor: Colors.orange,
+              activeThumbColor: Colors.orange,
               onChanged: (val) => setState(() => _includeDelivery = val),
             ),
             const Divider(height: 40),

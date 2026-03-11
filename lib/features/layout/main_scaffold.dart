@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:prokat/features/navigation/main_app_bar.dart';
-import 'package:prokat/features/navigation/sidebar_drawer.dart';
+import 'package:prokat/features/navigation/sidebar/sidebar_drawer.dart';
 
 class MainScaffold extends StatelessWidget {
   final StatefulNavigationShell navigationShell;

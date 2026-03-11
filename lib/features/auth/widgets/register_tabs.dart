@@ -22,8 +22,8 @@ class RegisterTabs extends StatelessWidget {
         unselectedLabelColor: Colors.grey,
         dividerColor: Colors.transparent,
         tabs: const [
-          Tab(text: 'Username'),
           Tab(text: 'Phone'),
+          Tab(text: 'Username'),
         ],
       ),
     );

@@ -102,7 +102,7 @@ class CategoryCard extends StatelessWidget {
         children: [
           CircleAvatar(
             radius: 30,
-            backgroundColor: Colors.orange.withOpacity(0.1),
+            backgroundColor: Colors.orange.withAlpha(10),
             child: Icon(icon, color: Colors.orange),
           ),
           const SizedBox(height: 8),
@@ -130,7 +130,7 @@ class EquipmentCard extends StatelessWidget {
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
-          BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10),
+          BoxShadow(color: Colors.black.withAlpha(5), blurRadius: 10),
         ],
       ),
       child: Row(

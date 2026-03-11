@@ -14,6 +14,10 @@ import 'package:prokat/features/layout/main_scaffold.dart';
 /// screens
 import 'package:prokat/features/auth/screens/forgot_password_screen.dart';
 import 'package:prokat/features/auth/screens/login_screen.dart';
+import 'package:prokat/features/owner/equipment/screens/edit_equipment_screen.dart';
+import 'package:prokat/features/owner/equipment/screens/equipment_detail_screen.dart';
+import 'package:prokat/features/owner/equipment/screens/owner_equipment_create.dart';
+import 'package:prokat/features/owner/equipment/screens/owner_equipment_list_screen.dart';
 import 'package:prokat/screens/user/launch/launch_screen.dart';
 import 'package:prokat/screens/user/landing/landing_screen.dart';
 
@@ -26,10 +30,6 @@ import 'package:prokat/screens/user/profile/profile_screen.dart';
 import 'package:prokat/screens/user/settings/settings_screen.dart';
 
 import 'package:prokat/screens/owner/dashboard/owner_dashboard_screen.dart';
-import 'package:prokat/screens/owner/equipment/owner_equipment_screen.dart';
-import 'package:prokat/screens/owner/equipment/owner_equipment_new.dart';
-import 'package:prokat/screens/owner/equipment/owner_equipment_id_screen.dart';
-import 'package:prokat/screens/owner/equipment/owner_equipment_id_edit_screen.dart';
 import 'package:prokat/screens/owner/booking/owner_booking_screen.dart';
 import 'package:prokat/screens/owner/profile/owner_profile_screen.dart';
 import 'package:prokat/screens/owner/settings/owner_settings_screen.dart';
@@ -184,19 +184,25 @@ GoRouter createRouter(WidgetRef ref) {
               ),
               GoRoute(
                 path: AppRoutes.ownerEquiment,
-                builder: (_, _) => const OwnerEquipmentScreen(),
+                builder: (_, _) => const OwnerEquipmentListScreen(),
               ),
               GoRoute(
-                path: AppRoutes.ownerEquimentNew,
-                builder: (_, _) => const OwnerEquipmentNew(),
+                path: AppRoutes.ownerEquimentCreate,
+                builder: (_, _) => const CreateEquipmentScreen(),
               ),
               GoRoute(
                 path: AppRoutes.ownerEquimentId,
-                builder: (_, _) => OwnerEquipmentIdScreen(),
+                builder: (context, state) {
+                  final id = state.pathParameters['id']!;
+                  return OwnerEquipmentDetailScreen(equipmentId: id);
+                },
               ),
               GoRoute(
                 path: AppRoutes.ownerEquimentIdEdit,
-                builder: (_, _) => OwnerEquipmentIdEditScreen(),
+                builder: (context, state) {
+                  final id = state.pathParameters['id']!;
+                  return EditEquipmentScreen(equipmentId: id);
+                },
               ),
               GoRoute(
                 path: AppRoutes.ownerBookings,

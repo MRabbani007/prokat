@@ -24,11 +24,16 @@ class AppRoutes {
 
   // Owner Screens
   // prefixed with /owner
-  static const String ownerDashboard = '/dashboard';
-  static const String ownerEquiment = '/owner/equipment';
+  static const String ownerDashboard = '/owner/dashboard';
+
+  static const String ownerEquiment = '/owner/equipment/list';
+  static const String ownerEquimentMap = '/owner/equipment/map';
   static const String ownerEquimentId = '/owner/equipment/:id';
-  static const String ownerEquimentIdEdit = '/owner/equipment/edit/id';
-  static const String ownerEquimentNew = '/owner/equipment/new';
+  static const String ownerEquimentIdEdit = '/owner/equipment/:id/edit';
+  static const String ownerEquimentCreate = '/owner/equipment/create';
+
+  static const String ownerRequests = '/owner/requests';
+
   static const String ownerBookings = '/bookings';
 
   static const String ownerProfile = '/profile';

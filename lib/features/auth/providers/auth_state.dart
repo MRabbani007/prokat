@@ -1,4 +1,6 @@
-import '../models/auth_session.dart';
+
+
+import 'package:prokat/features/auth/models/auth_session.dart';
 
 class AuthState {
   final AuthSession? session;

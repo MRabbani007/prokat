@@ -1,11 +1,11 @@
 // features/equipment/models/price_entry.dart
 
-enum PriceRate { PER_TRIP, PER_DAY, PER_HOUR }
+enum PriceRate { perTrip, perDay, perHour }
 
 PriceRate priceRateFromString(String value) {
   return PriceRate.values.firstWhere(
     (e) => e.name == value,
-    orElse: () => PriceRate.PER_DAY,
+    orElse: () => PriceRate.perDay,
   );
 }
 

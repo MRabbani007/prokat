@@ -1,12 +1,12 @@
 import 'package:dio/dio.dart';
-import '../storage/secure_storage.dart';
+import 'package:prokat/features/auth/services/auth_secure_storage.dart';
 import '../config/env.dart';
 import 'api_interceptor.dart';
 
 class ApiClient {
   late final Dio dio;
 
-  ApiClient(SecureStorage secureStorage) {
+  ApiClient(AuthSecureStorage secureStorage) {
     dio = Dio(
       BaseOptions(
         baseUrl: Env.baseUrl,
