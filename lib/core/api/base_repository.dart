@@ -23,4 +23,14 @@ abstract class BaseRepository {
       return ApiResponse.error(e.toString());
     }
   }
+
+  Future<T> execute<T>(Future<T> Function() request) async {
+    try {
+      return await request();
+    } on DioException catch (e) {
+      throw ApiException.fromDio(e);
+    } catch (e) {
+      throw ApiException(message: "Unexpected error");
+    }
+  }
 }

@@ -1,17 +1,19 @@
-import 'package:prokat/features/auth/models/auth_session.dart';
-
-enum AuthStatus { unknown, authenticated, unauthenticated, loading }
+import '../models/auth_session.dart';
 
 class AuthState {
-  final AuthStatus status;
   final AuthSession? session;
+  final bool isLoading;
+  final String? error;
 
-  const AuthState({required this.status, this.session});
+  const AuthState({this.session, this.isLoading = false, this.error});
 
-  AuthState copyWith({AuthStatus? status, AuthSession? session}) {
+  bool get isAuthenticated => session != null;
+
+  AuthState copyWith({AuthSession? session, bool? isLoading, String? error}) {
     return AuthState(
-      status: status ?? this.status,
       session: session ?? this.session,
+      isLoading: isLoading ?? this.isLoading,
+      error: error,
     );
   }
 }

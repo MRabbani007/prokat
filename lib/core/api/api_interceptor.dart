@@ -25,8 +25,8 @@ class ApiInterceptor extends Interceptor {
       }
 
       // JSON headers
-      options.headers["Content-Type"] = "application/json";
-      options.headers["Accept"] = "application/json";
+      options.headers.putIfAbsent("Content-Type", () => "application/json");
+      options.headers.putIfAbsent("Accept", () => "application/json");
 
       handler.next(options);
     } catch (e) {

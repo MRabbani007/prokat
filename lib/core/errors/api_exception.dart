@@ -7,6 +7,15 @@ class ApiException implements Exception {
 
   ApiException({required this.message, this.statusCode, this.data});
 
+  bool get isAuthError => statusCode == 401;
+
+  static String _extractMessage(dynamic data, String fallback) {
+    if (data is Map && data["message"] != null) {
+      return data["message"];
+    }
+    return fallback;
+  }
+
   @override
   String toString() {
     return "ApiException: $message (statusCode: $statusCode)";
@@ -16,6 +25,25 @@ class ApiException implements Exception {
   factory ApiException.fromDio(DioException error) {
     final statusCode = error.response?.statusCode;
     final data = error.response?.data;
+
+    switch (error.type) {
+      case DioExceptionType.connectionTimeout:
+      case DioExceptionType.sendTimeout:
+      case DioExceptionType.receiveTimeout:
+        return ApiException(message: "Connection timeout");
+
+      case DioExceptionType.connectionError:
+        return ApiException.network();
+
+      case DioExceptionType.badResponse:
+        break; // continue to statusCode switch
+
+      case DioExceptionType.cancel:
+        return ApiException(message: "Request cancelled");
+
+      default:
+        return ApiException(message: error.message ?? "Unknown network error");
+    }
 
     switch (statusCode) {
       case 400:
@@ -50,7 +78,7 @@ class ApiException implements Exception {
     }
   }
 
-  /// Factories
+  // Factories
 
   factory ApiException.badRequest(dynamic data) {
     return ApiException(message: "Bad request", statusCode: 400, data: data);
@@ -73,7 +101,11 @@ class ApiException implements Exception {
   }
 
   factory ApiException.conflict(dynamic data) {
-    return ApiException(message: "Conflict", statusCode: 409, data: data);
+    return ApiException(
+      message: _extractMessage(data, "Conflict"),
+      statusCode: 409,
+      data: data,
+    );
   }
 
   factory ApiException.validation(dynamic data) {

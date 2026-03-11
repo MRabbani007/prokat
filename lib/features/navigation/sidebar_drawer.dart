@@ -1,25 +1,29 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+
 import 'package:prokat/core/router/app_routes.dart';
 import 'package:prokat/features/auth/providers/auth_provider.dart';
-import 'package:prokat/features/auth/providers/auth_state.dart';
 
 class SidebarDrawer extends ConsumerWidget {
   const SidebarDrawer({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final auth = ref.watch(authProvider);
+    final authState = ref.watch(authProvider);
 
-    final isLoggedIn = auth.status == AuthStatus.authenticated;
-    final user = auth.session?.user;
+    final isLoggedIn = authState.isAuthenticated;
+    final user = authState.session?.user;
 
     return Drawer(
       backgroundColor: Colors.white,
       child: Column(
         children: [
-          _buildHeader(isLoggedIn, user?.displayName, user?.username),
+          _buildHeader(
+            isLoggedIn: isLoggedIn,
+            username: user?.username,
+            role: user?.role,
+          ),
 
           const SizedBox(height: 12),
 
@@ -32,9 +36,15 @@ class SidebarDrawer extends ConsumerWidget {
           ),
           _item(
             context,
+            icon: Icons.category,
+            label: 'Categories',
+            route: AppRoutes.categories,
+          ),
+          _item(
+            context,
             icon: Icons.search_rounded,
             label: 'Search',
-            route: AppRoutes.searchList,
+            route: AppRoutes.searchMap,
           ),
           _item(
             context,
@@ -109,7 +119,11 @@ class SidebarDrawer extends ConsumerWidget {
   }
 
   /// HEADER
-  Widget _buildHeader(bool isLoggedIn, String? name, String? username) {
+  Widget _buildHeader({
+    required bool isLoggedIn,
+    String? username,
+    String? role,
+  }) {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.only(top: 60, bottom: 24, left: 20, right: 20),
@@ -154,12 +168,12 @@ class SidebarDrawer extends ConsumerWidget {
           /// USER INFO
           if (isLoggedIn) ...[
             Text(
-              name ?? "User",
+              username ?? 'User',
               style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
             ),
-            if (username != null)
+            if (role != null)
               Text(
-                "@$username",
+                role,
                 style: const TextStyle(fontSize: 12, color: Colors.grey),
               ),
           ] else ...[
@@ -197,7 +211,7 @@ class SidebarDrawer extends ConsumerWidget {
       hoverColor: Colors.orange.withAlpha(10),
       onTap: () {
         Navigator.pop(context);
-        context.push(route);
+        context.go(route);
       },
     );
   }

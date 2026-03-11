@@ -1,6 +1,7 @@
 class User {
   final String id;
   final String? username;
+  final String? phone;
   final String? firstName;
   final String? lastName;
   final String role;
@@ -8,6 +9,7 @@ class User {
   const User({
     required this.id,
     this.username,
+    this.phone,
     this.firstName,
     this.lastName,
     required this.role,
@@ -24,6 +26,7 @@ class User {
     return User(
       id: json['id'],
       username: json['username'],
+      phone: json['phone'],
       firstName: json['firstName'],
       lastName: json['lastName'],
       role: json['role'],

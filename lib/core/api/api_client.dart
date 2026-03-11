@@ -1,23 +1,15 @@
 import 'package:dio/dio.dart';
 import '../storage/secure_storage.dart';
+import '../config/env.dart';
 import 'api_interceptor.dart';
-import 'dart:io';
-import 'package:flutter/foundation.dart';
 
 class ApiClient {
   late final Dio dio;
 
   ApiClient(SecureStorage secureStorage) {
-    // 2026-Ready: Auto-detect environment to avoid connection errors
-    String baseUrl = "http://localhost:4000"; // Default for iOS/Desktop
-
-    if (!kIsWeb && Platform.isAndroid) {
-      baseUrl = "http://10.0.2.2:5000"; // Specific for Android Emulator
-    }
-
     dio = Dio(
       BaseOptions(
-        baseUrl: baseUrl,
+        baseUrl: Env.baseUrl,
         connectTimeout: const Duration(seconds: 15),
         receiveTimeout: const Duration(seconds: 15),
         sendTimeout: const Duration(seconds: 15),

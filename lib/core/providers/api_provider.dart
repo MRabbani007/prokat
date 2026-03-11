@@ -7,6 +7,10 @@ final secureStorageProvider = Provider<SecureStorage>((ref) {
 });
 
 final apiClientProvider = Provider<ApiClient>((ref) {
-  final storage = ref.watch(secureStorageProvider);
-  return ApiClient(storage);
+  final secureStorage = ref.watch(secureStorageProvider);
+  return ApiClient(secureStorage);
+});
+
+final dioProvider = Provider((ref) {
+  return ref.watch(apiClientProvider).dio;
 });

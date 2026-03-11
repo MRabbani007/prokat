@@ -2,21 +2,22 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:prokat/core/router/app_routes.dart';
+import 'package:prokat/core/router/refresh_stream.dart';
 import 'package:prokat/features/auth/providers/auth_provider.dart';
-import 'package:prokat/features/auth/providers/auth_state.dart';
+import 'package:prokat/features/auth/screens/register_screen.dart';
+import 'package:prokat/features/categories/screens/categories_screen.dart';
+import 'package:prokat/features/equipment/screens/equipment_list_screen.dart';
+import 'package:prokat/features/equipment/screens/equipment_map_screen.dart';
 
 import 'package:prokat/features/layout/main_scaffold.dart';
 
 /// screens
-import 'package:prokat/screens/auth/forgot_password_screen.dart';
-import 'package:prokat/screens/auth/login_screen.dart';
-import 'package:prokat/screens/auth/register/register_screen.dart';
+import 'package:prokat/features/auth/screens/forgot_password_screen.dart';
+import 'package:prokat/features/auth/screens/login_screen.dart';
 import 'package:prokat/screens/user/launch/launch_screen.dart';
 import 'package:prokat/screens/user/landing/landing_screen.dart';
 
 import 'package:prokat/screens/user/main/main_screen.dart';
-import 'package:prokat/screens/user/map/map_screen.dart';
-import 'package:prokat/screens/user/search/search_list_screen.dart';
 import 'package:prokat/screens/user/equipment/equipment_id_screen.dart';
 import 'package:prokat/screens/user/booking/booking_screen.dart';
 import 'package:prokat/screens/user/booking/my_rentals_screen.dart';
@@ -37,34 +38,47 @@ GoRouter createRouter(WidgetRef ref) {
   return GoRouter(
     initialLocation: AppRoutes.launch,
 
+    /// 🔁 REFRESH WHEN AUTH CHANGES
+    refreshListenable: GoRouterRefreshStream(
+      ref.watch(authProvider.notifier).stream,
+    ),
+
     /// 🔐 AUTH GUARD
     redirect: (context, state) {
-      final auth = ref.read(authProvider);
+      final authState = ref.read(authProvider);
+      final isLoggedIn = authState.isAuthenticated;
+      final role = authState.session?.user.role;
 
-      final loggedIn = auth.status == AuthStatus.authenticated;
-      final role = auth.session?.user.role;
+      final location = state.matchedLocation;
 
-      final location = state.uri.toString();
+      /// 🔒 ROUTES THAT REQUIRE LOGIN
+      final requiresAuth = <String>[
+        AppRoutes.profile,
+        AppRoutes.settings,
+        AppRoutes.favorites,
+        AppRoutes.myRentals,
+      ].any((path) => location.startsWith(path));
 
-      /// protect profile/settings
-      final needsUserAuth =
-          location == AppRoutes.profile || location == AppRoutes.settings;
+      /// 🔒 BOOKING (nested route)
+      final isBookingRoute = location.contains('/book');
 
-      if (needsUserAuth && !loggedIn) {
+      /// 🔒 OWNER ROUTES
+      final isOwnerRoute = location.startsWith('/owner');
+
+      /// 🔐 USER AUTH GUARD
+      if (!isLoggedIn && (requiresAuth || isBookingRoute || isOwnerRoute)) {
         return AppRoutes.login;
       }
 
-      /// protect owner routes
-      final isOwnerRoute = location.startsWith("/owner");
+      /// 🏗 OWNER ROLE GUARD
+      if (isOwnerRoute && role != 'OWNER') {
+        return AppRoutes.main;
+      }
 
-      if (isOwnerRoute) {
-        if (!loggedIn) {
-          return AppRoutes.login;
-        }
-
-        if (role != "OWNER") {
-          return AppRoutes.main;
-        }
+      /// 🚫 BLOCK AUTH SCREENS WHEN LOGGED IN
+      if (isLoggedIn &&
+          (location == AppRoutes.login || location == AppRoutes.register)) {
+        return AppRoutes.main;
       }
 
       return null;
@@ -78,17 +92,7 @@ GoRouter createRouter(WidgetRef ref) {
         builder: (_, _) => const LandingScreen(),
       ),
 
-      GoRoute(path: AppRoutes.login, builder: (_, _) => const LoginScreen()),
-      GoRoute(
-        path: AppRoutes.register,
-        builder: (_, _) => const RegisterScreen(),
-      ),
-      GoRoute(
-        path: AppRoutes.forgotPassword,
-        builder: (_, _) => const ForgotPasswordScreen(),
-      ),
-
-      /// APP LAYOUT
+      /// 🧱 MAIN APP
       StatefulShellRoute.indexedStack(
         builder: (context, state, navigationShell) {
           return MainScaffold(navigationShell: navigationShell);
@@ -98,35 +102,46 @@ GoRouter createRouter(WidgetRef ref) {
           StatefulShellBranch(
             routes: [
               GoRoute(
+                path: AppRoutes.login,
+                builder: (_, _) => const LoginScreen(),
+              ),
+              GoRoute(
+                path: AppRoutes.register,
+                builder: (_, _) => const RegisterScreen(),
+              ),
+              GoRoute(
+                path: AppRoutes.forgotPassword,
+                builder: (_, _) => const ForgotPasswordScreen(),
+              ),
+              GoRoute(
                 path: AppRoutes.main,
                 builder: (_, _) => const MainScreen(),
               ),
-
+              GoRoute(
+                path: AppRoutes.categories,
+                builder: (_, _) => const CategoriesScreen(),
+              ),
               GoRoute(
                 path: AppRoutes.searchList,
-                name: 'search',
                 builder: (context, state) {
-                  final query = state.uri.queryParameters['q'] ?? '';
+                  final q = state.uri.queryParameters['q'] ?? '';
                   final category = state.uri.queryParameters['category'] ?? '';
                   final city =
                       state.uri.queryParameters['city'] ?? 'All Locations';
 
-                  return SearchListScreen(
-                    q: query,
+                  return EquipmentListScreen(
+                    q: q,
                     category: category,
                     city: city,
                   );
                 },
               ),
-
               GoRoute(
                 path: AppRoutes.searchMap,
-                builder: (_, _) => const MapScreen(),
+                builder: (_, _) => const EquipmentMapScreen(),
               ),
-
               GoRoute(
                 path: '/equipment/:id',
-                name: 'equipment_details',
                 builder: (context, state) {
                   final id = state.pathParameters['id']!;
                   return EquipmentIdScreen(equipmentId: id);
@@ -141,23 +156,18 @@ GoRouter createRouter(WidgetRef ref) {
                   ),
                 ],
               ),
-
               GoRoute(
                 path: AppRoutes.myRentals,
                 builder: (_, _) => const MyRentalsScreen(),
               ),
-
               GoRoute(
                 path: AppRoutes.favorites,
                 builder: (_, _) => const FavoritesScreen(),
               ),
-
-              /// 🔒 PROTECTED
               GoRoute(
                 path: AppRoutes.profile,
                 builder: (_, _) => const ProfileScreen(),
               ),
-
               GoRoute(
                 path: AppRoutes.settings,
                 builder: (_, _) => const SettingsScreen(),

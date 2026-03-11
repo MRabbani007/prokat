@@ -10,10 +10,12 @@ class AppRoutes {
 
   // User Screens
   static const String main = '/main';
-  static const String searchList = '/search';
+  static const String categories = '/categories';
+  static const String searchList = '/search/list';
   static const String searchMap = '/search/map';
   static const String equipmentId = '/equipment/:id';
   static const String booking = '/equipment/:id/book';
+  static const String createRequest = '/requests/create';
   static const String myRentals = '/myrentals';
   static const String favorites = '/favorites';
 
