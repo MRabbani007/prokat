@@ -14,7 +14,9 @@ import 'package:prokat/features/layout/main_scaffold.dart';
 /// screens
 import 'package:prokat/features/auth/screens/forgot_password_screen.dart';
 import 'package:prokat/features/auth/screens/login_screen.dart';
-import 'package:prokat/features/owner/equipment/screens/edit_equipment_screen.dart';
+import 'package:prokat/features/owner/addresses/screens/owner_address_edit_screen.dart';
+import 'package:prokat/features/owner/addresses/screens/owner_addresses_screen.dart';
+import 'package:prokat/features/owner/addresses/screens/owner_select_address_screen.dart';
 import 'package:prokat/features/owner/equipment/screens/equipment_detail_screen.dart';
 import 'package:prokat/features/owner/equipment/screens/owner_equipment_create.dart';
 import 'package:prokat/features/owner/equipment/screens/owner_equipment_list_screen.dart';
@@ -197,17 +199,44 @@ GoRouter createRouter(WidgetRef ref) {
                   return OwnerEquipmentDetailScreen(equipmentId: id);
                 },
               ),
+              // 
+              // Owner Addresses
+              // 
               GoRoute(
-                path: AppRoutes.ownerEquimentIdEdit,
+                path: AppRoutes.ownerAddresses,
                 builder: (context, state) {
-                  final id = state.pathParameters['id']!;
-                  return EditEquipmentScreen(equipmentId: id);
+                  return OwnerAddressesScreen();
                 },
               ),
+              GoRoute(
+                path: AppRoutes.ownerAddressCreate,
+                builder: (context, state) {
+                  return OwnerSelectAddressScreen();
+                },
+              ),
+              GoRoute(
+                path: AppRoutes.ownerAddressSelect,
+                builder: (context, state) {
+                  return OwnerSelectAddressScreen();
+                },
+              ),
+              GoRoute(
+                path: AppRoutes.ownerAddressEdit,
+                builder: (context, state) {
+                  final id = state.pathParameters['id']!;
+                  return OwnerAddressEditScreen(id: id);
+                },
+              ),
+              // 
+              // Owner Bookings
+              // 
               GoRoute(
                 path: AppRoutes.ownerBookings,
                 builder: (_, _) => const OwnerBookingScreen(),
               ),
+              // 
+              // Owner Profile
+              // 
               GoRoute(
                 path: AppRoutes.ownerProfile,
                 builder: (_, _) => const OwnerProfileScreen(),

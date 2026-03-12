@@ -35,11 +35,7 @@ class SidebarDrawer extends ConsumerWidget {
 
           /// Dynamic menu
           for (final item in menu)
-            SidebarItem(
-              icon: item.icon,
-              label: item.label,
-              route: item.route,
-            ),
+            SidebarItem(icon: item.icon, label: item.label, route: item.route),
 
           const Spacer(),
 
@@ -47,10 +43,7 @@ class SidebarDrawer extends ConsumerWidget {
 
           /// Profile tile
           if (isLoggedIn)
-            SidebarProfileTile(
-              username: user?.username ?? 'User',
-              role: role,
-            ),
+            SidebarProfileTile(username: user?.username ?? 'User', role: role),
 
           if (isLoggedIn) const Divider(),
 

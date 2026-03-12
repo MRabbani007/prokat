@@ -1,29 +1,30 @@
-// features/equipment/models/price_entry.dart
+// enum PriceRate { PER_TRIP, PER_DAY, PER_HOUR, PER_CUBIC_METER }
 
-enum PriceRate { perTrip, perDay, perHour }
-
-PriceRate priceRateFromString(String value) {
-  return PriceRate.values.firstWhere(
-    (e) => e.name == value,
-    orElse: () => PriceRate.perDay,
-  );
-}
+// PriceRate priceRateFromString(String value) {
+//   return PriceRate.values.firstWhere(
+//     (e) => e.name == value,
+//     orElse: () => PriceRate.PER_TRIP,
+//   );
+// }
 
 class PriceEntry {
+  final String id;
   final int price;
-  final PriceRate rate;
+  final String priceRate;
   final int serviceTime;
 
   PriceEntry({
+    required this.id,
     required this.price,
-    required this.rate,
+    required this.priceRate,
     required this.serviceTime,
   });
 
   factory PriceEntry.fromJson(Map<String, dynamic> json) {
     return PriceEntry(
+      id: json["id"],
       price: json["price"],
-      rate: priceRateFromString(json["priceRate"]),
+      priceRate: json["priceRate"],
       serviceTime: json["serviceTime"] ?? 0,
     );
   }

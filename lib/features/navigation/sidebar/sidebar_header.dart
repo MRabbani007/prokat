@@ -19,8 +19,7 @@ class SidebarHeader extends StatelessWidget {
           bottom: BorderSide(color: Colors.black12, width: 0.5),
         ),
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      child: Row(
         children: [
           /// APP ICON
           Container(
@@ -36,25 +35,15 @@ class SidebarHeader extends StatelessWidget {
             ),
           ),
 
-          const SizedBox(height: 16),
+          const SizedBox(width: 12),
 
           /// APP NAME
           const Text(
             'PROKAT',
             style: TextStyle(
-              fontSize: 24,
+              fontSize: 22,
               fontWeight: FontWeight.bold,
               letterSpacing: 2,
-            ),
-          ),
-
-          const SizedBox(height: 6),
-
-          const Text(
-            'Heavy Equipment Rentals',
-            style: TextStyle(
-              fontSize: 12,
-              color: Colors.grey,
             ),
           ),
         ],

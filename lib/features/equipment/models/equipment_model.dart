@@ -19,7 +19,7 @@ class Equipment {
   final String capacity;
   final String? ownerComment;
   final String rentCondition;
-  final EquipmentStatus status;
+  final String status;
   final bool isVisible;
   final String ownerId;
   final String? imageUrl;
@@ -50,7 +50,7 @@ class Equipment {
       "capacity": capacity,
       "ownerComment": ownerComment,
       "rentCondition": rentCondition,
-      "status": status.name,
+      "status": status,
       "imageUrl": imageUrl,
       "isVisible": isVisible,
       "ownerId": ownerId,
@@ -66,8 +66,10 @@ class Equipment {
       capacity: json["capacity"],
       ownerComment: json["ownerComment"],
       rentCondition: json["rentCondition"],
-      status: equipmentStatusFromString(json["status"]),
-      prices: [],
+      status: json["status"],
+      prices: (json["prices"] as List? ?? [])
+          .map((e) => PriceEntry.fromJson(e))
+          .toList(),
       imageUrl: json["imageUrl"],
       isVisible: json["isVisible"],
       ownerId: json["ownerId"],

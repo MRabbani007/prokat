@@ -11,6 +11,10 @@ class OwnerEquipmentCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    String testImage =
+        "https://insqvwqlfhbfcqqnvzxu.supabase.co/storage/v1/object/public/Media/kamaz1.jpg";
+    final displayUrl = equipment.imageUrl?.isNotEmpty == true ? equipment.imageUrl! : testImage;
+
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       clipBehavior: Clip.antiAlias,
@@ -62,7 +66,7 @@ class OwnerEquipmentCard extends StatelessWidget {
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(8),
                     child: CachedNetworkImage(
-                      imageUrl: equipment.imageUrl ?? '',
+                      imageUrl: displayUrl,
                       fit: BoxFit.cover,
                       placeholder: (context, url) => Container(
                         color: Colors.grey[200],
@@ -94,7 +98,7 @@ class OwnerEquipmentCard extends StatelessWidget {
                   ),
                 ),
                 // Status Badge
-                _StatusBadge(status: equipment.status.name),
+                _StatusBadge(status: equipment.status),
               ],
             ),
           ),

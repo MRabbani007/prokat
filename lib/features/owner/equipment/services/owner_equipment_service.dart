@@ -31,10 +31,7 @@ class OwnerEquipmentService {
 
   Future<Equipment> createEquipment(Map<String, dynamic> data) async {
     try {
-      final response = await _dio.post(
-        ApiRoutes.equipment,
-        data: data,
-      );
+      final response = await _dio.post(ApiRoutes.equipment, data: data);
 
       return Equipment.fromJson(response.data);
     } on DioException catch (e) {
@@ -47,9 +44,23 @@ class OwnerEquipmentService {
     Map<String, dynamic> data,
   ) async {
     try {
+      final response = await _dio.patch('/equipment/$equipmentId', data: data);
+
+      return Equipment.fromJson(response.data);
+    } on DioException catch (e) {
+      throw Exception(e.response?.data ?? 'Failed to update equipment');
+    }
+  }
+
+  Future<Equipment> updateVisibilityStatus(
+    String equipmentId,
+    bool isVisible,
+    String status,
+  ) async {
+    try {
       final response = await _dio.patch(
-       '/equipment/$equipmentId',
-        data: data,
+        '/equipment/$equipmentId/status',
+        data: {"id": equipmentId, "isVisible": isVisible, "status": status},
       );
 
       return Equipment.fromJson(response.data);
@@ -63,6 +74,33 @@ class OwnerEquipmentService {
       await _dio.delete('/equipment/$equipmentId');
     } on DioException catch (e) {
       throw Exception(e.response?.data ?? 'Failed to delete equipment');
+    }
+  }
+
+  Future<void> addPriceEntry(
+    String equipmentId,
+    Map<String, dynamic> data,
+  ) async {
+    await _dio.post("/equipment/$equipmentId/priceEntry", data: data);
+  }
+
+  Future<void> updatePriceEntry(
+    String equipmentId,
+    Map<String, dynamic> data,
+  ) async {
+    final priceEntryId = data["id"];
+
+    await _dio.patch(
+      '/equipment/$equipmentId/priceEntry/$priceEntryId',
+      data: data,
+    );
+  }
+
+  Future<void> deletePriceEntry(String equipmentId, String priceEntryId) async {
+    try {
+      await _dio.delete('/equipment/$equipmentId/priceEntry/$priceEntryId');
+    } on DioException catch (e) {
+      throw Exception(e.response?.data ?? 'Failed to delete price entry');
     }
   }
 }

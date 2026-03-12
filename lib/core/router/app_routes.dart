@@ -31,6 +31,11 @@ class AppRoutes {
   static const String ownerEquimentId = '/owner/equipment/:id';
   static const String ownerEquimentIdEdit = '/owner/equipment/:id/edit';
   static const String ownerEquimentCreate = '/owner/equipment/create';
+  static const String ownerAddresses = '/owner/addresses';
+  static const String ownerAddressCreate = '/owner/addresses/create';
+  static const String ownerAddressEdit = '/owner/addresses/edit';
+  static const String ownerAddressSelect = '/owner/addresses/select';
+  static const String ownerAddressMap = '/owner/addresses/map';
 
   static const String ownerRequests = '/owner/requests';
 

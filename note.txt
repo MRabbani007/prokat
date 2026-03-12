@@ -69,3 +69,16 @@ RequestCard
 BookingCard
 PriceDisplay
 EquipmentStatusBadge
+
+Equipment Details
+sliver scrolling header
+sticky sections
+hero image
+optimistic editing
+image upload pipeline
+
+2026 "Bento" aesthetic
+
+add snackbars for submit results, and is loading to block/disable submit button
+
+showSuccessSnackBar(context, "Equipment updated");

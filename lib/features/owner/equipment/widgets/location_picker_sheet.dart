@@ -1,0 +1,82 @@
+import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:prokat/features/equipment/models/equipment_location.dart';
+
+class LocationPickerSheet extends StatelessWidget {
+  final List<EquipmentLocation> locations;
+
+  const LocationPickerSheet({
+    super.key,
+    required this.locations,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final previewLocations = locations.take(2).toList();
+
+    return SafeArea(
+      child: Padding(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+
+            const Text(
+              "Select Equipment Location",
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+
+            const SizedBox(height: 20),
+
+            /// SAVED LOCATIONS
+            if (previewLocations.isNotEmpty)
+              ...previewLocations.map(
+                (loc) => ListTile(
+                  leading: const Icon(Icons.location_on_rounded),
+                  title: Text(loc.name),
+                  subtitle: Text(loc.address),
+                  onTap: () {
+                    Navigator.pop(context, loc);
+                  },
+                ),
+              ),
+
+            if (previewLocations.isNotEmpty)
+              const SizedBox(height: 8),
+
+            /// VIEW ALL
+            if (locations.length > 2)
+              ListTile(
+                leading: const Icon(Icons.list_rounded),
+                title: const Text("View all locations"),
+                onTap: () {
+                  context.push("/owner/addresses");
+                },
+              ),
+
+            const Divider(height: 32),
+
+            /// ADD MANUALLY
+            ListTile(
+              leading: const Icon(Icons.add_location_alt_rounded),
+              title: const Text("Add address manually"),
+              onTap: () {
+                context.push("/owner/addresses/create");
+              },
+            ),
+
+            /// SET ON MAP
+            ListTile(
+              leading: const Icon(Icons.map_rounded),
+              title: const Text("Set on map"),
+              onTap: () {
+                context.push("/owner/addresses/map");
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
