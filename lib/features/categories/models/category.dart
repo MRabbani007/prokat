@@ -9,7 +9,7 @@ class Category {
   // final bool isOwnerVisible;
   final String? imageUrl;
 
-  Category({
+  const Category({
     required this.id,
     required this.name,
     required this.capacityUnit,

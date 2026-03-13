@@ -1,14 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart';
 import 'package:prokat/app.dart';
+
+// This line handles the platform check at compile time
+import 'package:prokat/map_setup_stub.dart'
+    if (dart.library.io) 'package:prokat/setup_mapbox.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
 
-  MapboxOptions.setAccessToken(
-    "pk.eyJ1IjoibXJhYmJhbmkwMDciLCJhIjoiY21tOHE5N21lMTBlZDJ1cXVpZTBra2JyZyJ9.gHYXieEcDJiq81xN4oodvw",
-  );
+  // This will call the real function on Mobile and the empty stub on Web
+  setupMapbox();
 
   runApp(const ProviderScope(child: MyApp()));
 }

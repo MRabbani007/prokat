@@ -26,6 +26,7 @@ class OwnerEquipmentCard extends StatelessWidget {
             SlidableAction(
               onPressed: (context) {
                 // TODO: Logic for View/Hide toggle
+                
               },
               backgroundColor: Colors.blue,
               foregroundColor: Colors.white,

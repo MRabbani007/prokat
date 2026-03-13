@@ -34,8 +34,8 @@ class LocationPickerSheet extends StatelessWidget {
               ...previewLocations.map(
                 (loc) => ListTile(
                   leading: const Icon(Icons.location_on_rounded),
-                  title: Text(loc.name),
-                  subtitle: Text(loc.address),
+                  title: Text(loc.city ?? ""),
+                  subtitle: Text(loc.street),
                   onTap: () {
                     Navigator.pop(context, loc);
                   },

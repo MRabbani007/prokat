@@ -2,26 +2,36 @@
 
 class EquipmentLocation {
   final String id;
-  final String name;
-  final String address;
-  final double latitude;
+  final String street;
+  final String? city;
   final double longitude;
+  final double latitude;
 
   EquipmentLocation({
-    required this.latitude,
-    required this.longitude,
     required this.id,
-    required this.name,
-    required this.address,
+    required this.street,
+    required this.longitude,
+    required this.latitude,
+    this.city,
   });
 
   factory EquipmentLocation.fromJson(Map<String, dynamic> json) {
     return EquipmentLocation(
-      latitude: (json['latitude'] as num).toDouble(),
-      longitude: (json['longitude'] as num).toDouble(),
-      name: json["name"],
       id: json["id"],
-      address: json["address"],
+      street: json["street"],
+      city: json["city"],
+      longitude: double.tryParse(json["longitude"].toString()) ?? 0,
+      latitude: double.tryParse(json["latitude"].toString()) ?? 0,
     );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      "id": id,
+      "street": street,
+      "city": city,
+      "longitude": longitude,
+      "latitude": latitude,
+    };
   }
 }

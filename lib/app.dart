@@ -15,8 +15,17 @@ class MyApp extends ConsumerWidget {
       debugShowCheckedModeBanner: false,
       routerConfig: router,
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.orange),
-        useMaterial3: true,
+        useMaterial3: true, // Recommended for modern Flutter apps
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: const Color(0xFF1A237E), // Deep Navy
+          brightness: Brightness.light,
+        ),
+      ),
+      darkTheme: ThemeData(
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: const Color(0xFF1A237E),
+          brightness: Brightness.dark,
+        ),
       ),
     );
   }

@@ -16,7 +16,7 @@ class SidebarItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListTile(
-      leading: Icon(icon, color: Colors.orange),
+      leading: Icon(icon, color: Colors.indigo),
       title: Text(
         label,
         style: const TextStyle(
@@ -24,7 +24,7 @@ class SidebarItem extends StatelessWidget {
           fontSize: 15,
         ),
       ),
-      hoverColor: Colors.orange.withAlpha(10),
+      hoverColor: Colors.indigoAccent.withAlpha(60),
       onTap: () {
         Navigator.pop(context);
         context.go(route);

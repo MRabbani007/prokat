@@ -86,9 +86,9 @@ class OwnerEquipmentDetailScreen extends ConsumerWidget {
 
                 LocationSection(
                   location: equipment.locations.isNotEmpty
-                      ? equipment.locations[0].name
+                      ? '${equipment.locations[0].street}, ${equipment.locations[0].city}'
                       : null,
-                  onAction: () => openLocationPickerSheet(context, ref),
+                  onAction: () => openLocationPickerSheet(context, ref, equipment.id),
                 ),
 
                 VisibilityStatusSection(

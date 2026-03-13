@@ -29,7 +29,6 @@ class EquipmentImageHeader extends StatelessWidget {
                   placeholder: (_, _) =>
                       const Center(child: CircularProgressIndicator()),
                   errorWidget: (_, url, error) {
-                    debugPrint("IMAGE ERROR: $error");
                     return _fallback();
                   },
                 )

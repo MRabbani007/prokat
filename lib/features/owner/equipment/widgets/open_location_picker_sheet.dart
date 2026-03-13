@@ -2,7 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-void openLocationPickerSheet(BuildContext context, WidgetRef ref) {
+void openLocationPickerSheet(
+  BuildContext context,
+  WidgetRef ref,
+  String equipmentId,
+) {
   showModalBottomSheet(
     context: context,
     backgroundColor: Colors.transparent,
@@ -11,9 +15,7 @@ void openLocationPickerSheet(BuildContext context, WidgetRef ref) {
       return Container(
         decoration: BoxDecoration(
           color: Theme.of(context).colorScheme.surface,
-          borderRadius: const BorderRadius.vertical(
-            top: Radius.circular(32),
-          ),
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
         ),
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
         child: Column(
@@ -33,9 +35,9 @@ void openLocationPickerSheet(BuildContext context, WidgetRef ref) {
 
             Text(
               "Select Location",
-              style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
+              style: Theme.of(
+                context,
+              ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
             ),
 
             const SizedBox(height: 20),
@@ -69,7 +71,7 @@ void openLocationPickerSheet(BuildContext context, WidgetRef ref) {
               subtitle: "Drag a pin to the exact location",
               onTap: () {
                 Navigator.pop(context);
-                context.push("/owner/addresses/map");
+                context.push("/owner/addresses/map?equipmentId=$equipmentId");
               },
             ),
 
@@ -104,10 +106,7 @@ class _LocationActionTile extends StatelessWidget {
         backgroundColor: Theme.of(context).colorScheme.surfaceContainerHighest,
         child: Icon(icon, color: Theme.of(context).colorScheme.primary),
       ),
-      title: Text(
-        title,
-        style: const TextStyle(fontWeight: FontWeight.bold),
-      ),
+      title: Text(title, style: const TextStyle(fontWeight: FontWeight.bold)),
       subtitle: Text(subtitle),
       trailing: const Icon(Icons.chevron_right_rounded),
     );

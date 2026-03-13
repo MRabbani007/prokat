@@ -99,8 +99,6 @@ void openPricingEditSheet(
       ),
       child: StatefulBuilder(
         builder: (context, setState) {
-          print('selectedRate: ${selectedRate.toString()}');
-          print("options: ${priceRateOptions.map((e) => e.value)}");
           return Column(
             children: [
               ModernTextField(

@@ -28,4 +28,13 @@ class PriceEntry {
       serviceTime: json["serviceTime"] ?? 0,
     );
   }
+  
+  Map<String, dynamic> toJson() {
+    return {
+      "id": id,
+      "price": price,
+      "priceRate": priceRate,
+      "serviceTime": serviceTime,
+    };
+  }
 }

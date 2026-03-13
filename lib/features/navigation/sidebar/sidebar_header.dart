@@ -14,7 +14,7 @@ class SidebarHeader extends StatelessWidget {
         right: 20,
       ),
       decoration: BoxDecoration(
-        color: Colors.orange.withAlpha(5),
+        color: Colors.indigo.withAlpha(30),
         border: const Border(
           bottom: BorderSide(color: Colors.black12, width: 0.5),
         ),
@@ -25,7 +25,7 @@ class SidebarHeader extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: Colors.orange,
+              color: Colors.indigo.withAlpha(90),
               borderRadius: BorderRadius.circular(12),
             ),
             child: const Icon(

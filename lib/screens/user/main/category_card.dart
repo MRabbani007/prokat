@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:prokat/models/category.dart';
+import 'package:prokat/features/categories/models/category.dart';
 
 class CategoryCard extends StatelessWidget {
   final Category category;
@@ -22,7 +22,7 @@ class CategoryCard extends StatelessWidget {
               ),
               child: Image.asset(
                 height: 72, // 👈 image limit only
-                category.imagePath,
+                category.imageUrl ?? "",
                 fit: BoxFit.contain,
                 errorBuilder: (_, _, _) => const Icon(
                   Icons.image_not_supported,

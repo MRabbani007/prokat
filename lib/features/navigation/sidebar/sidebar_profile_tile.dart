@@ -19,7 +19,7 @@ class SidebarProfileTile extends StatelessWidget {
     return ListTile(
       leading: const Icon(
         Icons.person_rounded,
-        color: Colors.orange,
+        color: Colors.indigo,
       ),
       title: Text(
         username,

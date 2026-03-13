@@ -35,8 +35,6 @@ class _VisibilityStatusSectionState extends State<VisibilityStatusSection> {
 
   @override
   Widget build(BuildContext context) {
-    print("tempstatus");
-    print(_tempStatus);
     return EquipmentSectionCard(
       title: "Marketplace Presence",
       // Show the save button only if there's a change

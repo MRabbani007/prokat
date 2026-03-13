@@ -6,12 +6,14 @@ class EquipmentMapButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return IconButton(
-      tooltip: "View on map",
-      icon: const Icon(Icons.map_outlined),
-      onPressed: () {
-        context.push('/search/map');
-      },
+    return Card(
+      elevation: 2,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(50)),
+      child: IconButton.filledTonal(
+        tooltip: "View on map",
+        icon: const Icon(Icons.map_outlined),
+        onPressed: () => context.push('/search/map'),
+      ),
     );
   }
 }

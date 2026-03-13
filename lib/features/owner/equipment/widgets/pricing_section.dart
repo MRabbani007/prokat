@@ -21,8 +21,7 @@ class PricingSection extends StatelessWidget {
   Widget build(BuildContext context) {
     // Logic: Only allow adding if we haven't reached the limit of rates
     final bool canAddMore = prices.length < maxRates;
-print("PRICING SECTION");
-print(prices);
+    
     return EquipmentSectionCard(
       title: "Pricing Plans",
       actionIcon: Icons.add_rounded,

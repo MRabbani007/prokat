@@ -27,6 +27,7 @@ class ProfileScreen extends StatelessWidget {
   }
 
   Widget _buildSectionHeader(String title) => Text(title.toUpperCase());
+  
   Widget _buildProfileTile(
     IconData icon,
     String title,

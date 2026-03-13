@@ -26,7 +26,8 @@ class _OwnerEquipmentListScreenState
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(ownerEquipmentProvider);
-
+print("stateequipmentlist");
+print(state.equipment.toString());
     return Scaffold(
       // appBar: AppBar(title: const Text("My Equipment")),
       body: state.isLoading

@@ -5,6 +5,7 @@ import 'package:prokat/core/router/app_routes.dart';
 import 'package:prokat/core/router/refresh_stream.dart';
 import 'package:prokat/features/auth/providers/auth_provider.dart';
 import 'package:prokat/features/auth/screens/register_screen.dart';
+import 'package:prokat/features/bookings/screens/equipment_booking_screen.dart';
 import 'package:prokat/features/categories/screens/categories_screen.dart';
 import 'package:prokat/features/equipment/screens/equipment_list_screen.dart';
 import 'package:prokat/features/equipment/screens/equipment_map_screen.dart';
@@ -14,18 +15,19 @@ import 'package:prokat/features/layout/main_scaffold.dart';
 /// screens
 import 'package:prokat/features/auth/screens/forgot_password_screen.dart';
 import 'package:prokat/features/auth/screens/login_screen.dart';
+import 'package:prokat/features/locations/screens/map_pin_location_screen.dart';
+import 'package:prokat/features/owner/addresses/screens/owner_address_create_screen.dart';
 import 'package:prokat/features/owner/addresses/screens/owner_address_edit_screen.dart';
 import 'package:prokat/features/owner/addresses/screens/owner_addresses_screen.dart';
 import 'package:prokat/features/owner/addresses/screens/owner_select_address_screen.dart';
 import 'package:prokat/features/owner/equipment/screens/equipment_detail_screen.dart';
 import 'package:prokat/features/owner/equipment/screens/owner_equipment_create.dart';
 import 'package:prokat/features/owner/equipment/screens/owner_equipment_list_screen.dart';
+import 'package:prokat/features/owner/requests/screens/owner_requests_screen.dart';
 import 'package:prokat/screens/user/launch/launch_screen.dart';
-import 'package:prokat/screens/user/landing/landing_screen.dart';
 
 import 'package:prokat/screens/user/main/main_screen.dart';
 import 'package:prokat/screens/user/equipment/equipment_id_screen.dart';
-import 'package:prokat/screens/user/booking/booking_screen.dart';
 import 'package:prokat/screens/user/booking/my_rentals_screen.dart';
 import 'package:prokat/screens/user/favorites/favorites_screen.dart';
 import 'package:prokat/screens/user/profile/profile_screen.dart';
@@ -89,10 +91,6 @@ GoRouter createRouter(WidgetRef ref) {
     routes: [
       /// 🚀 PUBLIC
       GoRoute(path: AppRoutes.launch, builder: (_, _) => const LaunchScreen()),
-      GoRoute(
-        path: AppRoutes.landing,
-        builder: (_, _) => const LandingScreen(),
-      ),
 
       /// 🧱 MAIN APP
       StatefulShellRoute.indexedStack(
@@ -153,7 +151,7 @@ GoRouter createRouter(WidgetRef ref) {
                     path: 'book',
                     builder: (context, state) {
                       final id = state.pathParameters['id']!;
-                      return BookingScreen(equipmentId: id);
+                      return EquipmentBookingScreen(equipmentId: id);//
                     },
                   ),
                 ],
@@ -199,9 +197,9 @@ GoRouter createRouter(WidgetRef ref) {
                   return OwnerEquipmentDetailScreen(equipmentId: id);
                 },
               ),
-              // 
+              //
               // Owner Addresses
-              // 
+              //
               GoRoute(
                 path: AppRoutes.ownerAddresses,
                 builder: (context, state) {
@@ -209,9 +207,16 @@ GoRouter createRouter(WidgetRef ref) {
                 },
               ),
               GoRoute(
+                path: AppRoutes.ownerAddressMap,
+                builder: (context, state) {
+                  final equipmentId = state.uri.queryParameters['equipmentId'];
+                  return MapPinLocationScreen(equipmentId: equipmentId);
+                },
+              ),
+              GoRoute(
                 path: AppRoutes.ownerAddressCreate,
                 builder: (context, state) {
-                  return OwnerSelectAddressScreen();
+                  return OwnerAddressCreateScreen();
                 },
               ),
               GoRoute(
@@ -227,16 +232,20 @@ GoRouter createRouter(WidgetRef ref) {
                   return OwnerAddressEditScreen(id: id);
                 },
               ),
-              // 
+              //
               // Owner Bookings
-              // 
+              //
               GoRoute(
                 path: AppRoutes.ownerBookings,
                 builder: (_, _) => const OwnerBookingScreen(),
               ),
-              // 
+              GoRoute(
+                path: AppRoutes.ownerRequests,
+                builder: (_, _) => const OwnerRequestsScreen(),
+              ),
+              //
               // Owner Profile
-              // 
+              //
               GoRoute(
                 path: AppRoutes.ownerProfile,
                 builder: (_, _) => const OwnerProfileScreen(),

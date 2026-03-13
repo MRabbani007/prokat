@@ -82,3 +82,36 @@ image upload pipeline
 add snackbars for submit results, and is loading to block/disable submit button
 
 showSuccessSnackBar(context, "Equipment updated");
+
+Pin Map Screen
+🧭 map tilt + 3D buildings
+🏙 city boundary detection
+📦 service area validation
+⚡ super fast Mapbox search (local index)
+
+"Auto-snap pin to nearest road or building entrance."
+
+implementing the onCameraChangeListener to make the pin update the address while you drag the map?
+
+
+      // Future<void> debugStorage() async {
+      //   final all = await const FlutterSecureStorage().readAll();
+      //   print("SECURE STORAGE CONTENT:");
+      //   print(all.toString());
+      // }
+
+      // debugStorage();
+
+
+flutter run | Select-String "I/flutter"
+
+Later you can also add:
+
+City Restriction
+
+Example:
+
+bbox=76.5,43.1,77.3,43.5
+
+This limits searches to Almaty only, useful for equipment marketplaces.
+

@@ -1,5 +1,4 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:prokat/features/auth/models/auth_session.dart';
 import 'package:prokat/features/auth/services/auth_secure_storage.dart';
 import '../models/auth_credentials.dart';
@@ -30,19 +29,8 @@ class AuthNotifier extends StateNotifier<AuthState> {
     try {
       final session = await api.login(credentials);
 
-      // print("notifier");
-      // print(session.toJson());
-
       /// Save token string
       await storage.saveSession(session);
-
-            Future<void> debugStorage() async {
-        final all = await const FlutterSecureStorage().readAll();
-        print("SECURE STORAGE CONTENT:");
-        print(all.toString());
-      }
-
-      debugStorage();
 
       state = state.copyWith(session: session, isLoading: false);
     } catch (e) {
