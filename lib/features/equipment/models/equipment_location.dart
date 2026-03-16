@@ -4,14 +4,14 @@ class EquipmentLocation {
   final String id;
   final String street;
   final String? city;
-  final double longitude;
-  final double latitude;
+  final double? longitude;
+  final double? latitude;
 
   EquipmentLocation({
     required this.id,
     required this.street,
-    required this.longitude,
-    required this.latitude,
+    this.longitude,
+    this.latitude,
     this.city,
   });
 

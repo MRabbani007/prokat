@@ -115,3 +115,31 @@ bbox=76.5,43.1,77.3,43.5
 
 This limits searches to Almaty only, useful for equipment marketplaces.
 
+
+Now i have a map_pin_location_screen which is used for an owner to set an equipment location, 
+also I have a screen for showing the available equipment for a renter (equipment_map_screen), 
+I want to update it to map_renter_equipment_screen, 
+later on i will create a map_renter_address_screen which should allow the renter to place a pin for where the service is required, 
+also later on I will create a map to show the owner the location of his equipment...
+
+therefore, I want to move the below EquipmentMapScreen to a MapContainer widget? 
+it should receive a redirect URL and text to redirect the user with goRouter to the alternate list page or option that doesn't include a map
+
+my current MobileMapScreen is handling the actual map, 
+which is initial load, and in this case it is implementing features specific for displaying available equipment to a user, 
+let us make this inside the map_renter_address_screen. 
+finally, MobileEquipmentMapScreen is currently a container which is keeping the supporting sheets outside the Map methods and logic, 
+let's move it to map_renter_equipment_container
+
+
+now i have 2 screens:
+1. MapOwnerPinLocationScreen which is eventually calling MobileMapScreen
+2. MapRenterEquipmentScreen which is also using MobileMapScreen,
+
+things are getting better, but there is still some spagetti and some work to be done! 
+let us move the mobileMapscreen into the MapView widget that you provided earlier, and point all screens to use MapView (i will delete the mobileMapscreen)
+
+Map initial location
+1️⃣ User saved address (delivery location)
+2️⃣ If none → city center
+3️⃣ If GPS available → optionally update

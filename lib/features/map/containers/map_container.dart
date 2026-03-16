@@ -1,14 +1,20 @@
-// features/equipment/screens/equipment_map_screen.dart
-
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../../core/router/app_routes.dart';
-import 'mobile_equipment_map_screen.dart';
+class MapContainer extends StatelessWidget {
+  final Widget mobileMap;
+  final String redirectRoute;
+  final String redirectLabel;
+  final String title;
 
-class EquipmentMapScreen extends StatelessWidget {
-  const EquipmentMapScreen({super.key});
+  const MapContainer({
+    super.key,
+    required this.mobileMap,
+    required this.redirectRoute,
+    required this.redirectLabel,
+    required this.title,
+  });
 
   bool get _isMobile =>
       !kIsWeb &&
@@ -17,14 +23,12 @@ class EquipmentMapScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // ✅ Mobile: show real map
     if (_isMobile) {
-      return const MobileEquipmentMapScreen();
+      return mobileMap;
     }
 
-    // 🌐 Web / Desktop fallback
     return Scaffold(
-      appBar: AppBar(title: const Text('Equipment Map')),
+      appBar: AppBar(title: Text(title)),
       body: Center(
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -38,10 +42,10 @@ class EquipmentMapScreen extends StatelessWidget {
             const SizedBox(height: 24),
             ElevatedButton.icon(
               onPressed: () {
-                context.go(AppRoutes.searchList);
+                context.go(redirectRoute);
               },
               icon: const Icon(Icons.list),
-              label: const Text('View as list'),
+              label: Text(redirectLabel),
             ),
           ],
         ),

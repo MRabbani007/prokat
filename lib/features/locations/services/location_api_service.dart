@@ -21,7 +21,11 @@ class LocationApiService {
   Future<LocationModel> createLocation(LocationModel location) async {
     final response = await _dio.post('/locations', data: location.toJson());
 
-    return LocationModel.fromJson(response.data);
+    if (response.statusCode == 200 || response.statusCode == 201) {
+      return LocationModel.fromJson(response.data["data"]);
+    }
+
+    throw Exception("Location creation failed (${response.statusCode})");
   }
 
   Future<LocationModel> updateLocation(

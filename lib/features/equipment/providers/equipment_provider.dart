@@ -1,5 +1,3 @@
-// features/equipment/providers/equipment_provider.dart
-
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:dio/dio.dart';
 
@@ -12,7 +10,12 @@ final equipmentServiceProvider = Provider<EquipmentService>((ref) {
   return EquipmentService(dio);
 });
 
-final equipmentsProvider = FutureProvider<List<Equipment>>((ref) {
+final equipmentProvider = FutureProvider<List<Equipment>>((ref) async {
   final service = ref.watch(equipmentServiceProvider);
-  return service.getEquipments();
+
+  try {
+    return await service.getEquipment();
+  } catch (e) {
+    return [];
+  }
 });

@@ -5,9 +5,8 @@ import 'package:geolocator/geolocator.dart' as geo;
 import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart';
 import 'package:prokat/features/locations/models/location_model.dart';
 import 'package:prokat/features/owner/addresses/widgets/address_search_box.dart';
-
-import '../models/location_search_result.dart';
-import '../state/location_provider.dart';
+import '../../locations/models/location_search_result.dart';
+import '../../locations/state/location_provider.dart';
 
 class MapPinLocationScreen extends ConsumerStatefulWidget {
   final String? equipmentId;

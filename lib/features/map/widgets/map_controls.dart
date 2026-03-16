@@ -6,13 +6,13 @@ import 'package:prokat/features/categories/providers/category_provider.dart';
 class MapControls extends ConsumerWidget {
   final VoidCallback onZoomIn;
   final VoidCallback onZoomOut;
-  final VoidCallback onChangeLocation;
+  final VoidCallback? onChangeLocation;
 
   const MapControls({
     super.key,
     required this.onZoomIn,
     required this.onZoomOut,
-    required this.onChangeLocation,
+    this.onChangeLocation,
   });
 
   @override
@@ -24,6 +24,7 @@ class MapControls extends ConsumerWidget {
       top: 24,
       child: Column(
         children: [
+          const SizedBox(height: 50),
           // New List View Button
           FloatingActionButton(
             heroTag: 'view-list',
@@ -36,7 +37,7 @@ class MapControls extends ConsumerWidget {
             },
             child: const Icon(Icons.list),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 30),
           FloatingActionButton(
             heroTag: 'zoom-in',
             mini: true,

@@ -1,0 +1,306 @@
+import 'dart:ui' as ui;
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart';
+import 'package:prokat/features/equipment/models/equipment_model.dart';
+import 'package:prokat/features/equipment/providers/equipment_provider.dart';
+import 'package:geolocator/geolocator.dart' as geo;
+
+class MapController {
+  MapboxMap? _map;
+  PointAnnotationManager? _annotationManager;
+  bool markersAdded = false;
+  CircleAnnotationManager? _circleManager;
+  bool _markersAdded = false;
+  List<Equipment> _equipments = [];
+  Function(Equipment)? onEquipmentTapped;
+
+  void attach(
+    MapboxMap map, {
+    List<Equipment>? initialItems,
+    Function(Equipment)? onTap,
+  }) {
+    _map = map;
+    if (initialItems != null) _equipments = initialItems;
+    if (onTap != null) onEquipmentTapped = onTap;
+  }
+
+  MapboxMap get _requireMap {
+    if (_map == null) {
+      throw Exception("MapController not attached");
+    }
+    return _map!;
+  }
+
+  Future<void> enableUserLocation() async {
+    geo.LocationPermission permission = await geo.Geolocator.checkPermission();
+
+    if (permission == geo.LocationPermission.denied) {
+      permission = await geo.Geolocator.requestPermission();
+    }
+
+    if (permission == geo.LocationPermission.deniedForever) {
+      return;
+    }
+
+    await _requireMap.location.updateSettings(
+      LocationComponentSettings(
+        enabled: true,
+        pulsingEnabled: true,
+        showAccuracyRing: true,
+      ),
+    );
+  }
+
+  Future<void> moveToUserLocation(double lng, double lat) async {
+    await _requireMap.flyTo(
+      CameraOptions(center: Point(coordinates: Position(lng, lat)), zoom: 14),
+      MapAnimationOptions(duration: 800),
+    );
+  }
+
+  Future<void> moveToCurrentLocation() async {
+    final map = _requireMap;
+
+    bool serviceEnabled = await geo.Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) return;
+
+    geo.LocationPermission permission = await geo.Geolocator.checkPermission();
+
+    if (permission == geo.LocationPermission.denied) {
+      permission = await geo.Geolocator.requestPermission();
+    }
+
+    if (permission == geo.LocationPermission.deniedForever) {
+      return;
+    }
+
+    const locationSettings = geo.LocationSettings(
+      accuracy: geo.LocationAccuracy.high,
+    );
+
+    final position = await geo.Geolocator.getCurrentPosition(
+      locationSettings: locationSettings,
+    );
+
+    await map.flyTo(
+      CameraOptions(
+        center: Point(
+          coordinates: Position(position.longitude, position.latitude),
+        ),
+        zoom: 14,
+      ),
+      MapAnimationOptions(duration: 1200),
+    );
+  }
+
+  Future<void> onStyleLoaded(StyleLoadedEventData data, WidgetRef ref) async {
+    if (_map == null) return;
+
+    _annotationManager = await _map!.annotations.createPointAnnotationManager();
+
+    _annotationManager!.tapEvents(onTap: _onAnnotationTapped);
+
+    // 🔑 Read equipment data ONCE
+    final equipmentsAsync = ref.read(equipmentProvider);
+
+    equipmentsAsync.whenData((items) async {
+      if (_markersAdded || items.isEmpty) return;
+
+      _equipments = items;
+      await _addEquipmentMarkers(items);
+      _markersAdded = true;
+    });
+  }
+
+  /// Renders saved equipment as Red Circles (to avoid icon loading issues)
+  Future<void> renderEquipment(List<Equipment> equipment) async {
+    if (_map == null) return;
+
+    // Ensure manager exists
+    _circleManager ??= await _map!.annotations.createCircleAnnotationManager();
+
+    // Clear previous markers
+    await _circleManager!.deleteAll();
+
+    final List<CircleAnnotationOptions> annotations = [];
+
+    for (var item in equipment) {
+      if (item.locations.isEmpty) continue;
+
+      final loc = item.locations.first;
+
+      // FIX: Position must be [Longitude, Latitude]
+      final lng = loc.longitude ?? 0.0;
+      final lat = loc.latitude ?? 0.0;
+
+      annotations.add(
+        CircleAnnotationOptions(
+          geometry: Point(coordinates: Position(lng, lat)),
+          circleRadius: 8.0,
+          circleColor: Colors.red.value,
+          circleStrokeWidth: 2.0,
+          circleStrokeColor: Colors.white.value,
+        ),
+      );
+    }
+
+    if (annotations.isNotEmpty) {
+      await _circleManager!.createMulti(annotations);
+      debugPrint("Rendered ${annotations.length} equipment circles.");
+    }
+  }
+
+  Future<void> _loadMarkerIcon() async {
+    if (_map == null) return;
+
+    // 1. Load image from assets
+    final ByteData bytes = await rootBundle.load(
+      'assets/images/icons/truck_topview.png',
+    );
+    final Uint8List list = bytes.buffer.asUint8List();
+
+    // 2. Mapbox requires the exact width/height for the MbxImage object
+    final ui.Codec codec = await ui.instantiateImageCodec(list);
+    final ui.FrameInfo frame = await codec.getNextFrame();
+
+    final mbxImage = MbxImage(
+      width: frame.image.width,
+      height: frame.image.height,
+      data: list,
+    );
+
+    // 3. Add to style with the ID 'equipment-icon'
+    await _map!.style.addStyleImage(
+      'equipment-icon',
+      1.0, // Scale
+      mbxImage,
+      false,
+      [],
+      [],
+      null,
+    );
+  }
+
+  /// Load equipment pins on the map
+  Future<void> _addEquipmentMarkers(List<Equipment> equipments) async {
+    if (_map == null) return;
+
+    // Ensure manager is initialized
+    _annotationManager ??= await _map!.annotations
+        .createPointAnnotationManager();
+    await _annotationManager!.deleteAll();
+
+    // Load/Register the icon into the map style
+    await _loadMarkerIcon();
+
+    final camera = await getCameraState();
+    final zoom = camera.zoom;
+
+    double iconSizeForZoom(double zoom) {
+      if (zoom < 11) return 0.6;
+      if (zoom < 13) return 0.8;
+      if (zoom < 15) return 0.9;
+      return 1;
+    }
+
+    final List<PointAnnotationOptions> optionsList = [];
+
+    for (final equipment in equipments) {
+      if (equipment.locations.isEmpty) continue;
+
+      final location = equipment.locations.first;
+
+      optionsList.add(
+        PointAnnotationOptions(
+          geometry: Point(
+            coordinates: Position(
+              location.longitude ?? 0,
+              location.latitude ?? 0,
+            ),
+          ),
+          // FIX: You MUST provide the iconImage ID you registered above
+          iconImage: 'equipment-icon',
+          iconSize: iconSizeForZoom(zoom),
+          // Optional: Add text labels if you want to see IDs/Names
+          textField: equipment.name,
+          textOffset: [0, 2.0],
+        ),
+      );
+    }
+
+    if (optionsList.isNotEmpty) {
+      // Use createMulti for better performance
+      await _annotationManager!.createMulti(optionsList);
+      debugPrint("Rendered ${optionsList.length} equipment icons.");
+    }
+  }
+
+  void _onAnnotationTapped(PointAnnotation annotation) {
+    final id = annotation.customData?['id'];
+    if (id == null) return;
+
+    try {
+      // Look up the equipment from our local stored list
+      final equipment = _equipments.firstWhere((e) => e.id == id);
+
+      // Call the stored callback
+      onEquipmentTapped?.call(equipment);
+    } catch (e) {
+      debugPrint("Equipment not found for id: $id");
+    }
+  }
+
+  /// Camera helpers
+  Future<CameraState> getCameraState() async {
+    return await _requireMap.getCameraState();
+  }
+
+  Future<void> flyTo(
+    double longitude,
+    double latitude, {
+    double zoom = 14,
+  }) async {
+    await _requireMap.flyTo(
+      CameraOptions(
+        center: Point(coordinates: Position(longitude, latitude)),
+        zoom: zoom,
+      ),
+      MapAnimationOptions(duration: 1000),
+    );
+  }
+
+  Future<void> zoomIn() async {
+    final camera = await getCameraState();
+
+    await _requireMap.flyTo(
+      CameraOptions(zoom: camera.zoom + 1),
+      MapAnimationOptions(duration: 300),
+    );
+  }
+
+  Future<void> zoomOut() async {
+    final camera = await getCameraState();
+
+    await _requireMap.flyTo(
+      CameraOptions(zoom: camera.zoom - 1),
+      MapAnimationOptions(duration: 300),
+    );
+  }
+
+  void dispose() {
+    _annotationManager = null;
+    _map = null;
+  }
+}
+
+final mapControllerProvider = Provider<MapController>((ref) {
+  final controller = MapController();
+
+  ref.onDispose(() {
+    controller.dispose();
+  });
+
+  return controller;
+});

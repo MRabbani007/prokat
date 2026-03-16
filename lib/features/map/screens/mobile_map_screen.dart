@@ -6,8 +6,7 @@ import 'package:geolocator/geolocator.dart' as geo;
 import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart';
 import 'package:prokat/features/equipment/models/equipment_model.dart';
 import 'package:prokat/features/equipment/providers/equipment_provider.dart';
-import 'package:prokat/features/equipment/widgets/map/map_controls.dart';
-// import 'package:prokat/screens/user/map/widgets/equipment_sheet.dart';
+import 'package:prokat/features/map/widgets/map_controls.dart';
 
 enum MapMode { browseEquipment, pickLocation, ownerPlaceEquipment }
 
@@ -99,7 +98,7 @@ class _MobileMapScreenState extends ConsumerState<MobileMapScreen> {
     _annotationManager!.tapEvents(onTap: _onAnnotationTapped);
 
     // 🔑 Read equipment data ONCE
-    final equipmentsAsync = ref.read(equipmentsProvider);
+    final equipmentsAsync = ref.read(equipmentProvider);
 
     equipmentsAsync.whenData((items) async {
       if (_markersAdded || items.isEmpty) return;
@@ -166,7 +165,10 @@ class _MobileMapScreenState extends ConsumerState<MobileMapScreen> {
       options.add(
         PointAnnotationOptions(
           geometry: Point(
-            coordinates: Position(location.longitude, location.latitude),
+            coordinates: Position(
+              location.longitude ?? 0,
+              location.latitude ?? 0,
+            ),
           ),
           iconImage: 'equipment-icon',
           iconSize: iconSizeForZoom(_zoom),

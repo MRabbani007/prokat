@@ -1,13 +1,15 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:prokat/features/locations/models/location_search_result.dart';
+import 'package:prokat/features/owner/equipment/providers/owner_equipment_provider.dart';
 import '../models/location_model.dart';
 import '../services/location_api_service.dart';
 import 'location_state.dart';
 
 class LocationNotifier extends StateNotifier<LocationState> {
   final LocationApiService api;
+  final Ref ref;
 
-  LocationNotifier(this.api) : super(const LocationState());
+  LocationNotifier(this.api, this.ref) : super(const LocationState());
 
   List<LocationSearchResult> suggestions = [];
 
@@ -29,7 +31,13 @@ class LocationNotifier extends StateNotifier<LocationState> {
     try {
       final newLocation = await api.createLocation(location);
 
-      state = state.copyWith(locations: [...state.locations, newLocation]);
+      state = state.copyWith(
+        locations: [...state.locations, newLocation],
+        error: null,
+      );
+
+      // await ref.read(ownerEquipmentProvider.notifier).loadEquipment();
+      ref.invalidate(ownerEquipmentProvider);
 
       return true;
     } catch (e) {

@@ -1,6 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-
 import 'package:prokat/core/router/app_routes.dart';
 import 'package:prokat/core/router/refresh_stream.dart';
 import 'package:prokat/features/auth/providers/auth_provider.dart';
@@ -8,14 +7,11 @@ import 'package:prokat/features/auth/screens/register_screen.dart';
 import 'package:prokat/features/bookings/screens/equipment_booking_screen.dart';
 import 'package:prokat/features/categories/screens/categories_screen.dart';
 import 'package:prokat/features/equipment/screens/equipment_list_screen.dart';
-import 'package:prokat/features/equipment/screens/equipment_map_screen.dart';
-
 import 'package:prokat/features/layout/main_scaffold.dart';
-
-/// screens
 import 'package:prokat/features/auth/screens/forgot_password_screen.dart';
 import 'package:prokat/features/auth/screens/login_screen.dart';
-import 'package:prokat/features/locations/screens/map_pin_location_screen.dart';
+import 'package:prokat/features/map/screens/map_owner_pin_location_screen.dart';
+import 'package:prokat/features/map/screens/map_renter_equipment_screen.dart';
 import 'package:prokat/features/owner/addresses/screens/owner_address_create_screen.dart';
 import 'package:prokat/features/owner/addresses/screens/owner_address_edit_screen.dart';
 import 'package:prokat/features/owner/addresses/screens/owner_addresses_screen.dart';
@@ -25,14 +21,12 @@ import 'package:prokat/features/owner/equipment/screens/owner_equipment_create.d
 import 'package:prokat/features/owner/equipment/screens/owner_equipment_list_screen.dart';
 import 'package:prokat/features/owner/requests/screens/owner_requests_screen.dart';
 import 'package:prokat/screens/user/launch/launch_screen.dart';
-
 import 'package:prokat/screens/user/main/main_screen.dart';
 import 'package:prokat/screens/user/equipment/equipment_id_screen.dart';
 import 'package:prokat/screens/user/booking/my_rentals_screen.dart';
 import 'package:prokat/screens/user/favorites/favorites_screen.dart';
 import 'package:prokat/screens/user/profile/profile_screen.dart';
 import 'package:prokat/screens/user/settings/settings_screen.dart';
-
 import 'package:prokat/screens/owner/dashboard/owner_dashboard_screen.dart';
 import 'package:prokat/screens/owner/booking/owner_booking_screen.dart';
 import 'package:prokat/screens/owner/profile/owner_profile_screen.dart';
@@ -138,7 +132,7 @@ GoRouter createRouter(WidgetRef ref) {
               ),
               GoRoute(
                 path: AppRoutes.searchMap,
-                builder: (_, _) => const EquipmentMapScreen(),
+                builder: (_, _) => const MapRenterEquipmentScreen(),
               ),
               GoRoute(
                 path: '/equipment/:id',
@@ -209,8 +203,8 @@ GoRouter createRouter(WidgetRef ref) {
               GoRoute(
                 path: AppRoutes.ownerAddressMap,
                 builder: (context, state) {
-                  final equipmentId = state.uri.queryParameters['equipmentId'];
-                  return MapPinLocationScreen(equipmentId: equipmentId);
+                  final equipmentId = state.uri.queryParameters['equipmentId'] ?? "";
+                  return MapOwnerPinLocationScreen(equipmentId: equipmentId);
                 },
               ),
               GoRoute(

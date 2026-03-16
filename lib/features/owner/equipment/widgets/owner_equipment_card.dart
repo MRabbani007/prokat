@@ -118,10 +118,10 @@ class _StatusBadge extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
-        color: status.toLowerCase() == 'active' ? Colors.green[50] : Colors.orange[50],
+        color: status.toLowerCase() == 'active' ? Colors.green[50] : Colors.indigo[50],
         borderRadius: BorderRadius.circular(6),
         border: Border.all(
-          color: status.toLowerCase() == 'active' ? Colors.green : Colors.orange,
+          color: status.toLowerCase() == 'active' ? Colors.green : Colors.indigo,
         ),
       ),
       child: Text(
@@ -129,7 +129,7 @@ class _StatusBadge extends StatelessWidget {
         style: TextStyle(
           fontSize: 10,
           fontWeight: FontWeight.bold,
-          color: status.toLowerCase() == 'active' ? Colors.green[800] : Colors.orange[800],
+          color: status.toLowerCase() == 'active' ? Colors.green[800] : Colors.indigo[800],
         ),
       ),
     );

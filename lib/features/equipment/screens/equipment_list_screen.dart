@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-
 import '../providers/equipment_provider.dart';
 import '../widgets/list/equipment_list_tile.dart';
 import '../widgets/list/equipment_city_selector.dart';
@@ -25,7 +24,7 @@ class _EquipmentListScreenState extends ConsumerState<EquipmentListScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final equipmentsAsync = ref.watch(equipmentsProvider);
+    final equipmentsAsync = ref.watch(equipmentProvider);
 
     return Scaffold(
       backgroundColor: Colors.grey[100],
