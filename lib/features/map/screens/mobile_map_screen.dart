@@ -117,7 +117,7 @@ class _MobileMapScreenState extends ConsumerState<MobileMapScreen> {
 
   Future<void> _loadMarkerIcon() async {
     final ByteData bytes = await rootBundle.load(
-      'assets/images/icons/truck_topview.png',
+      'assets/images/icons/truck_96.png',
     );
     final Uint8List list = bytes.buffer.asUint8List();
 

@@ -111,4 +111,40 @@
   //   await _annotationManager!.createMulti(options);
   // }
 
-  
+  /// Renders saved equipment as Red Circles (to avoid icon loading issues)
+  // Future<void> renderEquipment(List<Equipment> equipment) async {
+  //   if (_map == null) return;
+
+  //   // Ensure manager exists
+  //   _circleManager ??= await _map!.annotations.createCircleAnnotationManager();
+
+  //   // Clear previous markers
+  //   await _circleManager!.deleteAll();
+
+  //   final List<CircleAnnotationOptions> annotations = [];
+
+  //   for (var item in equipment) {
+  //     if (item.locations.isEmpty) continue;
+
+  //     final loc = item.locations.first;
+
+  //     // FIX: Position must be [Longitude, Latitude]
+  //     final lng = loc.longitude ?? 0.0;
+  //     final lat = loc.latitude ?? 0.0;
+
+  //     annotations.add(
+  //       CircleAnnotationOptions(
+  //         geometry: Point(coordinates: Position(lng, lat)),
+  //         circleRadius: 8.0,
+  //         circleColor: Colors.red.value,
+  //         circleStrokeWidth: 2.0,
+  //         circleStrokeColor: Colors.white.value,
+  //       ),
+  //     );
+  //   }
+
+  //   if (annotations.isNotEmpty) {
+  //     await _circleManager!.createMulti(annotations);
+  //     debugPrint("Rendered ${annotations.length} equipment circles.");
+  //   }
+  // }

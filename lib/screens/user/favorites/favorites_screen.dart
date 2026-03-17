@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:prokat/core/widgets/page_header.dart';
 
 class FavoritesScreen extends StatefulWidget {
   const FavoritesScreen({super.key});
@@ -17,41 +18,53 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
     return Scaffold(
       body: _favoriteIds.isEmpty
           ? _buildEmptyState()
-          : ListView.builder(
-              padding: const EdgeInsets.all(16),
-              itemCount: _favoriteIds.length,
-              itemBuilder: (context, index) {
-                final id = _favoriteIds[index];
-                return Dismissible(
-                  key: Key(id),
-                  direction: DismissDirection.endToStart,
-                  background: Container(
-                    alignment: Alignment.centerRight,
-                    padding: const EdgeInsets.only(right: 20),
-                    color: Colors.red,
-                    child: const Icon(Icons.delete, color: Colors.white),
+          : SafeArea(
+              child: Column(
+                children: [
+                  PageHeader(title: "Favorites"),
+                  ListView.builder(
+                    padding: const EdgeInsets.all(16),
+                    itemCount: _favoriteIds.length,
+                    itemBuilder: (context, index) {
+                      final id = _favoriteIds[index];
+                      return Dismissible(
+                        key: Key(id),
+                        direction: DismissDirection.endToStart,
+                        background: Container(
+                          alignment: Alignment.centerRight,
+                          padding: const EdgeInsets.only(right: 20),
+                          color: Colors.red,
+                          child: const Icon(Icons.delete, color: Colors.white),
+                        ),
+                        onDismissed: (direction) {
+                          setState(() => _favoriteIds.removeAt(index));
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text("$id removed from favorites"),
+                            ),
+                          );
+                        },
+                        child: Card(
+                          margin: const EdgeInsets.only(bottom: 12),
+                          child: ListTile(
+                            leading: const Icon(
+                              Icons.construction,
+                              color: Colors.orange,
+                            ),
+                            title: Text(id.toUpperCase().replaceAll('-', ' ')),
+                            subtitle: const Text("Atyrau Sector • \$450/day"),
+                            trailing: const Icon(
+                              Icons.arrow_forward_ios,
+                              size: 14,
+                            ),
+                            onTap: () => context.push('/equipment/$id'),
+                          ),
+                        ),
+                      );
+                    },
                   ),
-                  onDismissed: (direction) {
-                    setState(() => _favoriteIds.removeAt(index));
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text("$id removed from favorites")),
-                    );
-                  },
-                  child: Card(
-                    margin: const EdgeInsets.only(bottom: 12),
-                    child: ListTile(
-                      leading: const Icon(
-                        Icons.construction,
-                        color: Colors.orange,
-                      ),
-                      title: Text(id.toUpperCase().replaceAll('-', ' ')),
-                      subtitle: const Text("Atyrau Sector • \$450/day"),
-                      trailing: const Icon(Icons.arrow_forward_ios, size: 14),
-                      onTap: () => context.push('/equipment/$id'),
-                    ),
-                  ),
-                );
-              },
+                ],
+              ),
             ),
     );
   }

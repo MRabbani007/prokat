@@ -10,10 +10,13 @@ class LocationApiService {
 
   Dio get _dio => apiClient.dio;
 
-  Future<List<LocationModel>> getLocations() async {
-    final response = await _dio.get('/locations');
+  Future<List<LocationModel>> getLocations({String? mode}) async {
+    final response = await _dio.get(
+      '/locations',
+      // queryParameters: {'mode': mode ?? "ADDRESS"},
+    );
 
-    return (response.data as List)
+    return (response.data["data"] as List)
         .map((e) => LocationModel.fromJson(e))
         .toList();
   }

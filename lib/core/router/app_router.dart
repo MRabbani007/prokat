@@ -5,13 +5,16 @@ import 'package:prokat/core/router/refresh_stream.dart';
 import 'package:prokat/features/auth/providers/auth_provider.dart';
 import 'package:prokat/features/auth/screens/register_screen.dart';
 import 'package:prokat/features/bookings/screens/equipment_booking_screen.dart';
+import 'package:prokat/features/bookings/screens/renter_bookings_screen.dart';
 import 'package:prokat/features/categories/screens/categories_screen.dart';
 import 'package:prokat/features/equipment/screens/equipment_list_screen.dart';
 import 'package:prokat/features/layout/main_scaffold.dart';
 import 'package:prokat/features/auth/screens/forgot_password_screen.dart';
 import 'package:prokat/features/auth/screens/login_screen.dart';
+import 'package:prokat/features/locations/screens/renter_addresses_screen.dart';
 import 'package:prokat/features/map/screens/map_owner_pin_location_screen.dart';
 import 'package:prokat/features/map/screens/map_renter_equipment_screen.dart';
+import 'package:prokat/features/map/screens/map_renter_pin_address_screen.dart';
 import 'package:prokat/features/owner/addresses/screens/owner_address_create_screen.dart';
 import 'package:prokat/features/owner/addresses/screens/owner_address_edit_screen.dart';
 import 'package:prokat/features/owner/addresses/screens/owner_addresses_screen.dart';
@@ -20,13 +23,12 @@ import 'package:prokat/features/owner/equipment/screens/equipment_detail_screen.
 import 'package:prokat/features/owner/equipment/screens/owner_equipment_create.dart';
 import 'package:prokat/features/owner/equipment/screens/owner_equipment_list_screen.dart';
 import 'package:prokat/features/owner/requests/screens/owner_requests_screen.dart';
+import 'package:prokat/features/user/screens/user_profile_screen.dart';
+import 'package:prokat/features/user/screens/user_settings_screen.dart';
 import 'package:prokat/screens/user/launch/launch_screen.dart';
 import 'package:prokat/screens/user/main/main_screen.dart';
 import 'package:prokat/screens/user/equipment/equipment_id_screen.dart';
-import 'package:prokat/screens/user/booking/my_rentals_screen.dart';
 import 'package:prokat/screens/user/favorites/favorites_screen.dart';
-import 'package:prokat/screens/user/profile/profile_screen.dart';
-import 'package:prokat/screens/user/settings/settings_screen.dart';
 import 'package:prokat/screens/owner/dashboard/owner_dashboard_screen.dart';
 import 'package:prokat/screens/owner/booking/owner_booking_screen.dart';
 import 'package:prokat/screens/owner/profile/owner_profile_screen.dart';
@@ -130,10 +132,12 @@ GoRouter createRouter(WidgetRef ref) {
                   );
                 },
               ),
+              // Map screen which displays equipment for rent
               GoRoute(
                 path: AppRoutes.searchMap,
                 builder: (_, _) => const MapRenterEquipmentScreen(),
               ),
+              // display equipment details in full screen
               GoRoute(
                 path: '/equipment/:id',
                 builder: (context, state) {
@@ -141,6 +145,7 @@ GoRouter createRouter(WidgetRef ref) {
                   return EquipmentIdScreen(equipmentId: id);
                 },
                 routes: [
+                  // Screen for creating a booking on an equipment
                   GoRoute(
                     path: 'book',
                     builder: (context, state) {
@@ -151,8 +156,23 @@ GoRouter createRouter(WidgetRef ref) {
                 ],
               ),
               GoRoute(
+                path: '/addresses',
+                builder: (context, state) {
+                  return RenterAddressesScreen();
+                },
+                routes: [
+                  // Screen for creating a booking on an equipment
+                  GoRoute(
+                    path: 'pintomap',
+                    builder: (context, state) {
+                      return MapRenterPinAddressScreen();//
+                    },
+                  ),
+                ],
+              ),
+              GoRoute(
                 path: AppRoutes.myRentals,
-                builder: (_, _) => const MyRentalsScreen(),
+                builder: (_, _) => const RenterBookingsScreen(),
               ),
               GoRoute(
                 path: AppRoutes.favorites,
@@ -160,11 +180,11 @@ GoRouter createRouter(WidgetRef ref) {
               ),
               GoRoute(
                 path: AppRoutes.profile,
-                builder: (_, _) => const ProfileScreen(),
+                builder: (_, _) => const UserProfileScreen(),
               ),
               GoRoute(
                 path: AppRoutes.settings,
-                builder: (_, _) => const SettingsScreen(),
+                builder: (_, _) => const UserSettingsScreen(),
               ),
             ],
           ),

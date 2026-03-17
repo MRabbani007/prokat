@@ -15,6 +15,7 @@ class ApiInterceptor extends Interceptor {
     try {
       final session = await secureStorage.readSession();
 
+      print("TOKEN: ${session?.sessionToken}");
       if (session != null) {
         final token = session.sessionToken;
 

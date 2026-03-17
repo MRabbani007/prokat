@@ -13,7 +13,20 @@ class LocationNotifier extends StateNotifier<LocationState> {
 
   List<LocationSearchResult> suggestions = [];
 
-  /// Fetch user locations
+  // Fetch user Addresses
+  Future<void> loadAddresses() async {
+    try {
+      state = state.copyWith(isLoading: true);
+
+      final addresses = await api.getLocations(mode: "ADDRESS");
+
+      state = state.copyWith(addresses: addresses, isLoading: false);
+    } catch (e) {
+      state = state.copyWith(isLoading: false, error: e.toString());
+    }
+  }
+
+  // Fetch owner equipment locations
   Future<void> loadLocations() async {
     try {
       state = state.copyWith(isLoading: true);
@@ -26,27 +39,37 @@ class LocationNotifier extends StateNotifier<LocationState> {
     }
   }
 
-  /// Create new location
+  // Create new location
   Future<bool> createLocation(LocationModel location) async {
     try {
+      state = state.copyWith(isLoading: true);
+
       final newLocation = await api.createLocation(location);
 
       state = state.copyWith(
-        locations: [...state.locations, newLocation],
+        isLoading: false,
+        addresses: newLocation.service == "ADDRESS"
+            ? [...state.addresses, newLocation]
+            : [...state.addresses],
+        locations: newLocation.service == "EQUIPMENT"
+            ? [...state.locations, newLocation]
+            : [...state.locations],
         error: null,
       );
-
-      // await ref.read(ownerEquipmentProvider.notifier).loadEquipment();
-      ref.invalidate(ownerEquipmentProvider);
+      
+      if (newLocation.service == "EQUIPMENT") {
+        ref.invalidate(ownerEquipmentProvider);
+        await ref.read(ownerEquipmentProvider.notifier).loadEquipment();
+      }
 
       return true;
     } catch (e) {
-      state = state.copyWith(error: e.toString());
+      state = state.copyWith(isLoading: false, error: e.toString());
       return false;
     }
   }
 
-  /// Update location
+  // Update location
   Future<void> updateLocation(String id, LocationModel location) async {
     try {
       final updated = await api.updateLocation(id, location);
@@ -62,7 +85,7 @@ class LocationNotifier extends StateNotifier<LocationState> {
     }
   }
 
-  /// Delete location
+  // Delete location
   Future<void> deleteLocation(String id) async {
     try {
       await api.deleteLocation(id);
@@ -100,5 +123,9 @@ class LocationNotifier extends StateNotifier<LocationState> {
 
   void clearSuggestions() {
     state = state.copyWith(suggestions: []);
+  }
+
+  void selectAddress(LocationModel address) {
+    state = state.copyWith(selectedAddress: address);
   }
 }

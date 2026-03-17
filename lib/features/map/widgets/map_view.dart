@@ -6,7 +6,7 @@ import 'package:prokat/features/equipment/models/equipment_model.dart';
 import 'package:prokat/features/map/state/map_controller_provider.dart';
 import 'package:prokat/features/map/widgets/map_controls.dart';
 
-enum MyMapMode { browseEquipment, pickLocation, ownerPlaceEquipment }
+enum MyMapMode { browseEquipment, renterPickAddress, ownerPlaceEquipment }
 
 class MyMapView extends ConsumerWidget {
   final MyMapMode mode;
@@ -41,6 +41,8 @@ class MyMapView extends ConsumerWidget {
 
           onMapCreated: (mapboxMap) async {
             controller.attach(mapboxMap);
+
+            controller.setRef(ref);
 
             await controller.enableUserLocation();
             await controller.moveToCurrentLocation();

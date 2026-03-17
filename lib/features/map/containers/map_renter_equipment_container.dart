@@ -3,18 +3,17 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:prokat/features/equipment/providers/equipment_map_provider.dart';
 import 'package:prokat/features/equipment/providers/equipment_provider.dart';
 import 'package:prokat/features/equipment/widgets/sheets/equipment_browse_sheet.dart';
-import 'package:prokat/features/equipment/widgets/sheets/equipment_preview_sheet.dart';
+import 'package:prokat/features/map/widgets/equipment_details_drawer.dart';
 import 'package:prokat/features/map/widgets/map_view.dart';
 
 class MapRenterEquipmentContainer extends ConsumerWidget {
   const MapRenterEquipmentContainer({super.key});
 
-
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final mapState = ref.watch(equipmentMapProvider);
     final equipmentList = ref.watch(equipmentProvider);
-  
+
     return Scaffold(
       body: Stack(
         children: [
@@ -28,20 +27,24 @@ class MapRenterEquipmentContainer extends ConsumerWidget {
                 const Center(child: Text("Failed to load equipment")),
           ),
 
-          EquipmentBrowseSheet(
-            expanded: mapState.isSheetExpanded,
-            onExpandChanged: (expanded) {
-              ref.read(equipmentMapProvider.notifier).toggleSheet(expanded);
-            },
-          ),
-
           if (mapState.selectedEquipment != null)
-            EquipmentPreviewSheet(
-              equipment: mapState.selectedEquipment!,
-              onClose: () {
-                ref.read(equipmentMapProvider.notifier).clearSelection();
+            EquipmentDetailsDrawer(equipment: mapState.selectedEquipment!),
+
+          if (mapState.selectedEquipment == null)
+            EquipmentBrowseSheet(
+              expanded: mapState.isSheetExpanded,
+              onExpandChanged: (expanded) {
+                ref.read(equipmentMapProvider.notifier).toggleSheet(expanded);
               },
             ),
+
+          // if (mapState.selectedEquipment != null)
+          //   EquipmentPreviewSheet(
+          //     equipment: mapState.selectedEquipment!,
+          //     onClose: () {
+          //       ref.read(equipmentMapProvider.notifier).clearSelection();
+          //     },
+          //   ),
         ],
       ),
     );

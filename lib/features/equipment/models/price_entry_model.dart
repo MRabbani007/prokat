@@ -1,12 +1,3 @@
-// enum PriceRate { PER_TRIP, PER_DAY, PER_HOUR, PER_CUBIC_METER }
-
-// PriceRate priceRateFromString(String value) {
-//   return PriceRate.values.firstWhere(
-//     (e) => e.name == value,
-//     orElse: () => PriceRate.PER_TRIP,
-//   );
-// }
-
 class PriceEntry {
   final String id;
   final int price;

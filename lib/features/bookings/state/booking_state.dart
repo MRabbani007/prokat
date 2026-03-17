@@ -1,0 +1,70 @@
+import 'package:prokat/features/bookings/models/booking_model.dart';
+import 'package:prokat/features/equipment/models/equipment_model.dart';
+import 'package:prokat/features/equipment/models/price_entry_model.dart';
+import 'package:prokat/features/locations/models/location_model.dart';
+
+class BookingState {
+  final bool isLoading;
+  final String? error;
+
+  final List<BookingModel> bookings;
+
+  /// 🔥 IMPORTANT: current draft booking
+  final BookingModel? currentBooking;
+
+  /// 🔥 local selections (before API create)
+  final Equipment? selectedEquipment;
+  final PriceEntry? selectedPriceEntry;
+  final LocationModel? selectedLocation;
+  final String? selectedLocationId;
+  final DateTime? selectedDate;
+  final DateTime? selectedTime;
+  final String? comment;
+
+  BookingState({
+    this.isLoading = false,
+    this.error,
+    this.bookings = const [],
+    this.currentBooking,
+    this.selectedEquipment,
+    this.selectedLocation,
+    this.selectedLocationId,
+    this.selectedPriceEntry,
+    this.selectedDate,
+    this.selectedTime,
+    this.comment,
+  });
+
+  BookingState copyWith({
+    bool? isLoading,
+    String? error,
+    List<BookingModel>? bookings,
+    BookingModel? currentBooking,
+    Equipment? selectedEquipment,
+    String? selectedLocationId,
+    LocationModel? selectedLocation,
+    PriceEntry? selectedPriceEntry,
+    DateTime? selectedDate,
+    DateTime? selectedTime,
+    String? comment,
+  }) {
+    return BookingState(
+      isLoading: isLoading ?? this.isLoading,
+      error: error ?? this.error,
+      bookings: bookings ?? this.bookings,
+      currentBooking: currentBooking ?? this.currentBooking,
+
+      selectedEquipment: selectedEquipment ?? this.selectedEquipment,
+
+      selectedLocationId: selectedLocationId ?? this.selectedLocationId,
+
+      selectedLocation: selectedLocation ?? this.selectedLocation,
+
+      selectedPriceEntry: selectedPriceEntry ?? this.selectedPriceEntry,
+
+      selectedDate: selectedDate ?? this.selectedDate,
+      selectedTime: selectedTime ?? this.selectedTime,
+      comment: comment ?? this.comment,
+    );
+  }
+}

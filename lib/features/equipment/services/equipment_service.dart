@@ -30,8 +30,6 @@ class EquipmentService extends BaseRepository {
           )
           .toList();
 
-      print(parsed[0].locations[0].latitude);
-      print(parsed[0].locations[0].longitude);
       return parsed;
     });
   }

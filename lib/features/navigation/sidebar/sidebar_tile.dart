@@ -1,12 +1,13 @@
+
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-class SidebarItem extends StatelessWidget {
+class SidebarTile extends StatelessWidget {
   final IconData icon;
   final String label;
   final String route;
 
-  const SidebarItem({
+  const SidebarTile({
     super.key,
     required this.icon,
     required this.label,
@@ -16,19 +17,19 @@ class SidebarItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListTile(
-      leading: Icon(icon, color: Colors.indigo),
+      onTap: () => context.push(route),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 12),
+      leading: Icon(icon, color: Colors.white70, size: 22),
       title: Text(
         label,
         style: const TextStyle(
-          fontWeight: FontWeight.w600,
+          color: Colors.white,
           fontSize: 15,
+          fontWeight: FontWeight.w500,
         ),
       ),
-      hoverColor: Colors.indigoAccent.withAlpha(60),
-      onTap: () {
-        Navigator.pop(context);
-        context.go(route);
-      },
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      visualDensity: VisualDensity.compact,
     );
   }
 }

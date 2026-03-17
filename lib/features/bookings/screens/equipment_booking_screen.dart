@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
+import 'package:prokat/features/bookings/state/booking_provider.dart';
 import 'package:prokat/features/bookings/widgets/equipment_image_header.dart';
+import 'package:prokat/features/locations/state/location_provider.dart';
 import 'package:prokat/features/owner/equipment/providers/owner_equipment_provider.dart';
+import 'package:go_router/go_router.dart';
 
 class EquipmentBookingScreen extends ConsumerStatefulWidget {
   final String equipmentId;
@@ -22,6 +25,7 @@ class _EquipmentBookingScreenState
 
     Future.microtask(() {
       ref.read(ownerEquipmentProvider.notifier).loadEquipment();
+      ref.read(locationProvider.notifier).loadAddresses();
     });
   }
 
@@ -29,11 +33,24 @@ class _EquipmentBookingScreenState
   DateTime? selectedDate;
   TimeOfDay? selectedTime;
 
-  String? userAddress = "123 Caspian Ave, Atyrau";
-
   @override
   Widget build(BuildContext context) {
+    /// 🔥 AUTO SYNC address → booking
+    ref.listen(locationProvider, (previous, next) {
+      final address = next.selectedAddress;
+
+      if (address != null && address.id != null) {
+        ref.read(bookingProvider.notifier).selectLocation(address);
+      }
+    });
+
+    final bookingState = ref.watch(bookingProvider);
+    final bookingNotifier = ref.read(bookingProvider.notifier);
+
     final state = ref.watch(ownerEquipmentProvider);
+    final locationState = ref.watch(locationProvider);
+
+    final selectedAddress = locationState.selectedAddress;
 
     if (state.equipment.isEmpty) {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
@@ -125,8 +142,13 @@ class _EquipmentBookingScreenState
 
                 return ChoiceChip(
                   label: Text("${entry.price} ₸ / ${entry.priceRate}"),
-                  selected: selectedPriceIndex == index,
+                  selected:
+                      bookingState.selectedPriceEntry?.id ==
+                      priceEntries[index].id,
                   onSelected: (_) {
+                    ref
+                        .read(bookingProvider.notifier)
+                        .selectPriceEntry(priceEntries[index]);
                     setState(() {
                       selectedPriceIndex = index;
                     });
@@ -140,21 +162,51 @@ class _EquipmentBookingScreenState
             /// Address
             _buildSectionTitle("Delivery Address"),
 
-            userAddress != null
-                ? ListTile(
-                    contentPadding: EdgeInsets.zero,
-                    leading: const Icon(Icons.home_outlined),
-                    title: Text(userAddress!),
-                    trailing: TextButton(
-                      onPressed: () {},
-                      child: const Text("Change"),
+            GestureDetector(
+              onTap: () => _openAddressSheet(context, ref),
+              child: Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  border: Border.all(color: Colors.grey.shade300),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Row(
+                  children: [
+                    const Icon(Icons.location_on_outlined, color: Colors.blue),
+
+                    const SizedBox(width: 12),
+
+                    Expanded(
+                      child: selectedAddress != null
+                          ? Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Text(
+                                  "Delivery to",
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    color: Colors.grey,
+                                  ),
+                                ),
+                                Text(
+                                  "${selectedAddress.street}, ${selectedAddress.city}",
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              ],
+                            )
+                          : const Text(
+                              "Add Delivery Address",
+                              style: TextStyle(fontWeight: FontWeight.w500),
+                            ),
                     ),
-                  )
-                : OutlinedButton.icon(
-                    onPressed: () {},
-                    icon: const Icon(Icons.add),
-                    label: const Text("Add Delivery Address"),
-                  ),
+
+                    const Icon(Icons.chevron_right),
+                  ],
+                ),
+              ),
+            ),
 
             const SizedBox(height: 24),
 
@@ -167,9 +219,11 @@ class _EquipmentBookingScreenState
                   child: OutlinedButton.icon(
                     icon: const Icon(Icons.calendar_month),
                     label: Text(
-                      selectedDate == null
+                      bookingState.selectedDate == null
                           ? "Select Date"
-                          : DateFormat('MMM dd, yyyy').format(selectedDate!),
+                          : DateFormat(
+                              'MMM dd, yyyy',
+                            ).format(bookingState.selectedDate!),
                     ),
                     onPressed: () async {
                       final date = await showDatePicker(
@@ -180,7 +234,7 @@ class _EquipmentBookingScreenState
                       );
 
                       if (date != null) {
-                        setState(() => selectedDate = date);
+                        bookingNotifier.setDate(date);
                       }
                     },
                   ),
@@ -192,9 +246,11 @@ class _EquipmentBookingScreenState
                   child: OutlinedButton.icon(
                     icon: const Icon(Icons.access_time),
                     label: Text(
-                      selectedTime == null
+                      bookingState.selectedTime == null
                           ? "Select Time"
-                          : selectedTime!.format(context),
+                          : TimeOfDay.fromDateTime(
+                              bookingState.selectedTime!,
+                            ).format(context),
                     ),
                     onPressed: () async {
                       final time = await showTimePicker(
@@ -203,7 +259,17 @@ class _EquipmentBookingScreenState
                       );
 
                       if (time != null) {
-                        setState(() => selectedTime = time);
+                        final now = DateTime.now();
+
+                        bookingNotifier.setTime(
+                          DateTime(
+                            now.year,
+                            now.month,
+                            now.day,
+                            time.hour,
+                            time.minute,
+                          ),
+                        );
                       }
                     },
                   ),
@@ -218,6 +284,9 @@ class _EquipmentBookingScreenState
 
             TextField(
               maxLines: 3,
+              onChanged: (value) {
+                bookingNotifier.setComment(value);
+              },
               decoration: InputDecoration(
                 hintText: "Anything the owner should know?",
                 border: OutlineInputBorder(
@@ -233,9 +302,28 @@ class _EquipmentBookingScreenState
               width: double.infinity,
               height: 50,
               child: FilledButton(
-                onPressed: () {
-                  // TODO booking logic
-                },
+                onPressed:
+                    bookingState.selectedLocationId == null ||
+                        bookingState.selectedDate == null ||
+                        bookingState.selectedTime == null
+                    ? null
+                    : () async {
+                        final res = await bookingNotifier.createBooking();
+
+                        if (context.mounted && res == true) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text("Booking created")),
+                          );
+
+                          context.pop();
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text("Something went wrong!"),
+                            ),
+                          );
+                        }
+                      },
                 child: const Text(
                   "Confirm Booking",
                   style: TextStyle(fontSize: 16),
@@ -257,6 +345,79 @@ class _EquipmentBookingScreenState
         title,
         style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
       ),
+    );
+  }
+
+  void _openAddressSheet(BuildContext context, WidgetRef ref) {
+    final addresses = ref.read(locationProvider).addresses.take(3).toList();
+
+    // ref.read(locationProvider.notifier).selectAddress(address);
+
+    // ref.read(bookingProvider.notifier).selectLocation(address.id);
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (context) {
+        return Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                "Select Address",
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+
+              const SizedBox(height: 16),
+
+              /// Last 3 addresses
+              ...addresses.map((address) {
+                return ListTile(
+                  contentPadding: EdgeInsets.zero,
+                  leading: const Icon(Icons.history),
+                  title: Text("${address.street}, ${address.city}"),
+                  onTap: () {
+                    ref.read(locationProvider.notifier).selectAddress(address);
+
+                    Navigator.pop(context);
+                  },
+                );
+              }),
+
+              const SizedBox(height: 12),
+
+              /// Choose on map
+              SizedBox(
+                width: double.infinity,
+                child: OutlinedButton.icon(
+                  icon: const Icon(Icons.map),
+                  label: const Text("Choose on Map"),
+                  onPressed: () {
+                    Navigator.pop(context); // close bottom sheet
+
+                    context.push(
+                      '/addresses/pintomap',
+                      extra: {'equipmentId': widget.equipmentId},
+                    );
+
+                    // final result =
+                    // if (result != null) {
+                    //   ref.read(locationProvider.notifier).selectAddress(result);
+                    // }
+                  },
+                ),
+              ),
+
+              const SizedBox(height: 16),
+            ],
+          ),
+        );
+      },
     );
   }
 }

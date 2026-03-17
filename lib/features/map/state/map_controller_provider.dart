@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart';
 import 'package:prokat/features/equipment/models/equipment_model.dart';
+import 'package:prokat/features/equipment/providers/equipment_map_provider.dart';
 import 'package:prokat/features/equipment/providers/equipment_provider.dart';
 import 'package:geolocator/geolocator.dart' as geo;
 
@@ -11,10 +12,16 @@ class MapController {
   MapboxMap? _map;
   PointAnnotationManager? _annotationManager;
   bool markersAdded = false;
-  CircleAnnotationManager? _circleManager;
+  // CircleAnnotationManager? _circleManager;
   bool _markersAdded = false;
   List<Equipment> _equipments = [];
-  Function(Equipment)? onEquipmentTapped;
+  // Function(Equipment)? onEquipmentTapped;
+
+  late WidgetRef _ref;
+
+  void setRef(WidgetRef ref) {
+    _ref = ref;
+  }
 
   void attach(
     MapboxMap map, {
@@ -23,7 +30,7 @@ class MapController {
   }) {
     _map = map;
     if (initialItems != null) _equipments = initialItems;
-    if (onTap != null) onEquipmentTapped = onTap;
+    // if (onTap != null) onEquipmentTapped = onTap;
   }
 
   MapboxMap get _requireMap {
@@ -114,50 +121,12 @@ class MapController {
     });
   }
 
-  /// Renders saved equipment as Red Circles (to avoid icon loading issues)
-  Future<void> renderEquipment(List<Equipment> equipment) async {
-    if (_map == null) return;
-
-    // Ensure manager exists
-    _circleManager ??= await _map!.annotations.createCircleAnnotationManager();
-
-    // Clear previous markers
-    await _circleManager!.deleteAll();
-
-    final List<CircleAnnotationOptions> annotations = [];
-
-    for (var item in equipment) {
-      if (item.locations.isEmpty) continue;
-
-      final loc = item.locations.first;
-
-      // FIX: Position must be [Longitude, Latitude]
-      final lng = loc.longitude ?? 0.0;
-      final lat = loc.latitude ?? 0.0;
-
-      annotations.add(
-        CircleAnnotationOptions(
-          geometry: Point(coordinates: Position(lng, lat)),
-          circleRadius: 8.0,
-          circleColor: Colors.red.value,
-          circleStrokeWidth: 2.0,
-          circleStrokeColor: Colors.white.value,
-        ),
-      );
-    }
-
-    if (annotations.isNotEmpty) {
-      await _circleManager!.createMulti(annotations);
-      debugPrint("Rendered ${annotations.length} equipment circles.");
-    }
-  }
-
   Future<void> _loadMarkerIcon() async {
     if (_map == null) return;
 
     // 1. Load image from assets
     final ByteData bytes = await rootBundle.load(
-      'assets/images/icons/truck_topview.png',
+      'assets/images/icons/truck_96.png',
     );
     final Uint8List list = bytes.buffer.asUint8List();
 
@@ -220,12 +189,13 @@ class MapController {
               location.latitude ?? 0,
             ),
           ),
-          // FIX: You MUST provide the iconImage ID you registered above
+          // Provide the iconImage ID registered above
           iconImage: 'equipment-icon',
           iconSize: iconSizeForZoom(zoom),
-          // Optional: Add text labels if you want to see IDs/Names
+          // Add text labels
           textField: equipment.name,
           textOffset: [0, 2.0],
+          customData: {'id': equipment.id},
         ),
       );
     }
@@ -237,7 +207,7 @@ class MapController {
     }
   }
 
-  void _onAnnotationTapped(PointAnnotation annotation) {
+  void _onAnnotationTapped(PointAnnotation annotation) async {
     final id = annotation.customData?['id'];
     if (id == null) return;
 
@@ -245,8 +215,13 @@ class MapController {
       // Look up the equipment from our local stored list
       final equipment = _equipments.firstWhere((e) => e.id == id);
 
-      // Call the stored callback
-      onEquipmentTapped?.call(equipment);
+      /// 🔥 Update global map state
+      _ref.read(equipmentMapProvider.notifier).selectEquipment(equipment);
+
+      // await _map!.flyTo(
+      //   CameraOptions(center: annotation.geometry, zoom: 14),
+      //   MapAnimationOptions(duration: 800),
+      // );
     } catch (e) {
       debugPrint("Equipment not found for id: $id");
     }
