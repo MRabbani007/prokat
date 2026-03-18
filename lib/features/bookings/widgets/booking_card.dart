@@ -1,25 +1,28 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:prokat/features/bookings/models/booking_model.dart'; // For better date/time formatting
+import 'package:prokat/features/bookings/models/booking_model.dart';
 
 class BookingCard extends StatelessWidget {
-  final BookingModel booking; // Replace with your BookingModel
+  final BookingModel booking;
 
   const BookingCard({super.key, required this.booking});
 
   @override
   Widget build(BuildContext context) {
+    const cardColor = Color(0xFF1E2125);
+    const accentColor = Color(0xFF4E73DF);
+
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: cardColor,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Colors.grey.withAlpha(20), width: 1),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withAlpha(4),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
+            color: Colors.black.withValues(alpha: 0.2),
+            blurRadius: 12,
+            offset: const Offset(0, 6),
           ),
         ],
       ),
@@ -27,7 +30,7 @@ class BookingCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(20),
         child: Column(
           children: [
-            // Top Section: Equipment & Status
+            // 1. Top Section: Primary Details
             Padding(
               padding: const EdgeInsets.all(16),
               child: Column(
@@ -38,11 +41,12 @@ class BookingCard extends StatelessWidget {
                     children: [
                       Expanded(
                         child: Text(
-                          "${booking.equipmentName} ${booking.equipmentName}",
+                          booking.equipmentName, // ?? 'Unknown Equipment',
                           style: const TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
-                            color: Color(0xFF1A1C1E),
+                            color: Colors.white,
+                            letterSpacing: 0.5,
                           ),
                         ),
                       ),
@@ -51,69 +55,73 @@ class BookingCard extends StatelessWidget {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    "Capacity: 10 M3",//${booking.capacity} ${booking.capacityUnit}",
-                    style: TextStyle(color: Colors.grey[600], fontSize: 14),
+                    "CAPACITY: 10 M3", // Hardcoded per your snippet
+                    style: TextStyle(
+                      color: Colors.white.withValues(alpha: 0.4),
+                      fontSize: 11,
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: 1,
+                    ),
                   ),
-                  const Divider(height: 24, thickness: 0.5),
-                  
-                  // Location Row
-                  Row(
-                    children: [
-                      const Icon(Icons.location_on_outlined, size: 16, color: Colors.blueAccent),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: Text(
-                          "Satpayeva, Atyrau",
-                          // "${booking.street}, ${booking.city}",
-                          style: const TextStyle(fontSize: 14, color: Colors.black87),
-                        ),
-                      ),
-                    ],
+                  const Padding(
+                    padding: EdgeInsets.symmetric(vertical: 16),
+                    child: Divider(height: 1, thickness: 1, color: Colors.white10),
                   ),
-                  const SizedBox(height: 8),
                   
-                  // Date/Time Row
-                  Row(
-                    children: [
-                      const Icon(Icons.calendar_today_outlined, size: 16, color: Colors.orange),
-                      const SizedBox(width: 8),
-                      Text(
-                        booking.bookedOn != null 
-                          ? DateFormat('MMM dd, yyyy • hh:mm a').format(booking.bookedOn ?? DateTime(0))
-                          : "Date not set",
-                        style: const TextStyle(fontSize: 14, color: Colors.black87),
-                      ),
-                    ],
+                  // Meta Info Grid
+                  _buildMetaRow(
+                    Icons.location_on_outlined, 
+                    "Satpayeva, Atyrau", 
+                    accentColor,
+                  ),
+                  const SizedBox(height: 12),
+                  _buildMetaRow(
+                    Icons.calendar_today_outlined,
+                    booking.bookedOn != null 
+                        ? DateFormat('MMM dd, yyyy • hh:mm a').format(booking.bookedOn!)
+                        : "Date not set",
+                    Colors.orangeAccent,
                   ),
                 ],
               ),
             ),
 
-            // Bottom Section: Pricing (Different Background)
+            // 2. Bottom Section: Pricing Action Bar
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-              color: Colors.grey[50],
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+              decoration: BoxDecoration(
+                color: Colors.white.withValues(alpha: 0.02),
+                border: Border(top: BorderSide(color: Colors.white.withValues(alpha: 0.05))),
+              ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text(
-                    "Total Price",
-                    style: TextStyle(fontWeight: FontWeight.w500, color: Colors.grey),
+                  Text(
+                    "TOTAL PRICE",
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold, 
+                      color: Colors.white.withValues(alpha: 0.3),
+                      fontSize: 10,
+                      letterSpacing: 1.2,
+                    ),
                   ),
                   RichText(
                     text: TextSpan(
                       children: [
                         TextSpan(
-                          text: "\$${booking.price} ",
+                          text: "${booking.price} ₸ ", // Switched to Tenge symbol for consistency
                           style: const TextStyle(
-                            fontSize: 20,
+                            fontSize: 18,
                             fontWeight: FontWeight.bold,
-                            color: Colors.blueAccent,
+                            color: accentColor,
                           ),
                         ),
                         TextSpan(
                           text: "/ ${booking.priceRate}",
-                          style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+                          style: TextStyle(
+                            fontSize: 12, 
+                            color: Colors.white.withValues(alpha: 0.4),
+                          ),
                         ),
                       ],
                     ),
@@ -124,6 +132,28 @@ class BookingCard extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildMetaRow(IconData icon, String text, Color iconColor) {
+    return Row(
+      children: [
+        Container(
+          padding: const EdgeInsets.all(6),
+          decoration: BoxDecoration(
+            color: iconColor.withValues(alpha: 0.1),
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Icon(icon, size: 14, color: iconColor),
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Text(
+            text,
+            style: const TextStyle(fontSize: 14, color: Colors.white70, fontWeight: FontWeight.w500),
+          ),
+        ),
+      ],
     );
   }
 }
@@ -137,26 +167,26 @@ class _StatusBadge extends StatelessWidget {
     Color baseColor;
     switch (status.toUpperCase()) {
       case 'CREATED': baseColor = Colors.orange; break;
-      case 'CONFIRMED': baseColor = Colors.green; break;
-      case 'COMPLETED': baseColor = Colors.blue; break;
-      case 'CANCELLED': baseColor = Colors.red; break;
+      case 'CONFIRMED': baseColor = Colors.greenAccent; break;
+      case 'COMPLETED': baseColor = Color(0xFF4E73DF); break;
+      case 'CANCELLED': baseColor = Colors.redAccent; break;
       default: baseColor = Colors.grey;
     }
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       decoration: BoxDecoration(
-        color: baseColor.withOpacity(0.12),
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: baseColor.withOpacity(0.5), width: 1),
+        color: baseColor.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: baseColor.withValues(alpha: 0.3), width: 1),
       ),
       child: Text(
-        status,
+        status.toUpperCase(),
         style: TextStyle(
           color: baseColor,
-          fontSize: 11,
+          fontSize: 10,
           fontWeight: FontWeight.bold,
-          letterSpacing: 0.5,
+          letterSpacing: 1,
         ),
       ),
     );

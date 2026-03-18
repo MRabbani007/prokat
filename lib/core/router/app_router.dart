@@ -7,6 +7,7 @@ import 'package:prokat/features/auth/screens/register_screen.dart';
 import 'package:prokat/features/bookings/screens/equipment_booking_screen.dart';
 import 'package:prokat/features/bookings/screens/renter_bookings_screen.dart';
 import 'package:prokat/features/categories/screens/categories_screen.dart';
+import 'package:prokat/features/equipment/screens/equipment_id_screen.dart';
 import 'package:prokat/features/equipment/screens/equipment_list_screen.dart';
 import 'package:prokat/features/layout/main_scaffold.dart';
 import 'package:prokat/features/auth/screens/forgot_password_screen.dart';
@@ -23,12 +24,13 @@ import 'package:prokat/features/owner/equipment/screens/equipment_detail_screen.
 import 'package:prokat/features/owner/equipment/screens/owner_equipment_create.dart';
 import 'package:prokat/features/owner/equipment/screens/owner_equipment_list_screen.dart';
 import 'package:prokat/features/owner/requests/screens/owner_requests_screen.dart';
+import 'package:prokat/features/requests/screens/create_request_screen.dart';
+import 'package:prokat/features/requests/screens/renter_requests_screen.dart';
 import 'package:prokat/features/user/screens/user_profile_screen.dart';
 import 'package:prokat/features/user/screens/user_settings_screen.dart';
 import 'package:prokat/screens/user/launch/launch_screen.dart';
 import 'package:prokat/screens/user/main/main_screen.dart';
-import 'package:prokat/screens/user/equipment/equipment_id_screen.dart';
-import 'package:prokat/screens/user/favorites/favorites_screen.dart';
+import 'package:prokat/features/favorites/screens/favorites_screen.dart';
 import 'package:prokat/screens/owner/dashboard/owner_dashboard_screen.dart';
 import 'package:prokat/screens/owner/booking/owner_booking_screen.dart';
 import 'package:prokat/screens/owner/profile/owner_profile_screen.dart';
@@ -166,6 +168,20 @@ GoRouter createRouter(WidgetRef ref) {
                     path: 'pintomap',
                     builder: (context, state) {
                       return MapRenterPinAddressScreen();//
+                    },
+                  ),
+                ],
+              ),
+              GoRoute(
+                path: '/requests',
+                builder: (context, state) {
+                  return RenterRequestsScreen();
+                },
+                routes: [
+                  GoRoute(
+                    path: 'create',
+                    builder: (context, state) {
+                      return CreateRequestScreen();
                     },
                   ),
                 ],

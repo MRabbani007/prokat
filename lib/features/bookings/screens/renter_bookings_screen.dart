@@ -5,30 +5,26 @@ import 'package:prokat/core/widgets/page_header.dart';
 import 'package:prokat/features/bookings/state/booking_provider.dart';
 import 'package:prokat/features/bookings/widgets/booking_card.dart';
 
-// Assume you already have these
-// bookingProvider -> handles fetching bookings
-// BookingModel -> has status + equipmentId + isDraft flag
 class RenterBookingsScreen extends ConsumerStatefulWidget {
   const RenterBookingsScreen({super.key});
 
   @override
-  ConsumerState<RenterBookingsScreen> createState() =>
-      _RenterBookingsScreenState();
+  ConsumerState<RenterBookingsScreen> createState() => _RenterBookingsScreenState();
 }
 
 class _RenterBookingsScreenState extends ConsumerState<RenterBookingsScreen>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
 
+  // Theme Constants
+  final bgColor = const Color(0xFF121417);
+  final accentColor = const Color(0xFF4E73DF);
+
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
-
-    // Fetch every time screen opens
-    Future.microtask(() {
-      ref.read(bookingProvider.notifier).getBookings();
-    });
+    Future.microtask(() => ref.read(bookingProvider.notifier).getBookings());
   }
 
   @override
@@ -37,13 +33,10 @@ class _RenterBookingsScreenState extends ConsumerState<RenterBookingsScreen>
     super.dispose();
   }
 
-  Future<void> _refresh() async {
-    await ref.read(bookingProvider.notifier).getBookings();
-  }
-
   @override
   Widget build(BuildContext context) {
     final bookingState = ref.watch(bookingProvider);
+    
     final upcoming = bookingState.bookings
         .where((b) => b.status == "CREATED" || b.status == "CONFIRMED")
         .toList();
@@ -57,69 +50,47 @@ class _RenterBookingsScreenState extends ConsumerState<RenterBookingsScreen>
         .toList();
 
     return Scaffold(
-      backgroundColor: Colors.grey[100], // Soft background
+      backgroundColor: bgColor,
       body: SafeArea(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            PageHeader(title: "My Bookings"),
-            // 1. Balanced Header (Accounts for top-left FAB)
-            // Padding(
-            //   padding: const EdgeInsets.only(
-            //     top: 12,
-            //     left: 90,
-            //     right: 20,
-            //     bottom: 20,
-            //   ),
-            //   child: Column(
-            //     crossAxisAlignment: CrossAxisAlignment.start,
-            //     children: [
-            //       Text(
-            //         'My Bookings',
-            //         style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-            //           fontWeight: FontWeight.bold,
-            //           color: Colors.black87,
-            //         ),
-            //       ),
-            //       Text(
-            //         'Track your rentals and history',
-            //         style: TextStyle(color: Colors.grey[600], fontSize: 14),
-            //       ),
-            //     ],
-            //   ),
-            // ),
+            const PageHeader(title: "My Rentals"),
 
-            // 2. High-Priority Draft Card
+            // 1. High-Priority Draft Card (Refined Orange)
             if (draft.isNotEmpty) _EnhancedDraftCard(booking: draft.first),
 
-            // 3. Modern Segmented TabBar
+            // 2. Industrial Segmented TabBar
             Container(
               margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+              height: 48,
               decoration: BoxDecoration(
-                color: Colors.grey[200],
-                borderRadius: BorderRadius.circular(12),
+                color: Colors.white.withValues(alpha: 0.03),
+                borderRadius: BorderRadius.circular(14),
+                border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
               ),
               child: TabBar(
                 controller: _tabController,
                 indicatorSize: TabBarIndicatorSize.tab,
                 dividerColor: Colors.transparent,
                 indicator: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(10),
+                  color: const Color(0xFF1E2125), // Lighter charcoal for active tab
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black12,
+                      color: Colors.black.withValues(alpha: 0.3),
                       blurRadius: 4,
-                      offset: Offset(0, 2),
+                      offset: const Offset(0, 2),
                     ),
                   ],
                 ),
-                labelColor: Colors.black,
-                unselectedLabelColor: Colors.grey[600],
-                labelStyle: const TextStyle(fontWeight: FontWeight.bold),
+                labelColor: Colors.white,
+                unselectedLabelColor: Colors.white.withValues(alpha: 0.3),
+                labelStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13, letterSpacing: 0.5),
                 tabs: const [
-                  Tab(text: 'Upcoming'),
-                  Tab(text: 'History'),
+                  Tab(text: 'UPCOMING'),
+                  Tab(text: 'HISTORY'),
                 ],
               ),
             ),
@@ -138,20 +109,6 @@ class _RenterBookingsScreenState extends ConsumerState<RenterBookingsScreen>
       ),
     );
   }
-
-  Widget _buildHeader() {
-    return const Padding(
-      padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      child: Row(
-        children: [
-          Text(
-            'My Bookings',
-            style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-          ),
-        ],
-      ),
-    );
-  }
 }
 
 class _BookingList extends StatelessWidget {
@@ -165,15 +122,11 @@ class _BookingList extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
-              Icons.calendar_today_outlined,
-              size: 60,
-              color: Colors.grey[300],
-            ),
+            Icon(Icons.inventory_2_outlined, size: 48, color: Colors.white.withValues(alpha: 0.05)),
             const SizedBox(height: 16),
             Text(
               'No bookings found',
-              style: TextStyle(color: Colors.grey[500], fontSize: 16),
+              style: TextStyle(color: Colors.white.withValues(alpha: 0.2), fontSize: 14),
             ),
           ],
         ),
@@ -181,9 +134,9 @@ class _BookingList extends StatelessWidget {
     }
 
     return ListView.separated(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.fromLTRB(20, 10, 20, 20),
       itemCount: bookings.length,
-      separatorBuilder: (_, __) => const SizedBox(height: 12),
+      separatorBuilder: (_, _) => const SizedBox(height: 12),
       itemBuilder: (context, index) {
         final booking = bookings[index];
         return BookingCard(booking: booking);
@@ -198,78 +151,49 @@ class _EnhancedDraftCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    const draftColor = Color(0xFFD97706); // Industrial Amber
+
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [Colors.orange[400]!, Colors.orange[600]!],
-        ),
+        color: draftColor.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.orange.withOpacity(0.3),
-            blurRadius: 8,
-            offset: const Offset(0, 4),
-          ),
-        ],
+        border: Border.all(color: draftColor.withValues(alpha: 0.3)),
       ),
       child: Row(
         children: [
-          const Icon(Icons.shopping_cart_checkout, color: Colors.white),
+          const Icon(Icons.error_outline_rounded, color: draftColor, size: 20),
           const SizedBox(width: 12),
           const Expanded(
-            child: Text(
-              'Finish your booking request',
-              style: TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.w600,
-              ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'DRAFT INCOMPLETE',
+                  style: TextStyle(
+                    color: draftColor,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 10,
+                    letterSpacing: 1,
+                  ),
+                ),
+                Text(
+                  'Finish your booking request',
+                  style: TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w500),
+                ),
+              ],
             ),
           ),
-          ElevatedButton(
-            onPressed: () =>
-                context.push('/equipment/${booking.equipmentId}/book'),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.white,
-              foregroundColor: Colors.orange[700],
-              elevation: 0,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
-              ),
-            ),
-            child: const Text('Resume'),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _DraftBanner extends StatelessWidget {
-  final dynamic booking;
-
-  const _DraftBanner({required this.booking});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.all(12),
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: Colors.orange.shade100,
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Row(
-        children: [
-          const Icon(Icons.warning_amber_rounded),
-          const SizedBox(width: 10),
-          const Expanded(child: Text('You have an unfinished booking')),
           TextButton(
-            onPressed: () {
-              context.push('/equipment/${booking.equipmentId}/book');
-            },
-            child: const Text('Continue'),
+            onPressed: () => context.push('/equipment/${booking.equipmentId}/book'),
+            style: TextButton.styleFrom(
+              foregroundColor: Colors.white,
+              backgroundColor: draftColor,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            ),
+            child: const Text('RESUME', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
           ),
         ],
       ),

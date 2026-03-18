@@ -19,10 +19,6 @@ class MapController {
 
   late WidgetRef _ref;
 
-  void setRef(WidgetRef ref) {
-    _ref = ref;
-  }
-
   void attach(
     MapboxMap map, {
     List<Equipment>? initialItems,
@@ -31,6 +27,19 @@ class MapController {
     _map = map;
     if (initialItems != null) _equipments = initialItems;
     // if (onTap != null) onEquipmentTapped = onTap;
+  }
+
+  void setRef(WidgetRef ref) {
+    _ref = ref;
+
+    /// Listen to equipment changes
+    ref.listen(equipmentProvider, (prev, next) {
+      next.whenData((items) async {
+        if (_map == null || items.isEmpty) return;
+
+        await _addEquipmentMarkers(items);
+      });
+    });
   }
 
   MapboxMap get _requireMap {
@@ -113,7 +122,7 @@ class MapController {
     final equipmentsAsync = ref.read(equipmentProvider);
 
     equipmentsAsync.whenData((items) async {
-      if (_markersAdded || items.isEmpty) return;
+      if (items.isEmpty) return; //_markersAdded ||
 
       _equipments = items;
       await _addEquipmentMarkers(items);

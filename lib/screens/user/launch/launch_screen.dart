@@ -16,31 +16,33 @@ class _LaunchScreenState extends State<LaunchScreen>
   late final Animation<double> _fadeAnimation;
   late final Animation<double> _scaleAnimation;
 
+  // Theme Constants matching your Sidebar & Header
+  final bgColor = const Color(0xFF121417);
+  final accentColor = const Color(0xFF4E73DF);
+
   @override
   void initState() {
     super.initState();
 
-    // Controller
     _controller = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 1500),
+      duration: const Duration(milliseconds: 1200),
     );
 
-    // Fade animation
-    _fadeAnimation = CurvedAnimation(parent: _controller, curve: Curves.easeIn);
+    _fadeAnimation = CurvedAnimation(
+      parent: _controller,
+      curve: const Interval(0.0, 0.8, curve: Curves.easeIn),
+    );
 
-    // Scale animation (slight zoom-in)
     _scaleAnimation = Tween<double>(
-      begin: 0.9,
+      begin: 0.85,
       end: 1.0,
-    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOutBack));
+    ).animate(CurvedAnimation(parent: _controller, curve: _OutProposedCurve()));
 
-    // Start animation
     _controller.forward();
 
-    // Navigate after splash
     Future.delayed(const Duration(seconds: 3), () {
-      if (mounted) context.go(AppRoutes.searchMap);
+      if (mounted) context.go(AppRoutes.searchMap); 
     });
   }
 
@@ -53,121 +55,133 @@ class _LaunchScreenState extends State<LaunchScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Stack(
-        children: [
-          // Background
-          Container(
-            decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: [
-                  Color(0xFF1A1A1A),
-                  Color(0xFF2D2D2D),
-                  Color(0xFF000000),
-                ],
+      backgroundColor: bgColor,
+      body: SizedBox.expand(
+        child: Stack(
+          alignment: Alignment.center,
+          children: [
+            // 1. Subtle Background Radial Glow
+            Positioned(
+              top: -100,
+              child: Container(
+                width: 400,
+                height: 400,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  gradient: RadialGradient(
+                    colors: [
+                      accentColor.withValues(alpha: 0.08),
+                      Colors.transparent,
+                    ],
+                  ),
+                ),
               ),
             ),
-          ),
-
-          // Logo + Text
-          Center(
-            child: FadeTransition(
+        
+            // 2. Central Branding
+            FadeTransition(
               opacity: _fadeAnimation,
               child: ScaleTransition(
                 scale: _scaleAnimation,
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
+                    // Icon with Neo-Industrial Style
                     Container(
-                      height: 120,
-                      width: 120,
+                      padding: const EdgeInsets.all(24),
                       decoration: BoxDecoration(
-                        color: Colors.orange.withAlpha(10),
-                        shape: BoxShape.circle,
+                        color: Colors.white.withValues(alpha: 0.03),
+                        borderRadius: BorderRadius.circular(32),
                         border: Border.all(
-                          color: Colors.orange.withAlpha(50),
-                          width: 2,
+                          color: Colors.white.withValues(alpha: 0.08),
                         ),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.orange.withAlpha(20),
-                            blurRadius: 30,
-                            spreadRadius: 5,
+                            color: accentColor.withValues(alpha: 0.15),
+                            blurRadius: 40,
+                            spreadRadius: 2,
                           ),
                         ],
                       ),
-                      child: const Icon(
+                      child: Icon(
                         Icons.precision_manufacturing_rounded,
-                        size: 60,
-                        color: Colors.orange,
+                        size: 64,
+                        color: accentColor,
                       ),
                     ),
-                    const SizedBox(height: 32),
-                    const Text(
+                    const SizedBox(height: 40),
+        
+                    // Clean Typography Stack
+                    Text(
                       'PROKAT',
                       style: TextStyle(
-                        fontSize: 40,
+                        fontSize: 42,
                         fontWeight: FontWeight.bold,
-                        letterSpacing: 4,
-                        color: Colors.white,
-                        fontStyle: FontStyle.italic,
+                        letterSpacing: 6,
+                        color: Colors.white.withValues(alpha: 0.95),
                       ),
                     ),
-                    const SizedBox(height: 8),
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 4,
-                      ),
-                      color: Colors.orange,
-                      child: const Text(
-                        'HEAVY EQUIPMENT RENTALS',
-                        style: TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.bold,
-                          letterSpacing: 1.5,
-                          color: Colors.black,
-                        ),
+                    const SizedBox(height: 12),
+                    Text(
+                      'HEAVY EQUIPMENT LOGISTICS',
+                      style: TextStyle(
+                        fontSize: 10,
+                        fontWeight: FontWeight.w800,
+                        letterSpacing: 2.5,
+                        color: Colors.white.withValues(alpha: 0.25),
                       ),
                     ),
                   ],
                 ),
               ),
             ),
-          ),
-
-          // Loader
-          Positioned(
-            bottom: 60,
-            left: 0,
-            right: 0,
-            child: Column(
-              children: [
-                SizedBox(
-                  width: 150,
-                  child: LinearProgressIndicator(
-                    backgroundColor: Colors.white10,
-                    valueColor: AlwaysStoppedAnimation<Color>(
-                      Colors.orange.withAlpha(80),
+        
+            // 3. Technical Loader
+            Positioned(
+              bottom: 80,
+              child: Column(
+                children: [
+                  SizedBox(
+                    width: 40,
+                    height: 40,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      valueColor: AlwaysStoppedAnimation<Color>(
+                        accentColor.withValues(alpha: 0.5),
+                      ),
+                      backgroundColor: Colors.white.withValues(alpha: 0.05),
                     ),
-                    minHeight: 2,
                   ),
-                ),
-                const SizedBox(height: 16),
-                Text(
-                  'SYNCING INVENTORY...',
-                  style: TextStyle(
-                    fontSize: 10,
-                    color: Colors.white.withAlpha(30),
-                    letterSpacing: 2,
+                  const SizedBox(height: 24),
+                  Text(
+                    "INITIALIZING SYSTEM",
+                    style: TextStyle(
+                      fontSize: 9,
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: 2,
+                      color: Colors.white.withValues(alpha: 0.15),
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
+}
+
+// Custom curve for a "Heavy" feel
+class _OutProposedCurve extends Curve {
+  const _OutProposedCurve(); // Add 'const' here!
+
+  @override
+  double transformInternal(double t) {
+    return 1.0 - (1.0 - t) * (1.0 - t) * (1.0 - t); // Cubic Out
+  }
+}
+
+extension on Curves {
+  static const outProposed = _OutProposedCurve();
 }

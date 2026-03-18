@@ -11,7 +11,7 @@ class BookingModel {
   final String? comment;
   final String? instructions;
 
-  final String userId;
+  final String? userId;
 
   final String equipmentId;
   final String equipmentName;
@@ -29,7 +29,7 @@ class BookingModel {
     required this.priceRate,
     this.comment,
     this.instructions,
-    required this.userId,
+    this.userId,
     required this.equipmentId,
     required this.equipmentName,
     required this.locationId,

@@ -1,17 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import '../providers/equipment_provider.dart';
-import '../widgets/list/equipment_list_tile.dart';
-import '../widgets/list/equipment_city_selector.dart';
-import '../widgets/list/equipment_map_button.dart';
+import 'package:prokat/core/widgets/page_header.dart';
+import 'package:prokat/features/equipment/providers/equipment_provider.dart';
+import 'package:prokat/features/equipment/widgets/list/equipment_city_selector.dart';
+import 'package:prokat/features/equipment/widgets/list/equipment_list_tile.dart';
+import 'package:prokat/features/equipment/widgets/list/equipment_map_button.dart';
 
 class EquipmentListScreen extends ConsumerStatefulWidget {
-  // Changed to Stateful for search toggle
-  final String? q;
-  final String? category;
-  final String? city;
-
+  final String? q, category, city;
   const EquipmentListScreen({super.key, this.q, this.category, this.city});
 
   @override
@@ -21,69 +18,93 @@ class EquipmentListScreen extends ConsumerStatefulWidget {
 
 class _EquipmentListScreenState extends ConsumerState<EquipmentListScreen> {
   bool _isSearchVisible = false;
+  final bgColor = const Color(0xFF121417);
+  final cardColor = const Color(0xFF1E2125);
+  final accentColor = const Color(0xFF4E73DF);
 
   @override
   Widget build(BuildContext context) {
     final equipmentsAsync = ref.watch(equipmentProvider);
 
     return Scaffold(
-      backgroundColor: Colors.grey[100],
+      backgroundColor: bgColor,
       body: SafeArea(
-        // Added SafeArea for mobile notches
         child: Column(
           children: [
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            PageHeader(title: "List View"),
+            
+            /// 1. INDUSTRIAL COMMAND HEADER
+            Container(
+              padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
+              decoration: BoxDecoration(
+                color: bgColor,
+                border: Border(
+                  bottom: BorderSide(
+                    color: Colors.white.withValues(alpha: 0.05),
+                  ),
+                ),
+              ),
               child: Column(
                 children: [
-                  // Action Row
                   Row(
                     children: [
-                      const EquipmentCitySelector(),
-                      const Spacer(), // Pushes the Map button to the end
-                      // Search Toggle Button
-                      Card(
-                        elevation: 2,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(50),
-                        ),
-                        child: IconButton.filledTonal(
-                          onPressed: () => setState(
-                            () => _isSearchVisible = !_isSearchVisible,
-                          ),
-                          icon: Icon(
-                            _isSearchVisible ? Icons.close : Icons.search,
-                          ),
-                          visualDensity: VisualDensity.compact,
+                      const EquipmentCitySelector(), // Assuming this matches the theme
+                      const Spacer(),
+
+                      // Industrial Search Toggle
+                      _HeaderActionButton(
+                        icon: _isSearchVisible
+                            ? Icons.close_rounded
+                            : Icons.search_rounded,
+                        isActive: _isSearchVisible,
+                        onTap: () => setState(
+                          () => _isSearchVisible = !_isSearchVisible,
                         ),
                       ),
-                      const SizedBox(width: 8),
-                      const EquipmentMapButton(),
+
+                      const SizedBox(width: 12),
+                      const EquipmentMapButton(), // Ensure this is a Squircle too
                     ],
                   ),
 
-                  // Expandable Search Bar
+                  /// Animated Search Bar
                   AnimatedVisibility(
                     visible: _isSearchVisible,
                     child: Padding(
-                      padding: const EdgeInsets.only(top: 12),
+                      padding: const EdgeInsets.only(top: 16),
                       child: TextField(
+                        style: const TextStyle(color: Colors.white),
                         decoration: InputDecoration(
-                          hintText: "Search equipment...",
-                          prefixIcon: const Icon(Icons.search),
-                          filled: true,
-                          fillColor: Colors.white,
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                            borderSide: BorderSide.none,
+                          hintText: "SEARCH FLEET...",
+                          hintStyle: TextStyle(
+                            color: Colors.white.withValues(alpha: 0.2),
+                            fontSize: 12,
+                            letterSpacing: 1,
                           ),
+                          prefixIcon: Icon(
+                            Icons.search_rounded,
+                            color: accentColor,
+                            size: 20,
+                          ),
+                          filled: true,
+                          fillColor: Colors.white.withValues(alpha: 0.03),
                           contentPadding: const EdgeInsets.symmetric(
-                            vertical: 0,
+                            horizontal: 16,
+                            vertical: 12,
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(14),
+                            borderSide: BorderSide(
+                              color: Colors.white.withValues(alpha: 0.08),
+                            ),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(14),
+                            borderSide: const BorderSide(
+                              color: Color(0xFF4E73DF),
+                            ),
                           ),
                         ),
-                        onSubmitted: (value) {
-                          // Handle search logic here
-                        },
                       ),
                     ),
                   ),
@@ -91,17 +112,17 @@ class _EquipmentListScreenState extends ConsumerState<EquipmentListScreen> {
               ),
             ),
 
-            // List
+            /// 2. LIST CONTENT
             Expanded(
               child: equipmentsAsync.when(
                 data: (items) {
                   if (items.isEmpty) {
-                    return const Center(child: Text("No equipment available"));
+                    return _buildEmptyState();
                   }
                   return ListView.separated(
-                    padding: const EdgeInsets.all(12),
+                    padding: const EdgeInsets.all(20),
                     itemCount: items.length,
-                    separatorBuilder: (_, _) => const SizedBox(height: 12),
+                    separatorBuilder: (_, __) => const SizedBox(height: 16),
                     itemBuilder: (context, index) => EquipmentListTile(
                       equipment: items[index],
                       onTap: () =>
@@ -109,8 +130,15 @@ class _EquipmentListScreenState extends ConsumerState<EquipmentListScreen> {
                     ),
                   );
                 },
-                loading: () => const Center(child: CircularProgressIndicator()),
-                error: (error, _) => Center(child: Text(error.toString())),
+                loading: () => const Center(
+                  child: CircularProgressIndicator(color: Color(0xFF4E73DF)),
+                ),
+                error: (error, _) => Center(
+                  child: Text(
+                    error.toString(),
+                    style: const TextStyle(color: Colors.redAccent),
+                  ),
+                ),
               ),
             ),
           ],
@@ -118,12 +146,71 @@ class _EquipmentListScreenState extends ConsumerState<EquipmentListScreen> {
       ),
     );
   }
+
+  Widget _buildEmptyState() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            Icons.search_off_rounded,
+            size: 64,
+            color: Colors.white.withValues(alpha: 0.05),
+          ),
+          const SizedBox(height: 16),
+          Text(
+            "NO EQUIPMENT MATCHES",
+            style: TextStyle(
+              color: Colors.white.withValues(alpha: 0.2),
+              letterSpacing: 1.5,
+              fontWeight: FontWeight.bold,
+              fontSize: 12,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 }
 
-// Simple helper for the search animation
+class _HeaderActionButton extends StatelessWidget {
+  final IconData icon;
+  final VoidCallback onTap;
+  final bool isActive;
+
+  const _HeaderActionButton({
+    required this.icon,
+    required this.onTap,
+    this.isActive = false,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.all(10),
+        decoration: BoxDecoration(
+          color: isActive
+              ? const Color(0xFF4E73DF)
+              : Colors.white.withValues(alpha: 0.03),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
+        ),
+        child: Icon(
+          icon,
+          color: isActive ? Colors.white : const Color(0xFF4E73DF),
+          size: 20,
+        ),
+      ),
+    );
+  }
+}
+
 class AnimatedVisibility extends StatelessWidget {
   final bool visible;
   final Widget child;
+
   const AnimatedVisibility({
     super.key,
     required this.visible,

@@ -15,6 +15,7 @@ class AppRoutes {
   static const String searchMap = '/search/map';
   static const String equipmentId = '/equipment/:id';
   static const String booking = '/equipment/:id/book';
+  static const String myRequests = '/requests';
   static const String createRequest = '/requests/create';
   static const String myRentals = '/myrentals';
   static const String favorites = '/favorites';

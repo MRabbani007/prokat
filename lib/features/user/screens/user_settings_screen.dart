@@ -7,8 +7,8 @@ class UserSettingsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     const bgColor = Color(0xFF121417);
-    const cardColor = Color(0xFF1E2125);
-    const accentColor = Color(0xFF4E73DF);
+    // const cardColor = Color(0xFF1E2125);
+    // const accentColor = Color(0xFF4E73DF);
 
     return Scaffold(
       backgroundColor: bgColor,
@@ -18,7 +18,7 @@ class UserSettingsScreen extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const PageHeader(title: "Settings"),
-              
+
               const SizedBox(height: 20),
 
               // SECTION: PREFERENCES
@@ -58,31 +58,37 @@ class UserSettingsScreen extends StatelessWidget {
               // SECTION: ACCOUNT ACTIONS (Danger Zone)
               const _SettingsSectionHeader(title: "ACCOUNT"),
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 24,
+                  vertical: 8,
+                ),
                 child: Column(
                   children: [
                     _DangerActionBtn(
                       label: "Logout",
                       icon: Icons.logout_rounded,
-                      color: Colors.white.withValues(alpha:0.7),
+                      color: Colors.white.withValues(alpha: 0.7),
                       onPressed: () {},
                     ),
                     const SizedBox(height: 12),
                     _DangerActionBtn(
                       label: "Delete Account",
                       icon: Icons.delete_forever_outlined,
-                      color: Colors.redAccent.withValues(alpha:0.8),
+                      color: Colors.redAccent.withValues(alpha: 0.8),
                       onPressed: () {},
                     ),
                   ],
                 ),
               ),
-              
+
               const SizedBox(height: 40),
               Center(
                 child: Text(
                   "Version 1.0.4 (Build 22)",
-                  style: TextStyle(color: Colors.white.withValues(alpha:0.2), fontSize: 12),
+                  style: TextStyle(
+                    color: Colors.white.withValues(alpha: 0.2),
+                    fontSize: 12,
+                  ),
                 ),
               ),
             ],
@@ -104,7 +110,7 @@ class _SettingsSectionHeader extends StatelessWidget {
       child: Text(
         title,
         style: TextStyle(
-          color: Colors.white.withValues(alpha:0.3),
+          color: Colors.white.withValues(alpha: 0.3),
           fontSize: 12,
           fontWeight: FontWeight.bold,
           letterSpacing: 1.2,
@@ -139,8 +145,17 @@ class _SettingsSwitchTile extends StatelessWidget {
       ),
       child: ListTile(
         leading: Icon(icon, color: const Color(0xFF4E73DF)),
-        title: Text(title, style: const TextStyle(color: Colors.white, fontSize: 15)),
-        subtitle: Text(subtitle, style: TextStyle(color: Colors.white.withValues(alpha:0.4), fontSize: 12)),
+        title: Text(
+          title,
+          style: const TextStyle(color: Colors.white, fontSize: 15),
+        ),
+        subtitle: Text(
+          subtitle,
+          style: TextStyle(
+            color: Colors.white.withValues(alpha: 0.4),
+            fontSize: 12,
+          ),
+        ),
         trailing: Switch(
           value: value,
           onChanged: onChanged,
@@ -156,7 +171,11 @@ class _SettingsActionTile extends StatelessWidget {
   final String title;
   final VoidCallback onTap;
 
-  const _SettingsActionTile({required this.icon, required this.title, required this.onTap});
+  const _SettingsActionTile({
+    required this.icon,
+    required this.title,
+    required this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -168,9 +187,15 @@ class _SettingsActionTile extends StatelessWidget {
       ),
       child: ListTile(
         onTap: onTap,
-        leading: Icon(icon, color: Colors.white.withValues(alpha:0.6)),
-        title: Text(title, style: const TextStyle(color: Colors.white, fontSize: 15)),
-        trailing: Icon(Icons.chevron_right_rounded, color: Colors.white.withValues(alpha:0.2)),
+        leading: Icon(icon, color: Colors.white.withValues(alpha: 0.6)),
+        title: Text(
+          title,
+          style: const TextStyle(color: Colors.white, fontSize: 15),
+        ),
+        trailing: Icon(
+          Icons.chevron_right_rounded,
+          color: Colors.white.withValues(alpha: 0.2),
+        ),
       ),
     );
   }
@@ -182,7 +207,12 @@ class _DangerActionBtn extends StatelessWidget {
   final Color color;
   final VoidCallback onPressed;
 
-  const _DangerActionBtn({required this.label, required this.icon, required this.color, required this.onPressed});
+  const _DangerActionBtn({
+    required this.label,
+    required this.icon,
+    required this.color,
+    required this.onPressed,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -192,7 +222,7 @@ class _DangerActionBtn extends StatelessWidget {
       label: Text(label),
       style: OutlinedButton.styleFrom(
         foregroundColor: color,
-        side: BorderSide(color: color.withValues(alpha:0.2)),
+        side: BorderSide(color: color.withValues(alpha: 0.2)),
         minimumSize: const Size(double.infinity, 54),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       ),

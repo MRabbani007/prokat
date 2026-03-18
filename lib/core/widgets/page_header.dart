@@ -13,7 +13,7 @@ class PageHeader extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.only(
         top: 20,     // Spacing from the top SafeArea
-        left: 90,    // Clears the FAB on the top-left
+        left: 70,    // Clears the FAB on the top-left
         right: 20,
         bottom: 12,  // Spacing before the content starts
       ),
@@ -22,7 +22,7 @@ class PageHeader extends StatelessWidget {
         style: const TextStyle(
           fontSize: 24,
           fontWeight: FontWeight.w700, // Not "Black", but a solid Bold
-          color: Color(0xFF1A1C1E),    // Deep charcoal, much richer than black87
+          color: Color.fromARGB(255, 221, 224, 228),    // Deep charcoal, much richer than black87 0xFF1A1C1E
           letterSpacing: -0.5,         // Tightening the letters makes it look modern
         ),
       ),

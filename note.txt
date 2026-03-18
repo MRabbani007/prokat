@@ -123,3 +123,6 @@ Map initial location
 
 Booking
 1. Persist draft across app restart (Hive / shared prefs)
+
+
+Industrial Dark theme, we’ll use the #121417 background

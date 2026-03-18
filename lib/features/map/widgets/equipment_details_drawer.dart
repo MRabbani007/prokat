@@ -1,150 +1,205 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:prokat/features/bookings/state/booking_provider.dart';
-import 'package:prokat/features/equipment/models/equipment_model.dart';
+import 'package:prokat/features/favorites/state/favorites_provider.dart';
 
 class EquipmentDetailsDrawer extends ConsumerWidget {
-  final Equipment equipment;
+  final dynamic equipment; // Use your Equipment model
 
   const EquipmentDetailsDrawer({super.key, required this.equipment});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    const bgColor = Color(0xFF121417);
+    const cardColor = Color(0xFF1E2125);
+    const accentColor = Color(0xFF4E73DF);
+
+    final notifier = ref.read(favoriteProvider.notifier);
+
+    final isFav = notifier.isFavorite(equipment.id);
+
     return DraggableScrollableSheet(
-      initialChildSize: 0.35,
-      minChildSize: 0.2,
-      maxChildSize: 0.85,
+      initialChildSize: 0.4,
+      minChildSize: 0.25,
+      maxChildSize: 0.9,
       builder: (context, scrollController) {
         return Container(
-          decoration: const BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-            boxShadow: [BoxShadow(color: Colors.black26, blurRadius: 10)],
+          decoration: BoxDecoration(
+            color: bgColor,
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
+            border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.5),
+                blurRadius: 20,
+                offset: const Offset(0, -5),
+              ),
+            ],
           ),
           child: Column(
             children: [
-              /// Handle
-              Container(
-                margin: const EdgeInsets.symmetric(vertical: 10),
-                width: 40,
-                height: 5,
-                decoration: BoxDecoration(
-                  color: Colors.grey[400],
-                  borderRadius: BorderRadius.circular(10),
+              /// Handle bar
+              Center(
+                child: Container(
+                  margin: const EdgeInsets.symmetric(vertical: 12),
+                  width: 40,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
                 ),
               ),
 
-              /// Scrollable Content
               Expanded(
                 child: ListView(
                   controller: scrollController,
-                  padding: EdgeInsets.zero, // 🔥 important for image
+                  padding: EdgeInsets.zero,
                   children: [
-                    /// 🖼 Image (NO padding)
+                    /// 🖼 Hero Image with Soft Rounded Corners
                     if (equipment.imageUrl != null &&
                         equipment.imageUrl!.isNotEmpty)
-                      Image.network(
-                        equipment.imageUrl!,
-                        height: 200,
-                        width: double.infinity,
-                        fit: BoxFit.cover,
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(20),
+                          child: Image.network(
+                            equipment.imageUrl!,
+                            height: 220,
+                            width: double.infinity,
+                            fit: BoxFit.cover,
+                          ),
+                        ),
                       ),
 
-                    const SizedBox(height: 12),
+                    const SizedBox(height: 20),
 
-                    /// 📦 Content
                     Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      padding: const EdgeInsets.symmetric(horizontal: 24),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          /// Name
+                          /// Status Badge (Optional but looks premium)
+                          _buildBadge("AVAILABLE", Colors.green),
+
+                          const SizedBox(height: 12),
+
+                          /// Name & Model
                           Text(
                             equipment.name,
                             style: const TextStyle(
-                              fontSize: 22,
+                              color: Colors.white,
+                              fontSize: 26,
                               fontWeight: FontWeight.bold,
+                              letterSpacing: -0.5,
                             ),
                           ),
-
-                          const SizedBox(height: 6),
-
-                          /// Model + Capacity
                           Text(
                             "${equipment.model} • ${equipment.capacity} ${equipment.capacityUnit}",
-                            style: TextStyle(color: Colors.grey[700]),
-                          ),
-
-                          const SizedBox(height: 16),
-
-                          /// 💰 Prices
-                          const Text(
-                            "Pricing",
-                            style: TextStyle(fontWeight: FontWeight.bold),
-                          ),
-                          const SizedBox(height: 8),
-
-                          ...equipment.prices.map(
-                            (p) => Padding(
-                              padding: const EdgeInsets.only(bottom: 4),
-                              child: Text("${p.price} / ${p.priceRate}"),
+                            style: TextStyle(
+                              color: Colors.white.withValues(alpha: 0.4),
+                              fontSize: 14,
+                              fontWeight: FontWeight.w500,
                             ),
                           ),
-
-                          const SizedBox(height: 16),
-
-                          /// 📍 Location
-                          if (equipment.locations.isNotEmpty)
-                            Row(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                const Icon(Icons.location_on, size: 18),
-                                const SizedBox(width: 6),
-                                Expanded(
-                                  child: Text(
-                                    "${equipment.locations[0].street}, ${equipment.locations[0].city}",
-                                  ),
-                                ),
-                              ],
-                            ),
 
                           const SizedBox(height: 24),
 
-                          /// ❤️ + 📅 Buttons
+                          /// 💰 Industrial Pricing Grid
+                          const Text(
+                            "PRICING RATES",
+                            style: TextStyle(
+                              color: Colors.white30,
+                              fontSize: 11,
+                              fontWeight: FontWeight.bold,
+                              letterSpacing: 1.2,
+                            ),
+                          ),
+                          const SizedBox(height: 12),
+                          Wrap(
+                            spacing: 10,
+                            children: equipment.prices
+                                .map<Widget>((p) => _PriceTag(p: p))
+                                .toList(),
+                          ),
+
+                          const SizedBox(height: 24),
+
+                          /// 📍 Location Card
+                          if (equipment.locations.isNotEmpty)
+                            Container(
+                              padding: const EdgeInsets.all(16),
+                              decoration: BoxDecoration(
+                                color: cardColor,
+                                borderRadius: BorderRadius.circular(16),
+                                border: Border.all(
+                                  color: Colors.white.withValues(alpha: 0.05),
+                                ),
+                              ),
+                              child: Row(
+                                children: [
+                                  const Icon(
+                                    Icons.location_on_outlined,
+                                    color: accentColor,
+                                    size: 20,
+                                  ),
+                                  const SizedBox(width: 12),
+                                  Expanded(
+                                    child: Text(
+                                      "${equipment.locations[0].street}, ${equipment.locations[0].city}",
+                                      style: const TextStyle(
+                                        color: Colors.white70,
+                                        fontSize: 14,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+
+                          const SizedBox(height: 32),
+
+                          /// ❤️ + 📅 Industrial Action Row
                           Row(
                             children: [
-                              /// Favorite button
-                              IconButton(
-                                onPressed: () {
-                                  // TODO: implement favorite
+                              _CircleIconButton(
+                                icon: isFav
+                                    ? Icons.favorite_rounded
+                                    : Icons.favorite_border_rounded,
+                                onTap: () {
+                                  notifier.toggle(equipment.id);
                                 },
-                                icon: const Icon(Icons.favorite_border),
                               ),
-
-                              const SizedBox(width: 8),
-
-                              /// Book button
+                              const SizedBox(width: 16),
                               Expanded(
                                 child: ElevatedButton(
                                   onPressed: () {
-                                    final notifier = ref.read(
-                                      bookingProvider.notifier,
-                                    );
-
-                                    notifier.startBooking(equipment);
-
+                                    // Your booking logic
                                     context.push(
                                       '/equipment/${equipment.id}/book',
                                     );
                                   },
-                                  child: const Text("Book"),
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: accentColor,
+                                    foregroundColor: Colors.white,
+                                    // height: 56,
+                                    elevation: 0,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(16),
+                                    ),
+                                  ),
+                                  child: const Text(
+                                    "START BOOKING",
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      letterSpacing: 1,
+                                    ),
+                                  ),
                                 ),
                               ),
                             ],
                           ),
-
-                          const SizedBox(height: 20),
+                          const SizedBox(height: 40),
                         ],
                       ),
                     ),
@@ -155,6 +210,85 @@ class EquipmentDetailsDrawer extends ConsumerWidget {
           ),
         );
       },
+    );
+  }
+
+  Widget _buildBadge(String text, Color color) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(6),
+        border: Border.all(color: color.withValues(alpha: 0.3)),
+      ),
+      child: Text(
+        text,
+        style: TextStyle(
+          color: color,
+          fontSize: 10,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+    );
+  }
+}
+
+class _PriceTag extends StatelessWidget {
+  final dynamic p;
+  const _PriceTag({required this.p});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.03),
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
+      ),
+      child: RichText(
+        text: TextSpan(
+          children: [
+            TextSpan(
+              text: "\$${p.price}",
+              style: const TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+                fontSize: 16,
+              ),
+            ),
+            TextSpan(
+              text: " / ${p.priceRate}",
+              style: const TextStyle(color: Colors.white38, fontSize: 12),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _CircleIconButton extends StatelessWidget {
+  final IconData icon;
+  final VoidCallback onTap;
+
+  const _CircleIconButton({required this.icon, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(16),
+      child: Container(
+        height: 56,
+        width: 56,
+        decoration: BoxDecoration(
+          color: Colors.white.withValues(alpha: 0.03),
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
+        ),
+        child: Icon(icon, color: Colors.white70),
+      ),
     );
   }
 }

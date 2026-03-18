@@ -1,0 +1,71 @@
+import 'package:prokat/features/locations/models/location_model.dart';
+import '../models/request_model.dart';
+
+class RequestState {
+  final bool isLoading;
+  final String? error;
+
+  /// All requests (list screen)
+  final List<RequestModel> requests;
+
+  /// Current opened request (details/edit)
+  final RequestModel? currentRequest;
+
+  /// 🔥 Draft (before creating request)
+  final String? capacity;
+  final int? offeredRate;
+  final String? comment;
+
+  final DateTime? selectedDate;
+  final DateTime? selectedTime;
+
+  final LocationModel? selectedLocation;
+  final String? selectedLocationId;
+
+  final String? categoryId;
+
+  RequestState({
+    this.isLoading = false,
+    this.error,
+    this.requests = const [],
+    this.currentRequest,
+    this.capacity,
+    this.offeredRate,
+    this.comment,
+    this.selectedDate,
+    this.selectedTime,
+    this.selectedLocation,
+    this.selectedLocationId,
+    this.categoryId,
+  });
+
+  RequestState copyWith({
+    bool? isLoading,
+    String? error,
+    List<RequestModel>? requests,
+    RequestModel? currentRequest,
+    String? capacity,
+    int? offeredRate,
+    String? comment,
+    DateTime? selectedDate,
+    DateTime? selectedTime,
+    LocationModel? selectedLocation,
+    String? selectedLocationId,
+    String? categoryId,
+  }) {
+    return RequestState(
+      isLoading: isLoading ?? this.isLoading,
+      error: error,
+      requests: requests ?? this.requests,
+      currentRequest: currentRequest ?? this.currentRequest,
+      capacity: capacity ?? this.capacity,
+      offeredRate: offeredRate ?? this.offeredRate,
+      comment: comment ?? this.comment,
+      selectedDate: selectedDate ?? this.selectedDate,
+      selectedTime: selectedTime ?? this.selectedTime,
+      selectedLocation: selectedLocation ?? this.selectedLocation,
+      selectedLocationId: selectedLocationId ?? this.selectedLocationId,
+      categoryId: categoryId ?? this.categoryId,
+    );
+  }
+}

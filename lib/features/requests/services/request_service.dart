@@ -1,0 +1,101 @@
+import 'package:prokat/core/api/api_client.dart';
+import 'package:prokat/features/requests/models/request_model.dart';
+import 'package:dio/dio.dart';
+
+class RequestService {
+  final ApiClient apiClient;
+
+  RequestService(this.apiClient);
+
+  Dio get _dio => apiClient.dio;
+
+  Future<List<RequestModel>> getRequests() async {
+    try {
+      final res = await _dio.get('/requests');
+
+      return (res.data['data'] as List)
+          .map((e) => RequestModel.fromJson(e))
+          .toList();
+          
+    } catch (e) {
+      return [];
+    }
+  }
+
+  Future<RequestModel?> createRequest({
+    required String categoryId,
+    required String locationId,
+    required String capacity,
+    required DateTime requiredOn,
+    DateTime? requiredAt,
+    String? comment,
+    required int offeredRate,
+  }) async {
+    try {
+      final res = await _dio.post(
+        '/requests',
+        data: {
+          "categoryId": categoryId,
+          "locationId": locationId,
+          "capacity": capacity,
+          "requiredOn": requiredOn.toIso8601String(),
+          "requiredAt": requiredAt?.toIso8601String(),
+          "comment": comment,
+          "offeredRate": offeredRate,
+        },
+      );
+
+      if (res.statusCode == 200 || res.statusCode == 201) {
+        return RequestModel.fromJson(res.data['data']);
+      }
+
+      return null;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  Future<RequestModel?> updateRequest({
+    required String id,
+    String? locationId,
+    DateTime? requiredOn,
+    DateTime? requiredAt,
+    int? offeredRate,
+  }) async {
+    try {
+      final res = await _dio.patch(
+        '/requests/$id',
+        data: {
+          if (locationId != null) "locationId": locationId,
+          if (requiredOn != null) "requiredOn": requiredOn.toIso8601String(),
+          if (requiredAt != null) "requiredAt": requiredAt.toIso8601String(),
+          if (offeredRate != null) "offeredRate": offeredRate,
+        },
+      );
+
+      if (res.statusCode == 200 || res.statusCode == 201) {
+        return RequestModel.fromJson(res.data['data']);
+      }
+
+      return null;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  Future<RequestModel?> cancelRequest(String id) async {
+    try {
+      final res = await _dio.patch(
+        '/requests/$id',
+        data: {"status": "CANCELLED"},
+      );
+      if (res.statusCode == 200 || res.statusCode == 201) {
+        return RequestModel.fromJson(res.data['data']);
+      }
+
+      return null;
+    } catch (e) {
+      return null;
+    }
+  }
+}

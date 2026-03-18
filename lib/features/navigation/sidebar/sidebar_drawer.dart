@@ -55,6 +55,11 @@ class SidebarDrawer extends ConsumerWidget {
                   route: AppRoutes.searchMap,
                 ),
                 SidebarTile(
+                  icon: Icons.ads_click,
+                  label: "My Requests",
+                  route: AppRoutes.myRequests,
+                ),
+                SidebarTile(
                   icon: Icons.favorite_border,
                   label: "Favorites",
                   route: AppRoutes.favorites,

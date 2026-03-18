@@ -42,10 +42,6 @@ class BookingNotifier extends StateNotifier<BookingState> {
     state = state.copyWith(comment: comment);
   }
 
-  void startBooking(Equipment equipment) {
-    state = BookingState(selectedEquipment: equipment);
-  }
-
   /// -------------------------
   /// CREATE BOOKING
   /// -------------------------
@@ -57,20 +53,15 @@ class BookingNotifier extends StateNotifier<BookingState> {
       final booking = BookingModel(
         id: "",
         status: "CREATED",
-        equipmentName:"",
+        equipmentName: "",
         bookedOn: state.selectedDate!,
         bookedAt: state.selectedTime!,
-        price:
-            state.selectedPriceEntry?.price ??
-            0, // backend should calculate later
+        price: state.selectedPriceEntry?.price ?? 0,
         priceRate: state.selectedPriceEntry?.priceRate ?? "",
         comment: state.comment,
         instructions: null,
-        userId: "",
         equipmentId: state.selectedEquipment?.id ?? "",
         locationId: state.selectedLocation?.id ?? "",
-        createdAt: DateTime.now(),
-        updatedAt: DateTime.now(),
       );
 
       final created = await api.createBooking(booking);
@@ -114,20 +105,23 @@ class BookingNotifier extends StateNotifier<BookingState> {
 
   Future<void> updateBooking(String id, Map<String, dynamic> data) async {
     try {
+      state = state.copyWith(isLoading: true);
+
       final updated = await api.updateBooking(id, data);
 
       final updatedList = state.bookings.map((b) {
-        return b.id == id ? updated : b;
+        return b.id == id && updated != null ? updated : b;
       }).toList();
 
       state = state.copyWith(
+        isLoading: false,
         bookings: updatedList,
         currentBooking: state.currentBooking?.id == id
             ? updated
             : state.currentBooking,
       );
     } catch (e) {
-      state = state.copyWith(error: e.toString());
+      state = state.copyWith(isLoading: false, error: e.toString());
     }
   }
 }
