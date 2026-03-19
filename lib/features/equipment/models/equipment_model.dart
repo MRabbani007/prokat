@@ -1,16 +1,6 @@
-// features/equipment/models/equipment.dart
-
+import 'package:prokat/features/auth/models/user_model.dart';
 import 'package:prokat/features/equipment/models/equipment_location.dart';
 import 'package:prokat/features/equipment/models/price_entry_model.dart';
-
-enum EquipmentStatus { available, unavailable, booked }
-
-EquipmentStatus equipmentStatusFromString(String value) {
-  return EquipmentStatus.values.firstWhere(
-    (e) => e.name == value,
-    orElse: () => EquipmentStatus.available,
-  );
-}
 
 class Equipment {
   final String id;
@@ -22,7 +12,7 @@ class Equipment {
   final String rentCondition;
   final String status;
   final bool isVisible;
-  final String ownerId;
+  final User? owner;
   final String? imageUrl;
   final List<PriceEntry> prices;
   final List<EquipmentLocation> locations;
@@ -38,7 +28,7 @@ class Equipment {
     required this.status,
     this.imageUrl,
     required this.isVisible,
-    required this.ownerId,
+    this.owner,
     required this.locations,
     required this.prices,
   });
@@ -53,7 +43,7 @@ class Equipment {
       "rentCondition": rentCondition,
       "status": status,
       "isVisible": isVisible,
-      "ownerId": ownerId,
+      "owner": owner,
     };
 
     if (ownerComment != null) {
@@ -76,24 +66,32 @@ class Equipment {
   }
 
   factory Equipment.fromJson(Map<String, dynamic> json) {
-    return Equipment(
-      id: json["id"],
-      name: json["name"],
-      model: json["model"],
-      capacity: json["capacity"].toString(),
-      capacityUnit: json["capacityUnit"].toString(),
-      ownerComment: json["ownerComment"],
-      rentCondition: json["rentCondition"],
-      status: json["status"],
-      prices: (json["prices"] as List<dynamic>? ?? [])
-          .map((e) => PriceEntry.fromJson(e as Map<String, dynamic>))
-          .toList(),
-      imageUrl: json["imageUrl"] as String?,
-      isVisible: json["isVisible"],
-      ownerId: json["ownerId"],
-      locations: (json['locations'] as List<dynamic>? ?? [])
-          .map((e) => EquipmentLocation.fromJson(e as Map<String, dynamic>))
-          .toList(),
-    );
+    try {
+      return Equipment(
+        id: json["id"],
+        name: json["name"],
+        model: json["model"],
+        capacity: json["capacity"].toString(),
+        capacityUnit: json["capacityUnit"]?.toString() ?? '',
+        ownerComment: json["ownerComment"],
+        rentCondition: json["rentCondition"],
+        status: json["status"],
+        prices: (json["prices"] as List<dynamic>? ?? [])
+            .map((e) => PriceEntry.fromJson(e as Map<String, dynamic>))
+            .toList(),
+        imageUrl: json["imageUrl"] as String?,
+        isVisible: json["isVisible"],
+        owner: json["owner"] != null ? User.fromJson(json["owner"]) : null,
+        locations: (json['locations'] as List<dynamic>? ?? [])
+            .map((e) => EquipmentLocation.fromJson(e as Map<String, dynamic>))
+            .toList(),
+      );
+    } catch (e, stack) {
+      print("❌ Equipment parsing failed");
+      print("JSON: $json");
+      print(e);
+      print(stack);
+      rethrow; // important
+    }
   }
 }

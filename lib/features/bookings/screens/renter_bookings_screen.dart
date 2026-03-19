@@ -9,7 +9,8 @@ class RenterBookingsScreen extends ConsumerStatefulWidget {
   const RenterBookingsScreen({super.key});
 
   @override
-  ConsumerState<RenterBookingsScreen> createState() => _RenterBookingsScreenState();
+  ConsumerState<RenterBookingsScreen> createState() =>
+      _RenterBookingsScreenState();
 }
 
 class _RenterBookingsScreenState extends ConsumerState<RenterBookingsScreen>
@@ -24,7 +25,9 @@ class _RenterBookingsScreenState extends ConsumerState<RenterBookingsScreen>
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
-    Future.microtask(() => ref.read(bookingProvider.notifier).getBookings());
+    Future.microtask(
+      () => ref.read(bookingProvider.notifier).getUserBookings(),
+    );
   }
 
   @override
@@ -36,13 +39,18 @@ class _RenterBookingsScreenState extends ConsumerState<RenterBookingsScreen>
   @override
   Widget build(BuildContext context) {
     final bookingState = ref.watch(bookingProvider);
-    
+
     final upcoming = bookingState.bookings
         .where((b) => b.status == "CREATED" || b.status == "CONFIRMED")
         .toList();
 
     final history = bookingState.bookings
-        .where((b) => b.status == "COMPLETED" || b.status == "CANCELLED")
+        .where(
+          (b) =>
+              b.status == "COMPLETED" ||
+              b.status == "CANCELLED" ||
+              b.status == "REJECTED",
+        )
         .toList();
 
     final draft = bookingState.bookings
@@ -74,9 +82,13 @@ class _RenterBookingsScreenState extends ConsumerState<RenterBookingsScreen>
                 indicatorSize: TabBarIndicatorSize.tab,
                 dividerColor: Colors.transparent,
                 indicator: BoxDecoration(
-                  color: const Color(0xFF1E2125), // Lighter charcoal for active tab
+                  color: const Color(
+                    0xFF1E2125,
+                  ), // Lighter charcoal for active tab
                   borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
+                  border: Border.all(
+                    color: Colors.white.withValues(alpha: 0.1),
+                  ),
                   boxShadow: [
                     BoxShadow(
                       color: Colors.black.withValues(alpha: 0.3),
@@ -87,7 +99,11 @@ class _RenterBookingsScreenState extends ConsumerState<RenterBookingsScreen>
                 ),
                 labelColor: Colors.white,
                 unselectedLabelColor: Colors.white.withValues(alpha: 0.3),
-                labelStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13, letterSpacing: 0.5),
+                labelStyle: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 13,
+                  letterSpacing: 0.5,
+                ),
                 tabs: const [
                   Tab(text: 'UPCOMING'),
                   Tab(text: 'HISTORY'),
@@ -122,11 +138,18 @@ class _BookingList extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.inventory_2_outlined, size: 48, color: Colors.white.withValues(alpha: 0.05)),
+            Icon(
+              Icons.inventory_2_outlined,
+              size: 48,
+              color: Colors.white.withValues(alpha: 0.05),
+            ),
             const SizedBox(height: 16),
             Text(
               'No bookings found',
-              style: TextStyle(color: Colors.white.withValues(alpha: 0.2), fontSize: 14),
+              style: TextStyle(
+                color: Colors.white.withValues(alpha: 0.2),
+                fontSize: 14,
+              ),
             ),
           ],
         ),
@@ -180,20 +203,30 @@ class _EnhancedDraftCard extends StatelessWidget {
                 ),
                 Text(
                   'Finish your booking request',
-                  style: TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w500),
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 13,
+                    fontWeight: FontWeight.w500,
+                  ),
                 ),
               ],
             ),
           ),
           TextButton(
-            onPressed: () => context.push('/equipment/${booking.equipmentId}/book'),
+            onPressed: () =>
+                context.push('/equipment/${booking.equipmentId}/book'),
             style: TextButton.styleFrom(
               foregroundColor: Colors.white,
               backgroundColor: draftColor,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             ),
-            child: const Text('RESUME', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
+            child: const Text(
+              'RESUME',
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
+            ),
           ),
         ],
       ),

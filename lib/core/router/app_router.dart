@@ -20,10 +20,12 @@ import 'package:prokat/features/owner/addresses/screens/owner_address_create_scr
 import 'package:prokat/features/owner/addresses/screens/owner_address_edit_screen.dart';
 import 'package:prokat/features/owner/addresses/screens/owner_addresses_screen.dart';
 import 'package:prokat/features/owner/addresses/screens/owner_select_address_screen.dart';
+import 'package:prokat/features/bookings/screens/owner_bookings_history_screen.dart';
+import 'package:prokat/features/bookings/screens/owner_bookings_screen.dart';
 import 'package:prokat/features/owner/equipment/screens/equipment_detail_screen.dart';
 import 'package:prokat/features/owner/equipment/screens/owner_equipment_create.dart';
 import 'package:prokat/features/owner/equipment/screens/owner_equipment_list_screen.dart';
-import 'package:prokat/features/owner/requests/screens/owner_requests_screen.dart';
+import 'package:prokat/features/requests/screens/owner_requests_screen.dart';
 import 'package:prokat/features/requests/screens/create_request_screen.dart';
 import 'package:prokat/features/requests/screens/renter_requests_screen.dart';
 import 'package:prokat/features/user/screens/user_profile_screen.dart';
@@ -32,7 +34,6 @@ import 'package:prokat/screens/user/launch/launch_screen.dart';
 import 'package:prokat/screens/user/main/main_screen.dart';
 import 'package:prokat/features/favorites/screens/favorites_screen.dart';
 import 'package:prokat/screens/owner/dashboard/owner_dashboard_screen.dart';
-import 'package:prokat/screens/owner/booking/owner_booking_screen.dart';
 import 'package:prokat/screens/owner/profile/owner_profile_screen.dart';
 import 'package:prokat/screens/owner/settings/owner_settings_screen.dart';
 
@@ -267,7 +268,15 @@ GoRouter createRouter(WidgetRef ref) {
               //
               GoRoute(
                 path: AppRoutes.ownerBookings,
-                builder: (_, _) => const OwnerBookingScreen(),
+                builder: (_, _) => const OwnerBookingsScreen(),
+                routes: [
+                  GoRoute(
+                    path: 'history',
+                    builder: (context, state) {
+                      return OwnerBookingHistoryScreen();
+                    },
+                  ),
+                ],
               ),
               GoRoute(
                 path: AppRoutes.ownerRequests,

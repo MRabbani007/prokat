@@ -8,11 +8,12 @@ class BookingState {
   final String? error;
 
   final List<BookingModel> bookings;
+  final List<BookingModel> ownerBookings;
 
-  /// 🔥 IMPORTANT: current draft booking
+  /// Renter draft booking
   final BookingModel? currentBooking;
 
-  /// 🔥 local selections (before API create)
+  /// Renter local selections (before API create)
   final Equipment? selectedEquipment;
   final PriceEntry? selectedPriceEntry;
   final LocationModel? selectedLocation;
@@ -25,6 +26,7 @@ class BookingState {
     this.isLoading = false,
     this.error,
     this.bookings = const [],
+    this.ownerBookings = const [],
     this.currentBooking,
     this.selectedEquipment,
     this.selectedLocation,
@@ -39,6 +41,7 @@ class BookingState {
     bool? isLoading,
     String? error,
     List<BookingModel>? bookings,
+    List<BookingModel>? ownerBookings,
     BookingModel? currentBooking,
     Equipment? selectedEquipment,
     String? selectedLocationId,
@@ -51,19 +54,19 @@ class BookingState {
     return BookingState(
       isLoading: isLoading ?? this.isLoading,
       error: error ?? this.error,
+
       bookings: bookings ?? this.bookings,
+      ownerBookings: ownerBookings ?? this.ownerBookings,
+
       currentBooking: currentBooking ?? this.currentBooking,
 
       selectedEquipment: selectedEquipment ?? this.selectedEquipment,
-
       selectedLocationId: selectedLocationId ?? this.selectedLocationId,
-
       selectedLocation: selectedLocation ?? this.selectedLocation,
-
       selectedPriceEntry: selectedPriceEntry ?? this.selectedPriceEntry,
-
       selectedDate: selectedDate ?? this.selectedDate,
       selectedTime: selectedTime ?? this.selectedTime,
+      
       comment: comment ?? this.comment,
     );
   }

@@ -1,65 +1,57 @@
 import 'package:prokat/core/api/api_client.dart';
-import 'package:prokat/features/requests/models/request_model.dart';
+import 'package:prokat/features/offers/models/offer_model.dart';
 import 'package:dio/dio.dart';
 
-class RequestService {
+class OffersService {
   final ApiClient apiClient;
 
-  RequestService(this.apiClient);
+  OffersService(this.apiClient);
 
   Dio get _dio => apiClient.dio;
 
-  Future<List<RequestModel>> getUserRequests() async {
+  Future<List<OfferModel>> getUserOffers() async {
     try {
-      final res = await _dio.get('/requests');
+      final res = await _dio.get('/offers');
 
       return (res.data['data'] as List)
-          .map((e) => RequestModel.fromJson(e))
+          .map((e) => OfferModel.fromJson(e))
           .toList();
-          
     } catch (e) {
       return [];
     }
   }
 
-    Future<List<RequestModel>> getOwnerRequests() async {
+  Future<List<OfferModel>> getOwnerOffers() async {
     try {
-      final res = await _dio.get('/requests/owner');
+      final res = await _dio.get('/offers/owner');
 
       return (res.data['data'] as List)
-          .map((e) => RequestModel.fromJson(e))
+          .map((e) => OfferModel.fromJson(e))
           .toList();
-          
     } catch (e) {
       return [];
     }
   }
 
-  Future<RequestModel?> createRequest({
-    required String categoryId,
-    required String locationId,
-    required String capacity,
-    required DateTime requiredOn,
-    DateTime? requiredAt,
+  Future<OfferModel?> createOffer({
+    required String equipmentId,
+    required int price,
+    required String priceRate,
     String? comment,
-    required int offeredRate,
   }) async {
     try {
       final res = await _dio.post(
-        '/requests',
+        '/offers',
         data: {
-          "categoryId": categoryId,
-          "locationId": locationId,
-          "capacity": capacity,
-          "requiredOn": requiredOn.toIso8601String(),
-          "requiredAt": requiredAt?.toIso8601String(),
+          "equipmentId": equipmentId,
+          "price": price,
+          "priceRate": priceRate,
           "comment": comment,
-          "offeredRate": offeredRate,
         },
       );
 
       if (res.statusCode == 200 || res.statusCode == 201) {
-        return RequestModel.fromJson(res.data['data']);
+        return OfferModel.fromJson(res.data['data']);
       }
 
       return null;
@@ -68,7 +60,7 @@ class RequestService {
     }
   }
 
-  Future<RequestModel?> updateRequest({
+  Future<OfferModel?> updateOffer({
     required String id,
     String? locationId,
     DateTime? requiredOn,
@@ -77,7 +69,7 @@ class RequestService {
   }) async {
     try {
       final res = await _dio.patch(
-        '/requests/$id',
+        '/offers/$id',
         data: {
           if (locationId != null) "locationId": locationId,
           if (requiredOn != null) "requiredOn": requiredOn.toIso8601String(),
@@ -87,7 +79,7 @@ class RequestService {
       );
 
       if (res.statusCode == 200 || res.statusCode == 201) {
-        return RequestModel.fromJson(res.data['data']);
+        return OfferModel.fromJson(res.data['data']);
       }
 
       return null;
@@ -96,14 +88,14 @@ class RequestService {
     }
   }
 
-  Future<RequestModel?> cancelRequest(String id) async {
+  Future<OfferModel?> cancelOffer(String id) async {
     try {
       final res = await _dio.patch(
-        '/requests/$id',
+        '/offers/$id',
         data: {"status": "CANCELLED"},
       );
       if (res.statusCode == 200 || res.statusCode == 201) {
-        return RequestModel.fromJson(res.data['data']);
+        return OfferModel.fromJson(res.data['data']);
       }
 
       return null;

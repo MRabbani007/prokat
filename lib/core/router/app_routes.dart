@@ -40,8 +40,8 @@ class AppRoutes {
 
   static const String ownerRequests = '/owner/requests';
 
-  static const String ownerBookings = '/bookings';
+  static const String ownerBookings = '/owner/bookings';
 
-  static const String ownerProfile = '/profile';
-  static const String ownerSettings = '/settings';
+  static const String ownerProfile = '/owner/profile';
+  static const String ownerSettings = '/owner/settings';
 }

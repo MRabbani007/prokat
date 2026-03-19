@@ -1,18 +1,16 @@
 class User {
-  final String id;
   final String? username;
   final String? phone;
   final String? firstName;
   final String? lastName;
-  final String role;
+  final String? role;
 
   const User({
-    required this.id,
     this.username,
     this.phone,
     this.firstName,
     this.lastName,
-    required this.role,
+    this.role,
   });
 
   String get displayName {
@@ -23,20 +21,28 @@ class User {
   }
 
   factory User.fromJson(Map<String, dynamic> json) {
-    return User(
-      id: json['id'],
-      username: json['username'],
-      // phone: json['phone'],
-      firstName: json['firstName'],
-      lastName: json['lastName'],
-      role: json['role'],
-    );
+    try {
+      print(json);
+      return User(
+        firstName: json['firstName']?.toString(),
+        lastName: json['lastName']?.toString(),
+        username: json['username']?.toString(),
+        phone: json['phone']?.toString(),
+        role: json['role']?.toString(),
+      );
+    } catch (e, stack) {
+      print("❌ User parsing failed");
+      print("JSON: $json");
+      print(e);
+      print(stack);
+      rethrow; // important
+    }
   }
 
   Map<String, dynamic> toJson() {
     return {
-      'id': id,
       'username': username,
+      'phone': phone,
       'firstName': firstName,
       'lastName': lastName,
       'role': role,

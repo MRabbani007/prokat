@@ -51,7 +51,7 @@ class _EquipmentCitySelectorState extends State<EquipmentCitySelector> {
         }
       }
     } catch (e) {
-      debugPrint("Location error: $e");
+      return;
     }
 
     // Fallback if everything fails

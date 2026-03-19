@@ -1,5 +1,4 @@
 import 'dart:ui' as ui;
-import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart';
@@ -13,7 +12,7 @@ class MapController {
   PointAnnotationManager? _annotationManager;
   bool markersAdded = false;
   // CircleAnnotationManager? _circleManager;
-  bool _markersAdded = false;
+  // bool _markersAdded = false;
   List<Equipment> _equipments = [];
   // Function(Equipment)? onEquipmentTapped;
 
@@ -126,7 +125,7 @@ class MapController {
 
       _equipments = items;
       await _addEquipmentMarkers(items);
-      _markersAdded = true;
+      // _markersAdded = true;
     });
   }
 
@@ -212,7 +211,6 @@ class MapController {
     if (optionsList.isNotEmpty) {
       // Use createMulti for better performance
       await _annotationManager!.createMulti(optionsList);
-      debugPrint("Rendered ${optionsList.length} equipment icons.");
     }
   }
 
@@ -232,7 +230,7 @@ class MapController {
       //   MapAnimationOptions(duration: 800),
       // );
     } catch (e) {
-      debugPrint("Equipment not found for id: $id");
+      return;
     }
   }
 

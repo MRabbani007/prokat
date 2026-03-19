@@ -48,20 +48,23 @@ class BookingNotifier extends StateNotifier<BookingState> {
 
   Future<bool> createBooking() async {
     try {
+      if (state.selectedEquipment == null || state.selectedLocation == null) {
+        return false;
+      }
+
       state = state.copyWith(isLoading: true);
 
       final booking = BookingModel(
         id: "",
         status: "CREATED",
-        equipmentName: "",
         bookedOn: state.selectedDate!,
         bookedAt: state.selectedTime!,
         price: state.selectedPriceEntry?.price ?? 0,
         priceRate: state.selectedPriceEntry?.priceRate ?? "",
         comment: state.comment,
         instructions: null,
-        equipmentId: state.selectedEquipment?.id ?? "",
-        locationId: state.selectedLocation?.id ?? "",
+        equipment: state.selectedEquipment as Equipment,
+        location: state.selectedLocation as LocationModel,
       );
 
       final created = await api.createBooking(booking);
@@ -69,7 +72,7 @@ class BookingNotifier extends StateNotifier<BookingState> {
       if (created != null) {
         state = state.copyWith(
           isLoading: false,
-          currentBooking: created,
+          currentBooking: null,
           bookings: [...state.bookings, created],
         );
 
@@ -87,13 +90,25 @@ class BookingNotifier extends StateNotifier<BookingState> {
   /// LOAD BOOKINGS
   /// -------------------------
 
-  Future<void> getBookings() async {
+  Future<void> getUserBookings() async {
     try {
       state = state.copyWith(isLoading: true);
 
-      final bookings = await api.getBookings();
+      final bookings = await api.getUserBookings();
 
       state = state.copyWith(isLoading: false, bookings: bookings);
+    } catch (e) {
+      state = state.copyWith(isLoading: false, error: e.toString());
+    }
+  }
+
+  Future<void> getOwnerBookings() async {
+    try {
+      state = state.copyWith(isLoading: true);
+
+      final ownerBookings = await api.getOwnerBookings();
+
+      state = state.copyWith(isLoading: false, ownerBookings: ownerBookings);
     } catch (e) {
       state = state.copyWith(isLoading: false, error: e.toString());
     }

@@ -19,15 +19,15 @@ class LocationModel {
   final String? equipmentId;
 
   LocationModel({
-     this.id,
+    this.id,
     required this.service,
     required this.street,
     required this.city,
     required this.country,
     required this.longitude,
     required this.latitude,
-     this.createdAt,
-     this.updatedAt,
+    this.createdAt,
+    this.updatedAt,
     this.comment,
     this.instructions,
     this.userId,
@@ -35,21 +35,35 @@ class LocationModel {
   });
 
   factory LocationModel.fromJson(Map<String, dynamic> json) {
-    return LocationModel(
-      id: json['id'],
-      service: json['service'],
-      street: json['street'],
-      city: json['city'],
-      country: json['country'],
-      comment: json['comment'],
-      instructions: json['instructions'],
-      longitude: double.parse(json['longitude'].toString()),
-      latitude: double.parse(json['latitude'].toString()),
-      createdAt: DateTime.parse(json['createdAt']),
-      updatedAt: DateTime.parse(json['updatedAt']),
-      userId: json['userId'],
-      equipmentId: json['equipmentId'],
-    );
+    try {
+      return LocationModel(
+        id: json['id'],
+        service: json['service'] ?? '',
+        street: json['street'] ?? '',
+        city: json['city'] ?? '',
+        country: json['country'] ?? '',
+        comment: json['comment'] ?? '',
+        instructions: json['instructions'] ?? '',
+        longitude: double.parse(json['longitude'].toString()),
+        latitude: double.parse(json['latitude'].toString()),
+
+        createdAt: json['createdAt'] != null
+            ? DateTime.parse(json['createdAt'])
+            : null,
+        updatedAt: json['updatedAt'] != null
+            ? DateTime.parse(json['updatedAt'])
+            : null,
+
+        userId: json['userId'] ?? '',
+        equipmentId: json['equipmentId'] ?? '',
+      );
+    } catch (e, stack) {
+      print("❌ Location parsing failed");
+      print("JSON: $json");
+      print(e);
+      print(stack);
+      rethrow; // important
+    }
   }
 
   Map<String, dynamic> toJson() {

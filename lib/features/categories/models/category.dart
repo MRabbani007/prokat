@@ -30,4 +30,14 @@ class Category {
       imageUrl: json["imageUrl"],
     );
   }
+
+  Map<String, dynamic> toJson() {
+    return {
+      "id": id,
+      "name": name,
+      "capacityUnit": capacityUnit,
+      "sortIndex": sortIndex,
+      "imageUrl": imageUrl,
+    };
+  }
 }

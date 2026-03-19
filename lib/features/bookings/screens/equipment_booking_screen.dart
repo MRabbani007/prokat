@@ -91,7 +91,7 @@ class _EquipmentBookingScreenState
       body: SafeArea(
         child: Column(
           children: [
-            const PageHeader(title: "Confirm Booking"),
+            const PageHeader(title: "Book Equipment"),
 
             Expanded(
               child: SingleChildScrollView(
@@ -322,7 +322,7 @@ class _EquipmentBookingScreenState
                     elevation: 0,
                   ),
                   child: const Text(
-                    "CONFIRM BOOKING",
+                    "Confirm",
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
                       letterSpacing: 1.2,

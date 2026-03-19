@@ -10,39 +10,82 @@ class PriceEntryTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    const ghostGray = Color(0x4DFFFFFF); // White @ 30%
+    const accentBlue = Color(0xFF4E73DF);
+
     return Container(
-      margin: const EdgeInsets.only(bottom: 12),
+      margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.2),
-        borderRadius: BorderRadius.circular(16),
+        color: Colors.black.withValues(alpha: 0.2), // Darker inset for the tile
+        borderRadius: BorderRadius.circular(16), // Small Item Radius
+        border: Border.all(
+          color: Colors.white.withValues(alpha: 0.05), // Subtle Rim Light
+        ),
       ),
-      child: ListTile(
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-        leading: CircleAvatar(
-          radius: 18,
-          backgroundColor: Theme.of(context).colorScheme.primaryContainer,
-          child: Icon(
-            Icons.sell_rounded,
-            size: 18,
-            color: Theme.of(context).colorScheme.onPrimaryContainer,
-          ),
-        ),
-        title: Text(
-          "${price.price} ₸",
-          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-        ),
-        subtitle: Text(
-          priceRateOptions
-              .firstWhere(
-                (o) => o.value == price.priceRate.toUpperCase(),
-                orElse: () =>
-                    const PriceRateOption(value: "", label: "Unknown"),
-              )
-              .label,
-        ),
-        trailing: IconButton.filledTonal(
-          icon: const Icon(Icons.edit_rounded, size: 16),
-          onPressed: onEdit,
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(16, 12, 8, 12),
+        child: Row(
+          children: [
+            // Industrial Icon Indicator
+            Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: accentBlue.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: const Icon(
+                Icons.payments_outlined,
+                size: 20,
+                color: accentBlue,
+              ),
+            ),
+            const SizedBox(width: 16),
+
+            // Pricing Info
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    priceRateOptions
+                        .firstWhere(
+                          (o) => o.value == price.priceRate.toUpperCase(),
+                          orElse: () => const PriceRateOption(
+                            value: "",
+                            label: "UNKNOWN RATE",
+                          ),
+                        )
+                        .label
+                        .toUpperCase(),
+                    style: const TextStyle(
+                      color: ghostGray,
+                      fontSize: 10,
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: 1.1,
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    "${price.price} ₸",
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 18,
+                      fontFamily:
+                          'monospace', // Gives it a technical/receipt feel
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            // Edit Action
+            IconButton(
+              onPressed: onEdit,
+              icon: const Icon(Icons.tune_rounded, color: ghostGray, size: 20),
+              visualDensity: VisualDensity.compact,
+            ),
+          ],
         ),
       ),
     );

@@ -7,55 +7,69 @@ void openLocationPickerSheet(
   WidgetRef ref,
   String equipmentId,
 ) {
+  // const bgColor = Color(0xFF1E2125); // Industrial Charcoal
+  const ghostGray = Color(0x4DFFFFFF);
+  // const accentBlue = Color(0xFF4E73DF);
+
   showModalBottomSheet(
     context: context,
     backgroundColor: Colors.transparent,
     isScrollControlled: true,
     builder: (context) {
       return Container(
-        decoration: BoxDecoration(
-          color: Theme.of(context).colorScheme.surface,
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
+        decoration: const BoxDecoration(
+          color: Color(0xFF121417), // Deep Midnight
+          borderRadius: BorderRadius.vertical(
+            top: Radius.circular(28),
+          ), // Large Radius
+          border: Border(
+            top: BorderSide(
+              color: Color(0x14FFFFFF),
+              width: 1,
+            ), // Rim light on top edge
+          ),
         ),
-        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            /// Drag Handle
+            /// Industrial Drag Handle
             Container(
-              width: 40,
+              width: 32,
               height: 4,
               decoration: BoxDecoration(
-                color: Colors.grey.shade300,
+                color: Colors.white.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
 
             const SizedBox(height: 24),
 
-            Text(
+            const Text(
               "Select Location",
-              style: Theme.of(
-                context,
-              ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+              style: TextStyle(
+                color: ghostGray,
+                fontSize: 11,
+                fontWeight: FontWeight.bold,
+                letterSpacing: 1.5,
+              ),
             ),
 
             const SizedBox(height: 20),
 
-            /// Saved Addresses
+            /// Actions
             _LocationActionTile(
               icon: Icons.history_rounded,
               title: "Saved Addresses",
-              subtitle: "Pick from your frequently used spots",
+              subtitle: "Select from your frequently used spots",
               onTap: () {
                 Navigator.pop(context);
                 context.push("/owner/addresses");
               },
             ),
 
-            /// Add Address Manually
             _LocationActionTile(
-              icon: Icons.add_home_work_rounded,
+              icon: Icons.terminal_rounded,
               title: "Enter New Address",
               subtitle: "Type in the address details manually",
               onTap: () {
@@ -64,18 +78,18 @@ void openLocationPickerSheet(
               },
             ),
 
-            /// Pick on Map
             _LocationActionTile(
-              icon: Icons.explore_rounded,
+              icon: Icons.map_outlined,
               title: "Pick on Map",
               subtitle: "Drag a pin to the exact location",
               onTap: () {
                 Navigator.pop(context);
                 context.push("/owner/addresses/map?equipmentId=$equipmentId");
               },
+              isLast: true,
             ),
 
-            const SizedBox(height: 16),
+            const SizedBox(height: 32),
           ],
         ),
       );
@@ -83,32 +97,79 @@ void openLocationPickerSheet(
   );
 }
 
-/// Sheet Row
 class _LocationActionTile extends StatelessWidget {
   final IconData icon;
   final String title;
   final String subtitle;
   final VoidCallback onTap;
+  final bool isLast;
 
   const _LocationActionTile({
     required this.icon,
     required this.title,
     required this.subtitle,
     required this.onTap,
+    this.isLast = false,
   });
 
   @override
   Widget build(BuildContext context) {
-    return ListTile(
-      onTap: onTap,
-      contentPadding: const EdgeInsets.symmetric(vertical: 8),
-      leading: CircleAvatar(
-        backgroundColor: Theme.of(context).colorScheme.surfaceContainerHighest,
-        child: Icon(icon, color: Theme.of(context).colorScheme.primary),
+    const accentBlue = Color(0xFF4E73DF);
+    const ghostGray = Color(0x4DFFFFFF);
+
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(16),
+        child: Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: Colors.black.withValues(alpha: 0.2), // Recessed panel
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
+          ),
+          child: Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: accentBlue.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Icon(icon, color: accentBlue, size: 20),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 13,
+                        letterSpacing: 0.5,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      subtitle,
+                      style: const TextStyle(color: ghostGray, fontSize: 11),
+                    ),
+                  ],
+                ),
+              ),
+              const Icon(
+                Icons.arrow_forward_ios_rounded,
+                color: ghostGray,
+                size: 14,
+              ),
+            ],
+          ),
+        ),
       ),
-      title: Text(title, style: const TextStyle(fontWeight: FontWeight.bold)),
-      subtitle: Text(subtitle),
-      trailing: const Icon(Icons.chevron_right_rounded),
     );
   }
 }

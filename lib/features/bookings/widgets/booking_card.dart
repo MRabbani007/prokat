@@ -41,7 +41,7 @@ class BookingCard extends StatelessWidget {
                     children: [
                       Expanded(
                         child: Text(
-                          booking.equipmentName, // ?? 'Unknown Equipment',
+                          booking.equipment.name, // ?? 'Unknown Equipment',
                           style: const TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,

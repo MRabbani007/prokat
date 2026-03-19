@@ -1,60 +1,88 @@
-enum RequestStatus { CREATED, CANCELLED, FULFILLED }
+import 'package:prokat/features/auth/models/user_model.dart';
+import 'package:prokat/features/categories/models/category.dart';
+import 'package:prokat/features/locations/models/location_model.dart';
 
 class RequestModel {
   final String id;
-  final String capacity;
-  final DateTime requiredOn;
-  final DateTime? requiredAt;
-  final String? comment;
-  final int offeredRate;
   final String status;
-  final String? categoryId;
-  final String locationId;
-  final String userId;
+  final Category? category;
+  final String capacity;
+  final int offeredRate;
+  final String? comment;
+  final DateTime? requiredOn;
+  final DateTime? requiredAt;
+  final User? renter;
+  final LocationModel location;
   final DateTime? createdAt;
   final DateTime? updatedAt;
 
   RequestModel({
     required this.id,
     required this.capacity,
-    required this.requiredOn,
+    this.requiredOn,
     this.requiredAt,
     this.comment,
     required this.offeredRate,
     required this.status,
-    this.categoryId,
-    required this.locationId,
-    required this.userId,
+    this.category,
+    required this.location,
+    this.renter,
     this.createdAt,
     this.updatedAt,
   });
 
   factory RequestModel.fromJson(Map<String, dynamic> json) {
-    return RequestModel(
-      id: json['id'] as String,
-      capacity: json['capacity'] as String,
-      requiredOn: DateTime.parse(json['requiredOn']),
-      requiredAt: json['requiredAt'] != null
-          ? DateTime.parse(json['requiredAt'])
-          : null,
-      comment: json['comment'] as String?,
+    try {
+      return RequestModel(
+        id: json['id']?.toString() ?? '',
+        status: json['status']?.toString() ?? '',
+        capacity: json['capacity']?.toString() ?? '',
+        comment: json['comment']?.toString() ?? '',
 
-      offeredRate: json['offeredRate'] as int,
+        offeredRate: json['offeredRate'] as int,
 
-      /// 🔥 SAFE status parsing
-      status: json['status'] as String,
+        requiredOn: DateTime.parse(json['requiredOn']),
+        requiredAt: json['requiredAt'] != null
+            ? DateTime.parse(json['requiredAt'])
+            : null,
 
-      /// 🔥 FIX: nullable
-      categoryId: json['categoryId'] as String?,
+        category: json['category'] != null
+            ? Category.fromJson(json['category'])
+            : null,
 
-      locationId: json['locationId'] as String,
-      userId: json['userId'] as String,
-      createdAt: json['createdAt'] != null
-          ? DateTime.parse(json['createdAt'])
-          : null,
-      updatedAt: json['updatedAt'] != null
-          ? DateTime.parse(json['updatedAt'])
-          : null,
-    );
+        location: json['location'] != null
+            ? LocationModel.fromJson(json['location'])
+            : throw Exception("Location is required but missing"),
+
+        renter: json["renter"] != null ? User.fromJson(json["renter"]) : null,
+
+        createdAt: json['createdAt'] != null
+            ? DateTime.parse(json['createdAt'])
+            : null,
+
+        updatedAt: json['updatedAt'] != null
+            ? DateTime.parse(json['updatedAt'])
+            : null,
+      );
+    } catch (e) {
+      print("Request Parse Failed");
+      print(json);
+      rethrow; // importan
+    }
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      "id": id,
+      "status": status,
+      "category": category?.toJson(),
+      "capacity": capacity,
+      "offeredRate": offeredRate,
+      "comment": comment,
+      "location": location.toJson(),
+      "renter": renter?.toJson(),
+      "requiredOn": requiredOn?.toIso8601String(),
+      "requiredAt": requiredAt?.toIso8601String(),
+    };
   }
 }

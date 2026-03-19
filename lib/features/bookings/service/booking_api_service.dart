@@ -9,7 +9,7 @@ class BookingApiService {
 
   Dio get _dio => apiClient.dio;
 
-  Future<List<BookingModel>> getBookings() async {
+  Future<List<BookingModel>> getUserBookings() async {
     try {
       final res = await _dio.get("/bookings");
 
@@ -21,12 +21,26 @@ class BookingApiService {
     }
   }
 
+  Future<List<BookingModel>> getOwnerBookings() async {
+    try {
+      final res = await _dio.get("/bookings/owner");
+
+      return (res.data["data"] as List)
+          .map((e) => BookingModel.fromJson(e))
+          .toList();
+          
+    } catch (e) {
+      print(e);
+      return [];
+    }
+  }
+
   Future<BookingModel?> createBooking(BookingModel booking) async {
     try {
       final res = await _dio.post("/bookings", data: booking.toJson());
 
       if (res.statusCode == 200 || res.statusCode == 201) {
-        return BookingModel.fromJson(res.data);
+        return BookingModel.fromJson(res.data["data"]);
       }
 
       return null;
@@ -40,10 +54,12 @@ class BookingApiService {
     Map<String, dynamic> data,
   ) async {
     try {
-      final res = await _dio.patch("/bookings/$id", data: data);
+      print("updating");
+      final res = await _dio.patch("/bookings/$id/status", data: data);
+
 
       if (res.statusCode == 200 || res.statusCode == 201) {
-        return BookingModel.fromJson(res.data);
+        return BookingModel.fromJson(res.data["data"]);
       }
 
       return null;

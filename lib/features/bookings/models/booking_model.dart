@@ -1,3 +1,7 @@
+import 'package:prokat/features/auth/models/user_model.dart';
+import 'package:prokat/features/equipment/models/equipment_model.dart';
+import 'package:prokat/features/locations/models/location_model.dart';
+
 class BookingModel {
   final String id;
   final String status;
@@ -11,11 +15,10 @@ class BookingModel {
   final String? comment;
   final String? instructions;
 
-  final String? userId;
+  final User? renter;
 
-  final String equipmentId;
-  final String equipmentName;
-  final String locationId;
+  final Equipment equipment;
+  final LocationModel location;
 
   final DateTime? createdAt;
   final DateTime? updatedAt;
@@ -29,10 +32,9 @@ class BookingModel {
     required this.priceRate,
     this.comment,
     this.instructions,
-    this.userId,
-    required this.equipmentId,
-    required this.equipmentName,
-    required this.locationId,
+    this.renter,
+    required this.equipment,
+    required this.location,
     this.createdAt,
     this.updatedAt,
   });
@@ -50,7 +52,7 @@ class BookingModel {
     return BookingModel(
       id: json['id']?.toString() ?? '',
 
-      status: json['status'], // fallback
+      status: json['status']?.toString() ?? '',
 
       bookedOn: tryParseDate(json['bookedOn']),
       bookedAt: tryParseDate(json['bookedAt']),
@@ -58,16 +60,26 @@ class BookingModel {
       price: (json['price'] as num?)?.toInt() ?? 0,
       priceRate: json['priceRate']?.toString() ?? '',
 
-      comment: json['comment'] ?? '',
-      instructions: json['instructions'] ?? '',
+      comment: json['comment']?.toString(),
+      instructions: json['instructions']?.toString(),
 
-      userId: json['userId']?.toString() ?? '',
-      equipmentId: json['equipmentId']?.toString() ?? '',
-      equipmentName: json['equipmentName']?.toString() ?? '',
-      locationId: json['locationId']?.toString() ?? '',
+      renter: json['renter'] != null ? User.fromJson(json['renter']) : null,
 
-      createdAt: tryParseDate(json['createdAt']),
-      updatedAt: tryParseDate(json['updatedAt']),
+      equipment: json['equipment'] != null
+          ? Equipment.fromJson(json['equipment'])
+          : throw Exception("Equipment is required but missing"),
+
+      location: json['location'] != null
+          ? LocationModel.fromJson(json['location'])
+          : throw Exception("Location is required but missing"),
+
+      createdAt: json['createdAt'] != null
+          ? DateTime.parse(json['createdAt'])
+          : null,
+
+      updatedAt: json['updatedAt'] != null
+          ? DateTime.parse(json['updatedAt'])
+          : null,
     );
   }
 
@@ -80,9 +92,9 @@ class BookingModel {
       "priceRate": priceRate,
       "comment": comment,
       "instructions": instructions,
-      "equipmentId": equipmentId,
-      "equipmentName": equipmentName,
-      "locationId": locationId,
+      "equipment": equipment.toJson(),
+      "location": location.toJson(),
+      "renter": renter?.toJson(),
     };
   }
 }

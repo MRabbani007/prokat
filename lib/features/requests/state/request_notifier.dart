@@ -7,7 +7,7 @@ class RequestNotifier extends StateNotifier<RequestState> {
   final RequestService service;
 
   RequestNotifier(this.service) : super(RequestState()) {
-    loadRequests();
+    getUserRequests();
   }
 
   void selectLocation(LocationModel location) {
@@ -37,11 +37,27 @@ class RequestNotifier extends StateNotifier<RequestState> {
     state = state.copyWith(capacity: capacity);
   }
 
-  Future<void> loadRequests() async {
+  Future<void> getUserRequests() async {
     try {
       state = state.copyWith(isLoading: true);
 
-      final data = await service.getRequests();
+      final data = await service.getUserRequests();
+
+      state = state.copyWith(isLoading: false, requests: data);
+    } catch (e) {
+      state = state.copyWith(
+        isLoading: false,
+        requests: [],
+        error: e.toString(),
+      );
+    }
+  }
+
+    Future<void> getOwnerRequests() async {
+    try {
+      state = state.copyWith(isLoading: true);
+
+      final data = await service.getOwnerRequests();
 
       state = state.copyWith(isLoading: false, requests: data);
     } catch (e) {
@@ -72,8 +88,7 @@ class RequestNotifier extends StateNotifier<RequestState> {
         comment: state.comment,
         offeredRate: state.offeredRate ?? 0,
       );
-print("requestservice");
-print(created.toString());
+      
       if (created != null) {
         state = state.copyWith(
           isLoading: false,
@@ -113,7 +128,7 @@ print(created.toString());
       );
 
       if (updated != null) {
-        await loadRequests();
+        await getUserRequests();
         state = state.copyWith(isLoading: false);
       }
     } catch (e) {
@@ -123,6 +138,6 @@ print(created.toString());
 
   Future<void> cancelRequest(String id) async {
     await service.cancelRequest(id);
-    await loadRequests();
+    await getUserRequests();
   }
 }

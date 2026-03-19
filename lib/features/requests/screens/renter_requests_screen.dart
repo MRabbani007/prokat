@@ -17,7 +17,7 @@ class RenterRequestsScreen extends ConsumerWidget {
     final active = state.requests
         .where((r) => ["CREATED", "VIEWED"].contains(r.status))
         .toList();
-
+ 
     final past = state.requests
         .where((r) => ["ACCEPTED", "CANCELLED", "EXPIRED"].contains(r.status))
         .toList();

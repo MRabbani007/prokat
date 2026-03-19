@@ -1,0 +1,64 @@
+import 'package:prokat/features/equipment/models/equipment_model.dart';
+import 'package:prokat/features/offers/models/offer_model.dart';
+
+class OffersState {
+  final bool isLoading;
+  final String? error;
+
+  // Offers received for renter
+  final List<OfferModel> renterOffers;
+
+  final Equipment? selectedEquipment;
+
+  final int? price;
+  final String? priceRate;
+  final String? comment;
+
+  final DateTime? selectedDate;
+  final DateTime? selectedTime;
+
+  OffersState({
+    this.isLoading = false,
+    this.error,
+
+    this.selectedEquipment,
+    this.renterOffers = const [],
+
+    this.price,
+    this.priceRate,
+    this.comment,
+
+    this.selectedDate,
+    this.selectedTime,
+  });
+
+  OffersState copyWith({
+    bool? isLoading,
+    String? error,
+
+    List<OfferModel>? renterOffers,
+
+    Equipment? selectedEquipment,
+    int? price,
+    String? priceRate,
+    String? comment,
+
+    DateTime? selectedDate,
+    DateTime? selectedTime,
+  }) {
+    return OffersState(
+      isLoading: isLoading ?? this.isLoading,
+      error: error,
+
+      selectedEquipment: selectedEquipment ?? this.selectedEquipment,
+      renterOffers: renterOffers ?? this.renterOffers,
+
+      price: price ?? this.price,
+      priceRate: priceRate ?? this.priceRate,
+      comment: comment ?? this.comment,
+
+      selectedDate: selectedDate ?? this.selectedDate,
+      selectedTime: selectedTime ?? this.selectedTime,
+    );
+  }
+}

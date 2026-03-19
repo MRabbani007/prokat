@@ -7,6 +7,7 @@ class RequestState {
 
   /// All requests (list screen)
   final List<RequestModel> requests;
+  final List<RequestModel> ownerRequests;
 
   /// Current opened request (details/edit)
   final RequestModel? currentRequest;
@@ -28,6 +29,7 @@ class RequestState {
     this.isLoading = false,
     this.error,
     this.requests = const [],
+    this.ownerRequests = const [],
     this.currentRequest,
     this.capacity,
     this.offeredRate,
@@ -43,6 +45,7 @@ class RequestState {
     bool? isLoading,
     String? error,
     List<RequestModel>? requests,
+    List<RequestModel>? ownerRequests,
     RequestModel? currentRequest,
     String? capacity,
     int? offeredRate,
@@ -57,6 +60,7 @@ class RequestState {
       isLoading: isLoading ?? this.isLoading,
       error: error,
       requests: requests ?? this.requests,
+      ownerRequests: ownerRequests ?? this.ownerRequests,
       currentRequest: currentRequest ?? this.currentRequest,
       capacity: capacity ?? this.capacity,
       offeredRate: offeredRate ?? this.offeredRate,

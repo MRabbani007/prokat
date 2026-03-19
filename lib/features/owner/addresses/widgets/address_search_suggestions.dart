@@ -12,8 +12,6 @@ class AddressSearchSuggestions extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final suggestions = ref.watch(locationProvider).suggestions;
 
-    print("suggestionswidget");
-    print(suggestions);
     if (suggestions.isEmpty) return const SizedBox();
 
     return Container(

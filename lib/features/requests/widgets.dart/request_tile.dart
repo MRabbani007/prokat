@@ -188,7 +188,7 @@ class RequestTile extends StatelessWidget {
   }
 
   String _formatDateTime(RequestModel r) {
-    final dateStr = DateFormat('MMM dd').format(r.requiredOn);
+    final dateStr = DateFormat('MMM dd').format(r.requiredOn!);
     if (r.requiredAt != null) {
       final timeStr = DateFormat('HH:mm').format(r.requiredAt!);
       return "$dateStr • $timeStr";

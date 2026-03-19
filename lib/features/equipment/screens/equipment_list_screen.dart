@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:prokat/core/widgets/page_header.dart';
+import 'package:prokat/features/bookings/state/booking_provider.dart';
 import 'package:prokat/features/equipment/providers/equipment_provider.dart';
 import 'package:prokat/features/equipment/widgets/list/equipment_city_selector.dart';
 import 'package:prokat/features/equipment/widgets/list/equipment_list_tile.dart';
@@ -25,14 +26,16 @@ class _EquipmentListScreenState extends ConsumerState<EquipmentListScreen> {
   @override
   Widget build(BuildContext context) {
     final equipmentsAsync = ref.watch(equipmentProvider);
+    final bookingNotifier = ref.read(bookingProvider.notifier);
 
     return Scaffold(
       backgroundColor: bgColor,
       body: SafeArea(
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            PageHeader(title: "List View"),
-            
+            PageHeader(title: "Search"),
+
             /// 1. INDUSTRIAL COMMAND HEADER
             Container(
               padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
@@ -122,11 +125,15 @@ class _EquipmentListScreenState extends ConsumerState<EquipmentListScreen> {
                   return ListView.separated(
                     padding: const EdgeInsets.all(20),
                     itemCount: items.length,
-                    separatorBuilder: (_, __) => const SizedBox(height: 16),
+                    separatorBuilder: (_, _) => const SizedBox(height: 16),
                     itemBuilder: (context, index) => EquipmentListTile(
                       equipment: items[index],
-                      onTap: () =>
-                          context.push('/equipment/${items[index].id}/book'),
+                      onTap: () {
+                        // Select equipment
+                        bookingNotifier.selectEquipment(items[index]);
+                        // Navigate to booking screen
+                        context.push('/equipment/${items[index].id}/book');
+                      },
                     ),
                   );
                 },

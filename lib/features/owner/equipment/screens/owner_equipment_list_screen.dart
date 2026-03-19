@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:prokat/core/widgets/page_header.dart';
 import 'package:prokat/features/owner/equipment/providers/owner_equipment_provider.dart';
 import 'package:prokat/features/owner/equipment/widgets/owner_equipment_card.dart';
 
@@ -42,27 +43,136 @@ class _OwnerEquipmentListScreenState
 
   @override
   Widget build(BuildContext context) {
+    // Industrial Midnight Palette
+    const bgColor = Color(0xFF121417);
+    const accentColor = Color(0xFF4E73DF); // Industrial Blue
+    const ghostGray = Color(0x4DFFFFFF); // White @ 30%
+
     final state = ref.watch(ownerEquipmentProvider);
 
     return Scaffold(
+      backgroundColor: bgColor,
       body: SafeArea(
-        child: state.isLoading
-            ? const Center(child: CircularProgressIndicator())
-            : ListView.builder(
-                padding: const EdgeInsets.only(top: 45),
-                itemCount: state.equipment.length,
-                itemBuilder: (context, index) {
-                  final equipment = state.equipment[index];
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [ 
+            // 1. Management Header Style
+            PageHeader(title: "My Equipment"),
 
-                  return OwnerEquipmentCard(equipment: equipment);
-                },
+            // Subtle "Owner Mode" Indicator
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+              child: Row(
+                children: [
+                  Container(
+                    width: 8,
+                    height: 8,
+                    decoration: const BoxDecoration(
+                      color: Color(0xFFD97706), // Amber/Warning
+                      shape: BoxShape.circle,
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    "ADMINISTRATIVE ACCESS ACTIVE",
+                    style: TextStyle(
+                      color: ghostGray,
+                      fontSize: 10,
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: 1.5,
+                    ),
+                  ),
+                ],
               ),
+            ),
+
+            // 2. Scrollable Content
+            Expanded(
+              child: state.isLoading
+                  ? const Center(
+                      child: CircularProgressIndicator(color: accentColor),
+                    )
+                  : ListView.builder(
+                      padding: const EdgeInsets.fromLTRB(
+                        20,
+                        10,
+                        20,
+                        100,
+                      ), // Extra bottom padding for the bar
+                      itemCount: state.equipment.length,
+                      itemBuilder: (context, index) {
+                        return Padding(
+                          padding: const EdgeInsets.only(bottom: 16),
+                          child: OwnerEquipmentCard(
+                            equipment: state.equipment[index],
+                          ),
+                        );
+                      },
+                    ),
+            ),
+          ],
+        ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          context.push('/owner/equipment/create');
-        },
-        child: const Icon(Icons.add),
+
+      // 3. Fixed Bottom Action Bar (Replaces FAB)
+      bottomNavigationBar: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+        decoration: BoxDecoration(
+          color: bgColor,
+          // The "Rim Light" top border to separate from the list
+          border: Border(
+            top: BorderSide(
+              color: Colors.white.withValues(alpha: 0.08),
+              width: 1,
+            ),
+          ),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  "TOTAL ASSETS",
+                  style: TextStyle(
+                    color: ghostGray,
+                    fontSize: 10,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                Text(
+                  "${state.equipment.length} UNITS",
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
+            ),
+
+            // The "Add Equipment" Button
+            ElevatedButton.icon(
+              onPressed: () => context.push('/owner/equipment/create'),
+              icon: const Icon(Icons.add_rounded, size: 20),
+              label: const Text("ADD EQUIPMENT"),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: accentColor,
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 24,
+                  vertical: 16,
+                ),
+                elevation: 0,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16), // Small Item Radius
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

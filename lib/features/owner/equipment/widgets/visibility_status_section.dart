@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:prokat/features/owner/equipment/widgets/equipment_section_card.dart';
 
 class VisibilityStatusSection extends StatefulWidget {
   final bool isVisible;
-  final String status; // "available", "rented", "maintenance", etc.
+  final String status;
   final Function(bool newVisibility, String newStatus) onSave;
 
   const VisibilityStatusSection({
@@ -29,86 +28,191 @@ class _VisibilityStatusSectionState extends State<VisibilityStatusSection> {
     _tempStatus = widget.status;
   }
 
-  // Check if current selection differs from original data
   bool get _isDirty =>
-      (_tempVisible != widget.isVisible) ||( _tempStatus != widget.status);
+      (_tempVisible != widget.isVisible) || (_tempStatus != widget.status);
 
   @override
   Widget build(BuildContext context) {
-    return EquipmentSectionCard(
-      title: "Marketplace Presence",
-      // Show the save button only if there's a change
-      actionIcon: _isDirty
-          ? Icons.check_circle_rounded
-          : Icons.lock_outline_rounded,
-      isActionEnabled: _isDirty,
-      onAction: _isDirty
-          ? () => widget.onSave(_tempVisible, _tempStatus)
-          : null,
-      children: [
-        // 1. Visibility Toggle
-        _InlineActionRow(
-          label: "Public Visibility",
-          trailing: Switch.adaptive(
-            value: _tempVisible,
-            onChanged: (v) => setState(() => _tempVisible = v),
-          ),
-        ),
+    const cardColor = Color(0xFF1E2125);
+    const ghostGray = Color(0x4DFFFFFF);
+    const accentBlue = Color(0xFF4E73DF);
 
-        const SizedBox(height: 16),
-        const Text(
-          "Current Availability",
-          style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
-        ),
-        const SizedBox(height: 10),
-
-        // 2. Modern Segmented Status Picker
-        SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          child: Row(
-            children: ["AVAILABLE", "BOOKED", "MAINTENANCE"].map((s) {
-              final isSelected = _tempStatus == s;
-              return Padding(
-                padding: const EdgeInsets.only(right: 8),
-                child: ChoiceChip(
-                  label: Text(s.toUpperCase()),
-                  selected: isSelected,
-                  onSelected: (selected) {
-                    if (selected) setState(() => _tempStatus = s);
-                  },
-                  showCheckmark: false,
-                  selectedColor: Theme.of(context).colorScheme.primaryContainer,
-                  labelStyle: TextStyle(
-                    fontSize: 11,
+    return Container(
+      decoration: BoxDecoration(
+        color: cardColor,
+        borderRadius: BorderRadius.circular(28),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Header with State-Aware Save Button
+          Padding(
+            padding: const EdgeInsets.fromLTRB(20, 12, 12, 4),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text(
+                  "SYSTEM AVAILABILITY",
+                  style: TextStyle(
+                    color: ghostGray,
+                    fontSize: 10,
                     fontWeight: FontWeight.bold,
-                    color: isSelected
-                        ? Theme.of(context).colorScheme.onPrimaryContainer
-                        : null,
+                    letterSpacing: 1.5,
                   ),
                 ),
-              );
-            }).toList(),
+                if (_isDirty)
+                  TextButton.icon(
+                    onPressed: () => widget.onSave(_tempVisible, _tempStatus),
+                    icon: const Icon(Icons.sync_rounded, size: 16),
+                    label: const Text("UPDATE STATE"),
+                    style: TextButton.styleFrom(
+                      foregroundColor: Colors.white,
+                      backgroundColor: accentBlue,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                  )
+                else
+                  const Padding(
+                    padding: EdgeInsets.all(12),
+                    child: Icon(
+                      Icons.lock_outline_rounded,
+                      color: ghostGray,
+                      size: 18,
+                    ),
+                  ),
+              ],
+            ),
           ),
-        ),
-      ],
+
+          // 1. Visibility Toggle Panel
+          _IndustrialControlRow(
+            label: "MARKETPLACE VISIBILITY",
+            subtitle: _tempVisible ? "UNIT IS DISCOVERABLE" : "UNIT IS HIDDEN",
+            trailing: Switch.adaptive(
+              value: _tempVisible,
+              activeColor: accentBlue,
+              activeTrackColor: accentBlue.withValues(alpha: 0.3),
+              onChanged: (v) => setState(() => _tempVisible = v),
+            ),
+          ),
+
+          const Padding(
+            padding: EdgeInsets.fromLTRB(20, 16, 20, 8),
+            child: Text(
+              "OPERATIONAL STATUS",
+              style: TextStyle(
+                color: ghostGray,
+                fontSize: 9,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+
+          // 2. Industrial Status Selector
+          Padding(
+            padding: const EdgeInsets.fromLTRB(20, 0, 20, 24),
+            child: SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                children: ["AVAILABLE", "BOOKED", "MAINTENANCE"].map((s) {
+                  final isSelected = _tempStatus == s;
+                  final isWarning = s == "MAINTENANCE";
+                  final Color activeColor = isWarning
+                      ? const Color(0xFFD97706)
+                      : accentBlue;
+
+                  return GestureDetector(
+                    onTap: () => setState(() => _tempStatus = s),
+                    child: AnimatedContainer(
+                      duration: const Duration(milliseconds: 200),
+                      margin: const EdgeInsets.only(right: 8),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 10,
+                      ),
+                      decoration: BoxDecoration(
+                        color: isSelected
+                            ? activeColor.withValues(alpha: 0.1)
+                            : Colors.black.withValues(alpha: 0.2),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: isSelected
+                              ? activeColor
+                              : Colors.white.withValues(alpha: 0.05),
+                          width: 1.5,
+                        ),
+                      ),
+                      child: Text(
+                        s,
+                        style: TextStyle(
+                          fontSize: 10,
+                          fontWeight: FontWeight.bold,
+                          letterSpacing: 1,
+                          color: isSelected ? activeColor : ghostGray,
+                        ),
+                      ),
+                    ),
+                  );
+                }).toList(),
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
 
-// Simple Helper for Rows
-class _InlineActionRow extends StatelessWidget {
+class _IndustrialControlRow extends StatelessWidget {
   final String label;
+  final String subtitle;
   final Widget trailing;
-  const _InlineActionRow({required this.label, required this.trailing});
+  const _IndustrialControlRow({
+    required this.label,
+    required this.subtitle,
+    required this.trailing,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Text(label, style: const TextStyle(fontWeight: FontWeight.w500)),
-        trailing,
-      ],
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.black.withValues(alpha: 0.2),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                label,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 12,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              Text(
+                subtitle,
+                style: const TextStyle(
+                  color: Color(0x4DFFFFFF),
+                  fontSize: 10,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
+          ),
+          trailing,
+        ],
+      ),
     );
   }
 }

@@ -14,7 +14,7 @@ class SidebarDrawer extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     const bgColor = Color(0xFF121417);
-    const accentColor = Color(0xFF4E73DF);
+    // const accentColor = Color(0xFF4E73DF);
 
     final authState = ref.watch(authProvider);
 
