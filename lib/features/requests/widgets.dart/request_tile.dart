@@ -154,7 +154,7 @@ class RequestTile extends StatelessWidget {
           Text(
             label,
             style: TextStyle(
-              color: Colors.white.withOpacity(0.3),
+              color: Colors.white.withValues(alpha: 0.3),
               fontSize: 9,
               fontWeight: FontWeight.bold,
               letterSpacing: 1.2,
@@ -166,7 +166,7 @@ class RequestTile extends StatelessWidget {
               Icon(
                 icon,
                 size: 14,
-                color: valueColor ?? Colors.white.withOpacity(0.5),
+                color: valueColor ?? Colors.white.withValues(alpha: 0.5),
               ),
               const SizedBox(width: 6),
               Expanded(

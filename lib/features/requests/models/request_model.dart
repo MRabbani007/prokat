@@ -67,7 +67,7 @@ class RequestModel {
     } catch (e) {
       print("Request Parse Failed");
       print(json);
-      rethrow; // importan
+      rethrow; // important
     }
   }
 

@@ -2,14 +2,22 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:prokat/core/router/app_routes.dart';
 import 'package:prokat/features/auth/providers/auth_provider.dart';
+import 'package:prokat/features/categories/providers/category_provider.dart';
 import 'package:prokat/features/navigation/sidebar/sidebar_tile.dart';
 import 'package:prokat/screens/user/main/main_screen.dart';
 import 'sidebar_header.dart';
-import 'sidebar_menu_config.dart';
 import 'package:go_router/go_router.dart';
 
 class SidebarDrawer extends ConsumerWidget {
   const SidebarDrawer({super.key});
+
+  IconData _getCategoryIcon(String name) {
+    final n = name.toLowerCase();
+    if (n.contains('septic')) return Icons.local_shipping_rounded;
+    if (n.contains('truck')) return Icons.fire_truck_rounded;
+    if (n.contains('excavator')) return Icons.precision_manufacturing_rounded;
+    return Icons.construction_rounded;
+  }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -17,16 +25,17 @@ class SidebarDrawer extends ConsumerWidget {
     // const accentColor = Color(0xFF4E73DF);
 
     final authState = ref.watch(authProvider);
+    final categoriesState = ref.watch(categoriesProvider);
 
     final isLoggedIn = authState.isAuthenticated;
     final user = authState.session?.user;
-    final role = user?.role;
+    final isOwner = user?.role == "OWNER" || user?.role == "ADMIN";
 
-    final menu = <SidebarMenuItem>[
-      ...publicMenu,
-      if (isLoggedIn) ...userMenu,
-      if (role == 'OWNER') ...ownerMenu,
-    ];
+    // final menu = <SidebarMenuItem>[
+    //   ...publicMenu,
+    //   if (isLoggedIn) ...userMenu,
+    //   if (role == 'OWNER') ...ownerMenu,
+    // ];
 
     return Drawer(
       backgroundColor: bgColor,
@@ -39,13 +48,20 @@ class SidebarDrawer extends ConsumerWidget {
             child: ListView(
               padding: const EdgeInsets.symmetric(horizontal: 16),
               children: [
+                const SizedBox(height: 10),
                 // SECTION: SERVICES
-                const SectionHeader(title: "SERVICES"),
+                const SectionHeader(title: "Services"),
 
                 // MAIN SELECTED SERVICE
                 _ActiveServiceTile(
-                  title: "Septic Trucks",
-                  icon: Icons.local_shipping_rounded,
+                  title:
+                      categoriesState.selectedCategory?.name ??
+                      "Select Service",
+                  icon: categoriesState.selectedCategory?.name != null
+                      ? _getCategoryIcon(
+                          categoriesState.selectedCategory?.name ?? "",
+                        )
+                      : Icons.local_shipping_rounded,
                   onTap: () => context.go(AppRoutes.categories),
                 ),
 
@@ -70,25 +86,28 @@ class SidebarDrawer extends ConsumerWidget {
                   route: AppRoutes.myRentals,
                 ),
 
-                const SizedBox(height: 32),
+                if (isOwner) ...[
+                  const SizedBox(height: 32),
 
-                // SECTION: OWNER (Conditional logic can be added here)
-                const SectionHeader(title: "OWNER DASHBOARD"),
-                SidebarTile(
-                  icon: Icons.construction,
-                  label: "Equipment",
-                  route: AppRoutes.ownerEquiment,
-                ),
-                SidebarTile(
-                  icon: Icons.book_online_outlined,
-                  label: "Bookings",
-                  route: AppRoutes.ownerBookings,
-                ),
-                SidebarTile(
-                  icon: Icons.message_outlined,
-                  label: "Requests",
-                  route: AppRoutes.ownerRequests,
-                ),
+                  // SECTION: OWNER (Conditional logic can be added here)
+                  const SectionHeader(title: "Owner"),
+
+                  SidebarTile(
+                    icon: Icons.construction,
+                    label: "Equipment",
+                    route: AppRoutes.ownerEquiment,
+                  ),
+                  SidebarTile(
+                    icon: Icons.book_online_outlined,
+                    label: "Bookings",
+                    route: AppRoutes.ownerBookings,
+                  ),
+                  SidebarTile(
+                    icon: Icons.message_outlined,
+                    label: "Requests",
+                    route: AppRoutes.ownerRequests,
+                  ),
+                ],
               ],
             ),
           ),
@@ -102,21 +121,31 @@ class SidebarDrawer extends ConsumerWidget {
                 top: BorderSide(color: Colors.white.withAlpha(10)),
               ),
             ),
-            child: Column(
-              children: [
-                SidebarTile(
-                  icon: Icons.person_outline,
-                  label: "Profile",
-                  route: "/profile",
-                ),
-                SidebarTile(
-                  icon: Icons.settings_outlined,
-                  label: "Settings",
-                  route: "/settings",
-                ),
-                const SizedBox(height: 10),
-              ],
-            ),
+            child: isLoggedIn
+                ? Column(
+                    children: [
+                      SidebarTile(
+                        icon: Icons.person_outline,
+                        label: "Profile",
+                        route: "/profile",
+                      ),
+                      SidebarTile(
+                        icon: Icons.settings_outlined,
+                        label: "Settings",
+                        route: "/settings",
+                      ),
+                      const SizedBox(height: 10),
+                    ],
+                  )
+                : Column(
+                    children: [
+                      SidebarTile(
+                        icon: Icons.person_outline,
+                        label: "Login",
+                        route: "/login",
+                      ),
+                    ],
+                  ),
           ),
         ],
       ),

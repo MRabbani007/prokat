@@ -1,4 +1,5 @@
 import 'package:prokat/features/auth/models/user_model.dart';
+import 'package:prokat/features/categories/models/category.dart';
 import 'package:prokat/features/equipment/models/equipment_location.dart';
 import 'package:prokat/features/equipment/models/price_entry_model.dart';
 
@@ -16,6 +17,7 @@ class Equipment {
   final String? imageUrl;
   final List<PriceEntry> prices;
   final List<EquipmentLocation> locations;
+  final Category? category;
 
   Equipment({
     required this.id,
@@ -29,6 +31,7 @@ class Equipment {
     this.imageUrl,
     required this.isVisible,
     this.owner,
+    this.category,
     required this.locations,
     required this.prices,
   });
@@ -44,6 +47,7 @@ class Equipment {
       "status": status,
       "isVisible": isVisible,
       "owner": owner,
+      "category": category,
     };
 
     if (ownerComment != null) {
@@ -85,6 +89,7 @@ class Equipment {
         locations: (json['locations'] as List<dynamic>? ?? [])
             .map((e) => EquipmentLocation.fromJson(e as Map<String, dynamic>))
             .toList(),
+        category: json["category"] != null ? Category.fromJson(json["category"]) : null,
       );
     } catch (e, stack) {
       print("❌ Equipment parsing failed");

@@ -1,24 +1,18 @@
-// features/categories/providers/category_provider.dart
-
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:dio/dio.dart';
-
+import 'package:prokat/features/categories/state/categories_notifier.dart';
+import 'package:prokat/features/categories/state/categories_state.dart';
 import '../../../core/providers/api_provider.dart';
-import '../models/category.dart';
 import '../services/category_service.dart';
 
 final categoryServiceProvider = Provider<CategoryService>((ref) {
-  final Dio dio = ref.watch(dioProvider);
+  final dio = ref.watch(apiClientProvider);
+
   return CategoryService(dio);
 });
 
-final categoriesProvider = FutureProvider<List<Category>>((ref) async {
-  final service = ref.watch(categoryServiceProvider);
+final categoriesProvider =
+    StateNotifierProvider<CategoriesNotifier, CategoryState>((ref) {
+      final service = ref.watch(categoryServiceProvider);
 
-  // ref.keepAlive();
-
-  return service.getCategories();
-});
-
-// Add this to your category_provider.dart
-final selectedCategoryProvider = StateProvider<Category?>((ref) => null);
+      return CategoriesNotifier(service);
+    });

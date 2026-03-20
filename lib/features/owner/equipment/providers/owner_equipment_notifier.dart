@@ -6,9 +6,11 @@ import 'package:prokat/features/owner/equipment/services/owner_equipment_state.d
 // Notifier — business logic + state
 // stores state, calls services, updates UI state, exposes actions
 class OwnerEquipmentNotifier extends StateNotifier<OwnerEquipmentState> {
-  final OwnerEquipmentService service; 
+  final OwnerEquipmentService service;
 
-  OwnerEquipmentNotifier(this.service) : super(OwnerEquipmentState());
+  OwnerEquipmentNotifier(this.service) : super(OwnerEquipmentState()) {
+    loadEquipment();
+  }
 
   /// LOAD OWNER EQUIPMENT
   Future<void> loadEquipment() async {

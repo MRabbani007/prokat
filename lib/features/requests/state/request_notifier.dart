@@ -53,7 +53,7 @@ class RequestNotifier extends StateNotifier<RequestState> {
     }
   }
 
-    Future<void> getOwnerRequests() async {
+  Future<void> getOwnerRequests() async {
     try {
       state = state.copyWith(isLoading: true);
 
@@ -88,7 +88,7 @@ class RequestNotifier extends StateNotifier<RequestState> {
         comment: state.comment,
         offeredRate: state.offeredRate ?? 0,
       );
-      
+
       if (created != null) {
         state = state.copyWith(
           isLoading: false,

@@ -4,6 +4,7 @@ import 'package:prokat/features/auth/models/auth_credentials.dart';
 import 'package:prokat/features/auth/providers/auth_provider.dart';
 import '../widgets/auth_button.dart';
 import '../widgets/auth_text_field.dart';
+import 'package:go_router/go_router.dart';
 
 class LoginWithUsernameForm extends ConsumerStatefulWidget {
   const LoginWithUsernameForm({super.key});
@@ -26,9 +27,15 @@ class _LoginWithUsernameFormState
   }
 
   Future<void> _login() async {
+    try{
+
+
     final credentials = UsernamePasswordCredentials(username:usernameController.text.trim(), password: passwordController.text);
 
-    await ref.read(authProvider.notifier).login(credentials);
+    final res = await ref.read(authProvider.notifier).login(credentials);
+
+    if(res == true){context.push("/search/map");}
+        }catch(e){}
   }
 
   @override

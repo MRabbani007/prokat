@@ -82,7 +82,7 @@ class SectionHeader extends StatelessWidget {
       children: [
         Text(
           title,
-          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500, color: Colors.blue),
         ),
         TextButton(onPressed: () {}, child: const Text("View All")),
       ],

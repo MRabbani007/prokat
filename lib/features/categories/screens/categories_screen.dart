@@ -10,17 +10,21 @@ class CategoriesScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final categoriesAsync = ref.watch(categoriesProvider);
-    
+    final categoriesState = ref.watch(categoriesProvider);
+
     // Theme Constants
     const bgColor = Color(0xFF121417);
     const accentColor = Color(0xFF4E73DF);
 
-    Future<void> onCategorySelected(BuildContext context, Category category) async {
-      ref.read(selectedCategoryProvider.notifier).state = category;
-      if (context.mounted) {
-        context.go('/search/map', extra: {'category': category.id});
-      }
+    Future<void> onCategorySelected(
+      BuildContext context,
+      Category category,
+    ) async {
+      ref.read(categoriesProvider.notifier).selectCategory(category);
+
+      // if (context.mounted) {
+      //   context.go('/search/map', extra: {'category': category.id});
+      // }
     }
 
     return Scaffold(
@@ -30,44 +34,57 @@ class CategoriesScreen extends ConsumerWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const PageHeader(title: "Select Service"),
-            
+
             Padding(padding: EdgeInsets.all(5)),
 
-            Expanded( // Prevents layout crashes
-              child: categoriesAsync.when(
-                data: (categories) {
-                  if (categories.isEmpty) {
-                    return Center(
-                      child: Text("No categories available", 
-                        style: TextStyle(color: Colors.white.withValues(alpha: 0.2))),
-                    );
-                  }
-              
-                  return GridView.builder(
-                    padding: const EdgeInsets.fromLTRB(20, 0, 20, 24),
-                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 2, // 2 columns for a "pro" catalog look
-                      mainAxisSpacing: 16,
-                      crossAxisSpacing: 16,
-                      childAspectRatio: 0.85, // Adjust based on icon/text size
+            Expanded(
+              // Prevents layout crashes
+              child: categoriesState.isLoading
+                  ? Center(
+                      child: CircularProgressIndicator(
+                        color: accentColor,
+                        strokeWidth: 2,
+                      ),
+                    )
+                  : categoriesState.error != null
+                  ? Center(
+                      child: Text(
+                        "Error: ${categoriesState.error}",
+                        style: const TextStyle(color: Colors.redAccent),
+                      ),
+                    )
+                  : categoriesState.categories.isEmpty
+                  ? Center(
+                      child: Text(
+                        "No categories available",
+                        style: TextStyle(
+                          color: Colors.white.withValues(alpha: 0.2),
+                        ),
+                      ),
+                    )
+                  : GridView.builder(
+                      padding: const EdgeInsets.fromLTRB(20, 0, 20, 24),
+                      gridDelegate:
+                          const SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount:
+                                2, // 2 columns for a "pro" catalog look
+                            mainAxisSpacing: 16,
+                            crossAxisSpacing: 16,
+                            childAspectRatio:
+                                0.85, // Adjust based on icon/text size
+                          ),
+                      itemCount: categoriesState.categories.length,
+                      itemBuilder: (context, index) {
+                        final category = categoriesState.categories[index];
+                        return _ServiceCard(
+                          category: category,
+                          isSelected:
+                              categoriesState.selectedCategory?.id ==
+                              category.id,
+                          onTap: () => onCategorySelected(context, category),
+                        );
+                      },
                     ),
-                    itemCount: categories.length,
-                    itemBuilder: (context, index) {
-                      final category = categories[index];
-                      return _ServiceCard(
-                        category: category,
-                        onTap: () => onCategorySelected(context, category),
-                      );
-                    },
-                  );
-                },
-                loading: () => const Center(
-                  child: CircularProgressIndicator(color: accentColor, strokeWidth: 2),
-                ),
-                error: (error, stack) => Center(
-                  child: Text("Error: $error", style: const TextStyle(color: Colors.redAccent)),
-                ),
-              ),
             ),
           ],
         ),
@@ -79,8 +96,13 @@ class CategoriesScreen extends ConsumerWidget {
 class _ServiceCard extends StatelessWidget {
   final Category category;
   final VoidCallback onTap;
+  final bool isSelected;
 
-  const _ServiceCard({required this.category, required this.onTap});
+  const _ServiceCard({
+    required this.category,
+    required this.onTap,
+    required this.isSelected,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -92,7 +114,9 @@ class _ServiceCard extends StatelessWidget {
       borderRadius: BorderRadius.circular(24),
       child: Container(
         decoration: BoxDecoration(
-          color: cardColor,
+          color: isSelected
+              ? accentColor.withValues(alpha: 0.15) // 🔥 highlight
+              : cardColor,
           borderRadius: BorderRadius.circular(24),
           border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
           boxShadow: [
@@ -100,7 +124,7 @@ class _ServiceCard extends StatelessWidget {
               color: Colors.black.withValues(alpha: 0.2),
               blurRadius: 12,
               offset: const Offset(0, 6),
-            )
+            ),
           ],
         ),
         child: Column(
@@ -115,7 +139,7 @@ class _ServiceCard extends StatelessWidget {
               ),
               child: Icon(
                 // Logic to map category names to icons or use dynamic icons
-                _getCategoryIcon(category.name), 
+                _getCategoryIcon(category.name),
                 color: accentColor,
                 size: 36,
               ),

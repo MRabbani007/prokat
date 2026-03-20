@@ -20,15 +20,21 @@ class Category {
   });
 
   factory Category.fromJson(Map<String, dynamic> json) {
-    return Category(
-      id: json["id"],
-      name: json["name"],
-      capacityUnit: json["capacityUnit"],
-      sortIndex: json["sortIndex"] ?? 0,
-      // isUserVisible: json["isUserVisible"] ?? false,
-      // isOwnerVisible: json["isOwnerVisible"] ?? false,
-      imageUrl: json["imageUrl"],
-    );
+    try {
+      return Category(
+        id: json["id"],
+        name: json["name"],
+        capacityUnit: json["capacityUnit"],
+        sortIndex: json["sortIndex"] ?? 0,
+        // isUserVisible: json["isUserVisible"] ?? false,
+        // isOwnerVisible: json["isOwnerVisible"] ?? false,
+        imageUrl: json["imageUrl"],
+      );
+    } catch (e) {
+      print("Category Parse Falied");
+      print(json);
+      rethrow; // important
+    }
   }
 
   Map<String, dynamic> toJson() {

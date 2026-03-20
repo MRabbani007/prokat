@@ -23,7 +23,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
   }
 
   /// LOGIN WITH USERNAME/PASSWORD
-  Future<void> login(AuthCredentials credentials) async {
+  Future<bool> login(AuthCredentials credentials) async {
     state = state.copyWith(isLoading: true, error: null);
 
     try {
@@ -33,8 +33,11 @@ class AuthNotifier extends StateNotifier<AuthState> {
       await storage.saveSession(session);
 
       state = state.copyWith(session: session, isLoading: false);
+
+      return true;
     } catch (e) {
       state = state.copyWith(isLoading: false, error: 'Login failed');
+      return false;
     }
   }
 

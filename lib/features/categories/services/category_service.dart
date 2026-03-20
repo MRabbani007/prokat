@@ -1,24 +1,28 @@
 import 'package:dio/dio.dart';
-import '../../../core/api/base_repository.dart';
+import 'package:prokat/core/api/api_client.dart';
 import '../../../core/constants/api_routes.dart';
 import '../models/category.dart';
 
-class CategoryService extends BaseRepository {
-  final Dio dio;
+class CategoryService {
+  final ApiClient apiClient;
 
-  CategoryService(this.dio);
+  CategoryService(this.apiClient);
 
-  Future<List<Category>> getCategories() {
-    return execute(() async {
-      final response = await dio.get(ApiRoutes.categories);
+  Dio get _dio => apiClient.dio;
+
+  Future<List<Category>> getCategories() async {
+    try {
+      final response = await _dio.get(ApiRoutes.categories);
 
       final List data = response.data["data"];
 
       final categories = data.map((json) => Category.fromJson(json)).toList();
 
-      categories.sort((a, b) => a.sortIndex.compareTo(b.sortIndex));
+      // categories.sort((a, b) => a.sortIndex.compareTo(b.sortIndex));
 
       return categories;
-    });
+    } catch (e) {
+      return [];
+    }
   }
 }

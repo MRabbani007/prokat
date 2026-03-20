@@ -1,5 +1,6 @@
 import 'package:prokat/features/equipment/models/equipment_model.dart';
 import 'package:prokat/features/offers/models/offer_model.dart';
+import 'package:prokat/features/requests/models/request_model.dart';
 
 class OffersState {
   final bool isLoading;
@@ -9,6 +10,7 @@ class OffersState {
   final List<OfferModel> renterOffers;
 
   final Equipment? selectedEquipment;
+  final RequestModel? selectedRequest;
 
   final int? price;
   final String? priceRate;
@@ -21,6 +23,7 @@ class OffersState {
     this.isLoading = false,
     this.error,
 
+    this.selectedRequest,
     this.selectedEquipment,
     this.renterOffers = const [],
 
@@ -39,6 +42,7 @@ class OffersState {
     List<OfferModel>? renterOffers,
 
     Equipment? selectedEquipment,
+    RequestModel? selectedRequest,
     int? price,
     String? priceRate,
     String? comment,
@@ -50,6 +54,7 @@ class OffersState {
       isLoading: isLoading ?? this.isLoading,
       error: error,
 
+      selectedRequest: selectedRequest ?? this.selectedRequest,
       selectedEquipment: selectedEquipment ?? this.selectedEquipment,
       renterOffers: renterOffers ?? this.renterOffers,
 

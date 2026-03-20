@@ -11,7 +11,7 @@ class SidebarHeader extends StatelessWidget {
 
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.only(top: 64, bottom: 30, left: 24, right: 24),
+      padding: const EdgeInsets.only(top: 30, bottom: 30, left: 24, right: 24),
       decoration: BoxDecoration(
         color: headerBg,
         border: Border(

@@ -1,15 +1,25 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:prokat/core/widgets/page_header.dart';
+import 'package:prokat/features/locations/state/location_provider.dart';
+import 'package:prokat/features/user/state/user_profile_provider.dart';
 
-class UserProfileScreen extends StatelessWidget {
+class UserProfileScreen extends ConsumerWidget {
   const UserProfileScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     const bgColor = Color(0xFF121417); // Matches Sidebar
     const cardColor = Color(0xFF1E2125); // Slightly lighter for depth
     const accentColor = Color(0xFF4E73DF); // Industrial Blue
 
+    final state = ref.watch(userProfileProvider);
+    final userAddresses = ref.watch(locationProvider).addresses;
+    final selectedAddress = userAddresses
+        .where((address) => state.userProfile?.selectedAddressId == address.id)
+        .firstOrNull;
+
+print(state.userProfile?.toJson());
     return Scaffold(
       backgroundColor: bgColor,
       body: SafeArea(
@@ -30,11 +40,16 @@ class UserProfileScreen extends StatelessWidget {
                       padding: const EdgeInsets.all(4),
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        border: Border.all(color: accentColor.withOpacity(0.5), width: 2),
+                        border: Border.all(
+                          color: accentColor.withValues(alpha: 0.5),
+                          width: 2,
+                        ),
                       ),
                       child: const CircleAvatar(
                         radius: 60,
-                        backgroundImage: NetworkImage('https://via.placeholder.com'), // Replace with actual user photo
+                        backgroundImage: NetworkImage(
+                          'https://via.placeholder.com',
+                        ), // Replace with actual user photo
                       ),
                     ),
                     Positioned(
@@ -46,7 +61,11 @@ class UserProfileScreen extends StatelessWidget {
                           color: accentColor,
                           shape: BoxShape.circle,
                         ),
-                        child: const Icon(Icons.edit_rounded, color: Colors.white, size: 18),
+                        child: const Icon(
+                          Icons.edit_rounded,
+                          color: Colors.white,
+                          size: 18,
+                        ),
                       ),
                     ),
                   ],
@@ -54,11 +73,15 @@ class UserProfileScreen extends StatelessWidget {
               ),
 
               const SizedBox(height: 12),
-              
-              const Center(
+
+              Center(
                 child: Text(
-                  "John Doe", // Replace with dynamic name
-                  style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold),
+                  state.userProfile?.displayName ?? "",
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 22,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
 
@@ -68,24 +91,26 @@ class UserProfileScreen extends StatelessWidget {
               _buildInfoTile(
                 icon: Icons.phone_android_rounded,
                 label: "Phone Number",
-                value: "+1 234 567 890",
+                value: state.userProfile?.phone ?? "+1 234 567 890",
                 cardColor: cardColor,
               ),
               _buildInfoTile(
                 icon: Icons.email_outlined,
                 label: "Email Address",
-                value: "john.doe@example.com",
+                value: state.userProfile?.username ?? "john.doe@example.com",
                 cardColor: cardColor,
               ),
               _buildInfoTile(
                 icon: Icons.location_on_outlined,
                 label: "Primary Address",
-                value: "123 Industrial Way, New York, NY",
+                value: selectedAddress != null
+                    ? selectedAddress.street
+                    : "123 Industrial Way, New York, NY",
                 cardColor: cardColor,
               ),
 
               const SizedBox(height: 40),
-              
+
               // Action Button
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 24),
@@ -97,11 +122,19 @@ class UserProfileScreen extends StatelessWidget {
                     style: ElevatedButton.styleFrom(
                       backgroundColor: accentColor,
                       foregroundColor: Colors.white,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
                       elevation: 8,
-                      shadowColor: accentColor.withOpacity(0.4),
+                      shadowColor: accentColor.withValues(alpha: 0.4),
                     ),
-                    child: const Text("Edit Profile", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                    child: const Text(
+                      "Edit Profile",
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
+                    ),
                   ),
                 ),
               ),
@@ -124,14 +157,14 @@ class UserProfileScreen extends StatelessWidget {
       decoration: BoxDecoration(
         color: cardColor,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.white.withOpacity(0.05)),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
       ),
       child: Row(
         children: [
           Container(
             padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.03),
+              color: Colors.white.withValues(alpha: 0.03),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Icon(icon, color: const Color(0xFF4E73DF), size: 22),
@@ -143,12 +176,19 @@ class UserProfileScreen extends StatelessWidget {
               children: [
                 Text(
                   label,
-                  style: TextStyle(color: Colors.white.withOpacity(0.4), fontSize: 12),
+                  style: TextStyle(
+                    color: Colors.white.withValues(alpha: 0.4),
+                    fontSize: 12,
+                  ),
                 ),
                 const SizedBox(height: 4),
                 Text(
                   value,
-                  style: const TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w500),
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 15,
+                    fontWeight: FontWeight.w500,
+                  ),
                 ),
               ],
             ),

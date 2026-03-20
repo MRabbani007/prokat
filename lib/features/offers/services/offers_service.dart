@@ -34,6 +34,7 @@ class OffersService {
   }
 
   Future<OfferModel?> createOffer({
+    required String requestId,
     required String equipmentId,
     required int price,
     required String priceRate,
@@ -43,6 +44,7 @@ class OffersService {
       final res = await _dio.post(
         '/offers',
         data: {
+          "requestId": requestId,
           "equipmentId": equipmentId,
           "price": price,
           "priceRate": priceRate,
@@ -62,19 +64,20 @@ class OffersService {
 
   Future<OfferModel?> updateOffer({
     required String id,
-    String? locationId,
-    DateTime? requiredOn,
-    DateTime? requiredAt,
-    int? offeredRate,
+    required String equipmentId,
+    required int price,
+    required String priceRate,
+    String? comment,
   }) async {
     try {
       final res = await _dio.patch(
         '/offers/$id',
         data: {
-          if (locationId != null) "locationId": locationId,
-          if (requiredOn != null) "requiredOn": requiredOn.toIso8601String(),
-          if (requiredAt != null) "requiredAt": requiredAt.toIso8601String(),
-          if (offeredRate != null) "offeredRate": offeredRate,
+          "id": id,
+          "equipmentId": equipmentId,
+          "price": price,
+          "priceRate": priceRate,
+          "comment": comment,
         },
       );
 
@@ -88,12 +91,16 @@ class OffersService {
     }
   }
 
-  Future<OfferModel?> cancelOffer(String id) async {
+  Future<OfferModel?> updateOfferStatus({
+    required String id,
+    required String status,
+  }) async {
     try {
       final res = await _dio.patch(
         '/offers/$id',
-        data: {"status": "CANCELLED"},
+        data: {"id": id, "status": status},
       );
+
       if (res.statusCode == 200 || res.statusCode == 201) {
         return OfferModel.fromJson(res.data['data']);
       }
