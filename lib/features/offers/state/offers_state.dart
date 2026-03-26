@@ -8,6 +8,7 @@ class OffersState {
 
   // Offers received for renter
   final List<OfferModel> renterOffers;
+  final List<OfferModel> ownerOffers;
 
   final Equipment? selectedEquipment;
   final RequestModel? selectedRequest;
@@ -26,6 +27,7 @@ class OffersState {
     this.selectedRequest,
     this.selectedEquipment,
     this.renterOffers = const [],
+    this.ownerOffers = const [],
 
     this.price,
     this.priceRate,
@@ -40,6 +42,7 @@ class OffersState {
     String? error,
 
     List<OfferModel>? renterOffers,
+    List<OfferModel>? ownerOffers,
 
     Equipment? selectedEquipment,
     RequestModel? selectedRequest,
@@ -57,6 +60,7 @@ class OffersState {
       selectedRequest: selectedRequest ?? this.selectedRequest,
       selectedEquipment: selectedEquipment ?? this.selectedEquipment,
       renterOffers: renterOffers ?? this.renterOffers,
+      ownerOffers: ownerOffers ?? this.ownerOffers,
 
       price: price ?? this.price,
       priceRate: priceRate ?? this.priceRate,

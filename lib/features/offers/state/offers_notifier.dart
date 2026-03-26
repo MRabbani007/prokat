@@ -7,7 +7,9 @@ import 'package:prokat/features/requests/models/request_model.dart';
 class OffersNotifier extends StateNotifier<OffersState> {
   final OffersService service;
 
-  OffersNotifier(this.service) : super(OffersState());
+  OffersNotifier(this.service) : super(OffersState()) {
+    getUserOffers();
+  }
 
   void selectRequest(RequestModel request) {
     state = state.copyWith(
@@ -53,6 +55,22 @@ class OffersNotifier extends StateNotifier<OffersState> {
       state = state.copyWith(
         isLoading: false,
         renterOffers: [],
+        error: e.toString(),
+      );
+    }
+  }
+
+  Future<void> getOwnerOffers() async {
+    try {
+      state = state.copyWith(isLoading: true);
+
+      final data = await service.getOwnerOffers();
+
+      state = state.copyWith(isLoading: false, ownerOffers: data);
+    } catch (e) {
+      state = state.copyWith(
+        isLoading: false,
+        ownerOffers: [],
         error: e.toString(),
       );
     }
@@ -104,6 +122,15 @@ class OffersNotifier extends StateNotifier<OffersState> {
           renterOffers: [...state.renterOffers, created],
         );
 
+        state = state.copyWith(
+          renterOffers: state.renterOffers.map((o) {
+            if (o.id == id) {
+              return created;
+            }
+            return o;
+          }).toList(),
+        );
+
         return true;
       }
 
@@ -122,14 +149,33 @@ class OffersNotifier extends StateNotifier<OffersState> {
 
       if (created != null) {
         state = state.copyWith(
-          isLoading: false,
-          renterOffers: [...state.renterOffers, created],
+          renterOffers: state.renterOffers.map((o) {
+            if (o.id == id) {
+              return created;
+            }
+            return o;
+          }).toList(),
         );
 
         return true;
       }
 
       return false;
+    } catch (e) {
+      state = state.copyWith(isLoading: false, error: e.toString());
+      return false;
+    }
+  }
+
+  Future<bool> acceptOffer(String id) async {
+    try {
+      state = state.copyWith(isLoading: true);
+
+      await service.acceptOffer(id: id);
+
+      state = state.copyWith(isLoading: false);
+
+      return true;
     } catch (e) {
       state = state.copyWith(isLoading: false, error: e.toString());
       return false;

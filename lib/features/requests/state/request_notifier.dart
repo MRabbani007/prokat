@@ -4,7 +4,7 @@ import 'package:prokat/features/requests/services/request_service.dart';
 import 'package:prokat/features/requests/state/request_state.dart';
 
 class RequestNotifier extends StateNotifier<RequestState> {
-  final RequestService service;
+  final RequestService service; 
 
   RequestNotifier(this.service) : super(RequestState()) {
     getUserRequests();

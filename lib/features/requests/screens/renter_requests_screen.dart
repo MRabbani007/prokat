@@ -2,25 +2,59 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:prokat/core/widgets/page_header.dart';
+import 'package:prokat/features/offers/providers/offers_provider.dart';
 import 'package:prokat/features/requests/providers/request_provider.dart';
-import 'package:prokat/features/requests/widgets.dart/request_tile.dart';
+import 'package:prokat/features/requests/widgets.dart/request_with_offers.dart';
 
-class RenterRequestsScreen extends ConsumerWidget {
+class RenterRequestsScreen extends ConsumerStatefulWidget {
   const RenterRequestsScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<RenterRequestsScreen> createState() =>
+      _RenterRequestsScreenState();
+}
+
+class _RenterRequestsScreenState extends ConsumerState<RenterRequestsScreen> {
+  @override
+  void initState() {
+    super.initState();
+
+    Future.microtask(() {
+      ref.read(offersProvider.notifier).getUserOffers();
+      ref.read(requestProvider.notifier).getUserRequests();
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final state = ref.watch(requestProvider);
+    final offersState = ref.watch(offersProvider);
     const bgColor = Color(0xFF121417);
     const accentColor = Color(0xFF4E73DF);
 
     final active = state.requests
         .where((r) => ["CREATED", "VIEWED"].contains(r.status))
         .toList();
- 
-    final past = state.requests
-        .where((r) => ["ACCEPTED", "CANCELLED", "EXPIRED"].contains(r.status))
-        .toList();
+
+    final offers = offersState.renterOffers.where(
+      (r) => ["CREATED", "VIEWED"].contains(r.status),
+    );
+
+    final offersByRequest = <String, List<dynamic>>{};
+
+    for (final offer in offers) {
+      final requestId = offer.requestId;
+
+      if (!offersByRequest.containsKey(requestId)) {
+        offersByRequest[requestId] = [];
+      }
+
+      offersByRequest[requestId]!.add(offer);
+    }
+
+    // final past = state.requests
+    //     .where((r) => ["ACCEPTED", "CANCELLED", "EXPIRED"].contains(r.status))
+    //     .toList();
 
     return Scaffold(
       backgroundColor: bgColor,
@@ -28,9 +62,35 @@ class RenterRequestsScreen extends ConsumerWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const PageHeader(title: "My Requests"),
+            Padding(
+              padding: const EdgeInsets.only(right: 12.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Expanded(child: PageHeader(title: "My Requests")),
+                  // Small technical Archive button
+                  IconButton(
+                    onPressed: () => context.push('/requests/history'),
+                    icon: const Icon(
+                      Icons.history_toggle_off_rounded,
+                      color: Color(0x4DFFFFFF),
+                      size: 24,
+                    ),
+                    tooltip: "Requests History",
+                  ),
+                ],
+              ),
+            ),
 
-            Expanded(child: _buildContent(context, ref, state, active, past)),
+            Expanded(
+              child: _buildContent(
+                context,
+                ref,
+                state,
+                active,
+                offersByRequest,
+              ),
+            ),
 
             /// ➕ CREATE REQUEST FOOTER
             Container(
@@ -71,7 +131,13 @@ class RenterRequestsScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildContent(context, ref, state, active, past) {
+  Widget _buildContent(
+    BuildContext context,
+    WidgetRef ref,
+    state,
+    active,
+    offersByRequest,
+  ) {
     if (state.isLoading) {
       return const Center(
         child: CircularProgressIndicator(color: Color(0xFF4E73DF)),
@@ -113,28 +179,31 @@ class RenterRequestsScreen extends ConsumerWidget {
         if (active.isNotEmpty) ...[
           _SectionLabel(label: "ACTIVE REQUESTS"),
           const SizedBox(height: 12),
-          ...active.map(
-            (r) => Padding(
+          ...active.map((r) {
+            final requestOffers = offersByRequest[r.id] ?? [];
+
+            return Padding(
               padding: const EdgeInsets.only(bottom: 12),
-              child: RequestTile(
+              child: RequestWithOffers(
                 request: r,
+                offers: requestOffers,
                 onCancel: () =>
                     ref.read(requestProvider.notifier).cancelRequest(r.id),
               ),
-            ),
-          ),
+            );
+          }),
           const SizedBox(height: 24),
         ],
-        if (past.isNotEmpty) ...[
-          _SectionLabel(label: "PAST HISTORY"),
-          const SizedBox(height: 12),
-          ...past.map(
-            (r) => Padding(
-              padding: const EdgeInsets.only(bottom: 12),
-              child: RequestTile(request: r),
-            ),
-          ),
-        ],
+        // if (past.isNotEmpty) ...[
+        //   _SectionLabel(label: "PAST HISTORY"),
+        //   const SizedBox(height: 12),
+        //   ...past.map(
+        //     (r) => Padding(
+        //       padding: const EdgeInsets.only(bottom: 12),
+        //       child: RequestTile(request: r),
+        //     ),
+        //   ),
+        // ],
       ],
     );
   }

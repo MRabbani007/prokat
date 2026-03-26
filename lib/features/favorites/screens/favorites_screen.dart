@@ -18,7 +18,7 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
     super.initState();
 
     Future.microtask(() {
-      ref.invalidate(favoriteProvider); // 🔥 refetch ONCE when entering screen
+      ref.invalidate(favoriteProvider); // refetch ONCE when entering screen
     });
   }
 

@@ -16,20 +16,18 @@ class RequestService {
       return (res.data['data'] as List)
           .map((e) => RequestModel.fromJson(e))
           .toList();
-          
     } catch (e) {
       return [];
     }
   }
 
-    Future<List<RequestModel>> getOwnerRequests() async {
+  Future<List<RequestModel>> getOwnerRequests() async {
     try {
       final res = await _dio.get('/requests/owner');
 
       return (res.data['data'] as List)
           .map((e) => RequestModel.fromJson(e))
           .toList();
-          
     } catch (e) {
       return [];
     }
@@ -99,8 +97,8 @@ class RequestService {
   Future<RequestModel?> cancelRequest(String id) async {
     try {
       final res = await _dio.patch(
-        '/requests/$id',
-        data: {"status": "CANCELLED"},
+        '/requests/$id/status',
+        data: {"id": id, "status": "CANCELLED"},
       );
       if (res.statusCode == 200 || res.statusCode == 201) {
         return RequestModel.fromJson(res.data['data']);

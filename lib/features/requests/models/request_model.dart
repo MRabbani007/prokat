@@ -5,28 +5,38 @@ import 'package:prokat/features/locations/models/location_model.dart';
 class RequestModel {
   final String id;
   final String status;
-  final Category? category;
   final String capacity;
   final int offeredRate;
   final String? comment;
+
   final DateTime? requiredOn;
   final DateTime? requiredAt;
-  final User? renter;
+
   final LocationModel location;
+  final User? renter;
+
+  final Category? category;
+  final String? categoryId;
+
   final DateTime? createdAt;
   final DateTime? updatedAt;
 
   RequestModel({
     required this.id,
+    required this.status,
     required this.capacity,
+    required this.offeredRate,
+    this.comment,
+
     this.requiredOn,
     this.requiredAt,
-    this.comment,
-    required this.offeredRate,
-    required this.status,
-    this.category,
+
     required this.location,
     this.renter,
+
+    this.category,
+    this.categoryId,
+
     this.createdAt,
     this.updatedAt,
   });
@@ -46,6 +56,7 @@ class RequestModel {
             ? DateTime.parse(json['requiredAt'])
             : null,
 
+        categoryId: json['categoryId']?.toString() ?? '',
         category: json['category'] != null
             ? Category.fromJson(json['category'])
             : null,

@@ -97,9 +97,23 @@ class OffersService {
   }) async {
     try {
       final res = await _dio.patch(
-        '/offers/$id',
+        '/offers/$id/status',
         data: {"id": id, "status": status},
       );
+
+      if (res.statusCode == 200 || res.statusCode == 201) {
+        return OfferModel.fromJson(res.data['data']);
+      }
+
+      return null;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  Future<OfferModel?> acceptOffer({required String id}) async {
+    try {
+      final res = await _dio.post('/offers/$id/accept', data: {"id": id});
 
       if (res.statusCode == 200 || res.statusCode == 201) {
         return OfferModel.fromJson(res.data['data']);

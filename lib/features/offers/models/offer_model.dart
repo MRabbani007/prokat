@@ -5,20 +5,37 @@ import 'package:prokat/features/requests/models/request_model.dart';
 class OfferModel {
   final String id;
   final String status;
+  final String? comment;
+
+  /// Relations (optional)
   final RequestModel? request;
+  final String requestId;
+
   final Equipment? equipment;
+  final String equipmentId;
+
+  final BookingModel? booking;
+  final String? bookingId;
+
   final int price;
   final String priceRate;
-  final BookingModel? booking;
 
   OfferModel({
     required this.id,
     required this.status,
-    required this.request,
-    required this.equipment,
+    this.comment,
+
+    required this.requestId,
+    this.request,
+
+    required this.equipmentId,
+    this.equipment,
+
+    this.bookingId,
+    this.booking,
+
     required this.price,
     required this.priceRate,
-    this.booking,
   });
 
   factory OfferModel.fromJson(Map<String, dynamic> json) {
@@ -26,36 +43,49 @@ class OfferModel {
       return OfferModel(
         id: json['id']?.toString() ?? '',
         status: json['status']?.toString() ?? '',
+        comment: json['comment']?.toString() ?? '',
 
-        request: json['request'] != null
-            ? RequestModel.fromJson(json['request'])
-            : null,
+        requestId: json['requestId']?.toString() ?? '',
+
+        // request: json['request'] != null
+        //     ? RequestModel.fromJson(json['request'])
+        //     : null,
+        equipmentId: json['equipmentId']?.toString() ?? '',
+
         equipment: json['equipment'] != null
             ? Equipment.fromJson(json['equipment'])
             : null,
-        booking: json['booking'] != null
-            ? BookingModel.fromJson(json['booking'])
-            : null,
+        bookingId: json['bookingId']?.toString(),
+        // booking: json['booking'] != null
+        //     ? BookingModel.fromJson(json['booking'])
+        //     : null,
 
-        price: json['price'] as int,
+        /// 🔥 SAFE INT PARSING
+        price: (json['price'] is int)
+            ? json['price']
+            : (json['price'] as num).toInt(),
+
         priceRate: json['priceRate']?.toString() ?? '',
       );
-    } catch (e) {
+    } catch (e, stack) {
       print("Offer Parse Failed");
       print(json);
+      print(stack);
       rethrow; // importan
     }
   }
 
-    Map<String, dynamic> toJson() {
+  Map<String, dynamic> toJson() {
     return {
       "id": id,
       "status": status,
       "price": price,
       "priceRate": priceRate,
-      "request": request?.toJson(),
-      "equipment": equipment?.toJson(),
-      "booking": booking?.toJson(),
+
+      /// ✅ IDs ONLY
+      "requestId": requestId,
+      "equipmentId": equipmentId,
+      "bookingId": bookingId,
     };
   }
 }

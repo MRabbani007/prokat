@@ -27,6 +27,7 @@ import 'package:prokat/features/owner/equipment/screens/owner_equipment_create.d
 import 'package:prokat/features/owner/equipment/screens/owner_equipment_list_screen.dart';
 import 'package:prokat/features/requests/screens/owner_requests_screen.dart';
 import 'package:prokat/features/requests/screens/create_request_screen.dart';
+import 'package:prokat/features/requests/screens/renter_requests_history_screen.dart';
 import 'package:prokat/features/requests/screens/renter_requests_screen.dart';
 import 'package:prokat/features/user/screens/user_profile_screen.dart';
 import 'package:prokat/features/user/screens/user_settings_screen.dart';
@@ -183,6 +184,12 @@ GoRouter createRouter(WidgetRef ref) {
                     path: 'create',
                     builder: (context, state) {
                       return CreateRequestScreen();
+                    },
+                  ),
+                  GoRoute(
+                    path: 'history',
+                    builder: (context, state) {
+                      return RenterRequestsHistoryScreen();
                     },
                   ),
                 ],

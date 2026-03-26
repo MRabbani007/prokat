@@ -117,7 +117,7 @@ class _OwnerBookingsScreenState extends ConsumerState<OwnerBookingsScreen> {
 class _OwnerHeader extends StatelessWidget {
   final VoidCallback onArchiveTap;
   const _OwnerHeader({required this.onArchiveTap});
-
+ 
   @override
   Widget build(BuildContext context) {
     return Padding(
