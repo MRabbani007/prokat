@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:prokat/features/equipment/providers/equipment_provider.dart';
 import 'package:prokat/features/map/containers/map_container.dart';
 import 'package:prokat/features/map/containers/map_renter_equipment_container.dart';
-import 'package:prokat/features/owner/equipment/providers/owner_equipment_provider.dart';
 import '../../../core/router/app_routes.dart';
 
 class MapRenterEquipmentScreen extends ConsumerStatefulWidget {
@@ -21,7 +21,7 @@ class _MapRenterEquipmentScreenState
     super.initState();
 
     Future.microtask(() {
-      ref.read(ownerEquipmentProvider.notifier).loadEquipment();
+      ref.read(equipmentProvider.notifier).getRenterEquipment();
     });
   }
 

@@ -98,15 +98,16 @@ class _MobileMapScreenState extends ConsumerState<MobileMapScreen> {
     _annotationManager!.tapEvents(onTap: _onAnnotationTapped);
 
     // 🔑 Read equipment data ONCE
-    final equipmentsAsync = ref.read(equipmentProvider);
+    final equipmentState = ref.read(equipmentProvider);
 
-    equipmentsAsync.whenData((items) async {
-      if (_markersAdded || items.isEmpty) return;
+    if (_markersAdded || equipmentState.renterEquipment.isEmpty) return;
 
-      _equipments = items;
-      await _addEquipmentMarkers(items);
+    if (equipmentState.isLoading == false &&
+        equipmentState.renterEquipment.isNotEmpty) {
+      _equipments = equipmentState.renterEquipment;
+      await _addEquipmentMarkers(equipmentState.renterEquipment);
       _markersAdded = true;
-    });
+    }
 
     _moveToUserOnce();
   }
@@ -172,9 +173,7 @@ class _MobileMapScreenState extends ConsumerState<MobileMapScreen> {
           ),
           iconImage: 'equipment-icon',
           iconSize: iconSizeForZoom(_zoom),
-          iconOpacity: equipment.status == "available"
-              ? 1.0
-              : 0.5,
+          iconOpacity: equipment.status == "available" ? 1.0 : 0.5,
           customData: {'id': equipment.id},
         ),
       );

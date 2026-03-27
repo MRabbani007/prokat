@@ -3,6 +3,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:prokat/core/widgets/page_header.dart';
 import 'package:prokat/features/locations/state/location_provider.dart';
 import 'package:prokat/features/user/state/user_profile_provider.dart';
+import 'package:prokat/features/user/widgets/build_info_tile.dart';
+import 'package:prokat/features/user/widgets/display_name.dart';
+import 'package:prokat/features/user/widgets/edit_phone_sheet.dart';
+import 'package:prokat/features/user/widgets/show_edit_username.dart';
 
 class UserProfileScreen extends ConsumerWidget {
   const UserProfileScreen({super.key});
@@ -19,7 +23,8 @@ class UserProfileScreen extends ConsumerWidget {
         .where((address) => state.userProfile?.selectedAddressId == address.id)
         .firstOrNull;
 
-print(state.userProfile?.toJson());
+    final username = state.userProfile?.username;
+
     return Scaffold(
       backgroundColor: bgColor,
       body: SafeArea(
@@ -74,126 +79,89 @@ print(state.userProfile?.toJson());
 
               const SizedBox(height: 12),
 
-              Center(
-                child: Text(
-                  state.userProfile?.displayName ?? "",
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 22,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
+              DisplayName(),
 
               const SizedBox(height: 32),
 
               // 2. Info Section (Cards)
-              _buildInfoTile(
+              BuildInfoTile(
                 icon: Icons.phone_android_rounded,
                 label: "Phone Number",
-                value: state.userProfile?.phone ?? "+1 234 567 890",
+                value: state.userProfile?.phoneNumber ?? "+7 234 ...",
                 cardColor: cardColor,
+                onTap: () => editPhoneSheet(
+                  context,
+                  ref,
+                  state.userProfile?.phoneNumber ?? "",
+                ),
+                trailing: const Icon(Icons.edit, color: Colors.white54),
               ),
-              _buildInfoTile(
+              BuildInfoTile(
                 icon: Icons.email_outlined,
                 label: "Email Address",
-                value: state.userProfile?.username ?? "john.doe@example.com",
+                value: username ?? "Add username",
                 cardColor: cardColor,
+                onTap: () => showEditUsernameSheet(context, ref, username),
+
+                // onTap: username == null
+                //     ? () => showEditUsernameSheet(context, ref, username)
+                //     : null,
+                trailing: username == null
+                    ? const Icon(Icons.add, color: Colors.white54)
+                    : null,
               ),
-              _buildInfoTile(
+              BuildInfoTile(
                 icon: Icons.location_on_outlined,
                 label: "Primary Address",
                 value: selectedAddress != null
                     ? selectedAddress.street
-                    : "123 Industrial Way, New York, NY",
+                    : "Select address",
                 cardColor: cardColor,
+
+                onTap: () {
+                  Scaffold.of(context).openEndDrawer();
+                  // OR
+                  // context.push(AppRoutes.selectAddress);
+                },
+
+                trailing: const Icon(
+                  Icons.chevron_right,
+                  color: Colors.white54,
+                ),
               ),
 
               const SizedBox(height: 40),
 
               // Action Button
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 24),
-                child: SizedBox(
-                  width: double.infinity,
-                  height: 56,
-                  child: ElevatedButton(
-                    onPressed: () {},
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: accentColor,
-                      foregroundColor: Colors.white,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                      elevation: 8,
-                      shadowColor: accentColor.withValues(alpha: 0.4),
-                    ),
-                    child: const Text(
-                      "Edit Profile",
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
+              // Padding(
+              //   padding: const EdgeInsets.symmetric(horizontal: 24),
+              //   child: SizedBox(
+              //     width: double.infinity,
+              //     height: 56,
+              //     child: ElevatedButton(
+              //       onPressed: () {},
+              //       style: ElevatedButton.styleFrom(
+              //         backgroundColor: accentColor,
+              //         foregroundColor: Colors.white,
+              //         shape: RoundedRectangleBorder(
+              //           borderRadius: BorderRadius.circular(16),
+              //         ),
+              //         elevation: 8,
+              //         shadowColor: accentColor.withValues(alpha: 0.4),
+              //       ),
+              //       child: const Text(
+              //         "Edit Profile",
+              //         style: TextStyle(
+              //           fontWeight: FontWeight.bold,
+              //           fontSize: 16,
+              //         ),
+              //       ),
+              //     ),
+              //   ),
+              // ),
             ],
           ),
         ),
-      ),
-    );
-  }
-
-  Widget _buildInfoTile({
-    required IconData icon,
-    required String label,
-    required String value,
-    required Color cardColor,
-  }) {
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: cardColor,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
-      ),
-      child: Row(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(10),
-            decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.03),
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Icon(icon, color: const Color(0xFF4E73DF), size: 22),
-          ),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  label,
-                  style: TextStyle(
-                    color: Colors.white.withValues(alpha: 0.4),
-                    fontSize: 12,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  value,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 15,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
       ),
     );
   }

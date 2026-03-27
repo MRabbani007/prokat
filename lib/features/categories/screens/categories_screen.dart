@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:prokat/core/widgets/page_header.dart';
 import 'package:prokat/features/categories/models/category.dart';
 import 'package:prokat/features/categories/providers/category_provider.dart';
+import 'package:prokat/features/user/state/user_profile_provider.dart';
 
 class CategoriesScreen extends ConsumerWidget {
   const CategoriesScreen({super.key});
@@ -11,6 +12,7 @@ class CategoriesScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final categoriesState = ref.watch(categoriesProvider);
+    final userProfileState = ref.read(userProfileProvider.notifier);
 
     // Theme Constants
     const bgColor = Color(0xFF121417);
@@ -22,9 +24,13 @@ class CategoriesScreen extends ConsumerWidget {
     ) async {
       ref.read(categoriesProvider.notifier).selectCategory(category);
 
-      // if (context.mounted) {
-      //   context.go('/search/map', extra: {'category': category.id});
-      // }
+      final res = await userProfileState.updateUserProfile(
+        selectedCategoryId: category.id,
+      );
+
+      if (res == true && context.mounted) {
+        context.go('/search/map', extra: {'category': category.id});
+      }
     }
 
     return Scaffold(

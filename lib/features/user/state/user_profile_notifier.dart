@@ -21,26 +21,35 @@ class UserProfileNotifier extends StateNotifier<UserProfileState> {
     state = state.copyWith(darkMode: darkMode);
   }
 
-  Future<void> getUserProfile() async {
+  Future<bool> getUserProfile() async {
     try {
       state = state.copyWith(isLoading: true);
 
       final data = await service.getUserProfile();
 
+      if (data == null) {
+        return false;
+      }
+
       state = state.copyWith(isLoading: false, userProfile: data);
+
+      return true;
     } catch (e) {
       state = state.copyWith(
         isLoading: false,
         userProfile: null,
         error: e.toString(),
       );
+
+      return false;
     }
   }
 
-  Future<void> updateUserProfile({
+  Future<bool> updateUserProfile({
     String? firstName,
     String? lastName,
-    String? phone,
+    String? phoneNumber,
+    String? phoneCountryCode,
     String? profileImageUrl,
     String? darkMode,
     String? selectedCategoryId,
@@ -52,7 +61,7 @@ class UserProfileNotifier extends StateNotifier<UserProfileState> {
       final updated = await service.updateUserProfile(
         firstName: firstName,
         lastName: lastName,
-        phone: phone,
+        phoneNumber: phoneNumber,
         profileImageUrl: profileImageUrl,
         darkMode: darkMode,
         selectedCategoryId: selectedCategoryId,
@@ -61,10 +70,35 @@ class UserProfileNotifier extends StateNotifier<UserProfileState> {
 
       if (updated != null) {
         await getUserProfile();
-        state = state.copyWith(isLoading: false);
+
+        return true;
       }
+
+      state = state.copyWith(isLoading: false);
+      return false;
     } catch (e) {
       state = state.copyWith(isLoading: false, error: e.toString());
+      return false;
+    }
+  }
+
+  Future<bool> updateUserName(String username) async {
+    try {
+      state = state.copyWith(isLoading: true);
+
+      final updated = await service.updateUserName(username);
+
+      if (updated != null) {
+        await getUserProfile();
+
+        return true;
+      }
+
+      state = state.copyWith(isLoading: false);
+      return false;
+    } catch (e) {
+      state = state.copyWith(isLoading: false, error: e.toString());
+      return false;
     }
   }
 }

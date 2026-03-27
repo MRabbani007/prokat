@@ -169,7 +169,7 @@ class EquipmentDetailsDrawer extends ConsumerWidget {
                                     ? Icons.favorite_rounded
                                     : Icons.favorite_border_rounded,
                                 onTap: () {
-                                  notifier.toggle(equipment.id);
+                                  notifier.toggleFavorite(equipment.id);
                                 },
                               ),
                               const SizedBox(width: 16),

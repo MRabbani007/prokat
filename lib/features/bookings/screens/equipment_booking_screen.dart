@@ -5,10 +5,10 @@ import 'package:prokat/core/widgets/industrial_date_time_button.dart';
 import 'package:prokat/core/widgets/page_header.dart';
 import 'package:prokat/features/bookings/state/booking_provider.dart';
 import 'package:prokat/features/bookings/widgets/equipment_image_header.dart';
+import 'package:prokat/features/equipment/providers/equipment_provider.dart';
 import 'package:prokat/features/locations/state/location_provider.dart';
 import 'package:prokat/features/locations/widgets/address_picker_card.dart';
 import 'package:prokat/features/locations/widgets/select_address_sheet.dart';
-import 'package:prokat/features/owner/equipment/providers/owner_equipment_provider.dart';
 import 'package:go_router/go_router.dart';
 
 class EquipmentBookingScreen extends ConsumerStatefulWidget {
@@ -28,7 +28,7 @@ class _EquipmentBookingScreenState
     super.initState();
 
     Future.microtask(() {
-      ref.read(ownerEquipmentProvider.notifier).loadEquipment();
+      ref.read(equipmentProvider.notifier).getRenterEquipment();
       ref.read(locationProvider.notifier).loadAddresses();
     });
   }
@@ -51,16 +51,16 @@ class _EquipmentBookingScreenState
     final bookingState = ref.watch(bookingProvider);
     final bookingNotifier = ref.read(bookingProvider.notifier);
 
-    final state = ref.watch(ownerEquipmentProvider);
+    final state = ref.watch(equipmentProvider);
     final locationState = ref.watch(locationProvider);
 
     final selectedAddress = locationState.selectedAddress;
 
-    if (state.equipment.isEmpty) {
+    if (state.renterEquipment.isEmpty) {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
 
-    final equipmentList = state.equipment.where(
+    final equipmentList = state.renterEquipment.where(
       (e) => e.id == widget.equipmentId,
     );
 

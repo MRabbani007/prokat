@@ -1,6 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:prokat/features/equipment/providers/equipment_provider.dart';
 import 'package:prokat/features/locations/models/location_search_result.dart';
-import 'package:prokat/features/owner/equipment/providers/owner_equipment_provider.dart';
 import '../models/location_model.dart';
 import '../services/location_api_service.dart';
 import 'location_state.dart';
@@ -56,10 +56,10 @@ class LocationNotifier extends StateNotifier<LocationState> {
             : [...state.locations],
         error: null,
       );
-      
+
       if (newLocation.service == "EQUIPMENT") {
-        ref.invalidate(ownerEquipmentProvider);
-        await ref.read(ownerEquipmentProvider.notifier).loadEquipment();
+        // ref.invalidate(equipmentProvider);
+        await ref.read(equipmentProvider.notifier).getOwnerEquipment();
       }
 
       return true;
@@ -106,8 +106,6 @@ class LocationNotifier extends StateNotifier<LocationState> {
 
     try {
       final results = await api.searchLocation(query);
-
-
 
       state = state.copyWith(suggestions: results);
     } catch (e) {

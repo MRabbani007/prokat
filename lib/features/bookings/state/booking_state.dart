@@ -8,7 +8,7 @@ class BookingState {
   final String? error;
 
   final List<BookingModel> bookings;
-  final List<BookingModel> ownerBookings;
+  final List<BookingModel> ownerBookings; 
 
   /// Renter draft booking
   final BookingModel? currentBooking;

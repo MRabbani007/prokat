@@ -9,8 +9,9 @@ final bookingApiProvider = Provider<BookingApiService>((ref) {
   return BookingApiService(api);
 });
 
-final bookingProvider =
-    StateNotifierProvider<BookingNotifier, BookingState>((ref) {
+final bookingProvider = StateNotifierProvider<BookingNotifier, BookingState>((
+  ref,
+) {
   final api = ref.read(bookingApiProvider);
   return BookingNotifier(api);
 });

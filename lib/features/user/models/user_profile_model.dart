@@ -1,6 +1,6 @@
 class UserProfileModel {
   final String? username;
-  final String? phone;
+  final String? phoneNumber;
   final bool? isPhoneVerified;
   final String? firstName;
   final String? lastName;
@@ -14,7 +14,7 @@ class UserProfileModel {
     this.username,
     this.firstName,
     this.lastName,
-    this.phone,
+    this.phoneNumber,
     this.isPhoneVerified,
     this.role,
     this.profileImageUrl,
@@ -36,7 +36,7 @@ class UserProfileModel {
         username: json['username']?.toString(),
         firstName: json['firstName']?.toString(),
         lastName: json['lastName']?.toString(),
-        phone: json['phone']?.toString(),
+        phoneNumber: json['phoneNumber']?.toString(),
         isPhoneVerified: json['isPhoneVerified'],
         role: json['role']?.toString(),
         profileImageUrl: json['profileImageUrl']?.toString(),
@@ -58,7 +58,7 @@ class UserProfileModel {
       'username': username,
       'firstName': firstName,
       'lastName': lastName,
-      'phone': phone,
+      'phoneNumber': phoneNumber,
       'isPhoneVerified': isPhoneVerified,
       'role': role,
       'profileImageUrl': profileImageUrl,

@@ -12,20 +12,19 @@ class MapRenterEquipmentContainer extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final mapState = ref.watch(equipmentMapProvider);
-    final equipmentList = ref.watch(equipmentProvider);
+    final equipmentState = ref.watch(equipmentProvider);
 
     return Scaffold(
       body: Stack(
         children: [
-          equipmentList.when(
-            data: (equipment) => MyMapView(
-              mode: MyMapMode.browseEquipment,
-              equipmentList: equipment,
-            ),
-            loading: () => const Center(child: CircularProgressIndicator()),
-            error: (e, _) =>
-                const Center(child: Text("Failed to load equipment")),
-          ),
+          equipmentState.isLoading
+              ? const Center(child: CircularProgressIndicator())
+              : equipmentState.error != null
+              ? const Center(child: Text("Failed to load equipment"))
+              : MyMapView(
+                  mode: MyMapMode.browseEquipment,
+                  equipmentList: equipmentState.renterEquipment,
+                ),
 
           if (mapState.selectedEquipment != null)
             EquipmentDetailsDrawer(equipment: mapState.selectedEquipment!),

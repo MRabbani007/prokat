@@ -15,9 +15,20 @@ class FavoriteService {
     return data.map((e) => e['equipmentId'] as String).toSet();
   }
 
-  Future<void> toggleFavorite(String equipmentId) async {
-    await _dio.post('/favorites/toggle', data: {
-      'equipmentId': equipmentId,
-    });
+  Future<bool> toggleFavorite(String equipmentId) async {
+    try {
+      final res = await _dio.post(
+        '/favorites/toggle',
+        data: {'equipmentId': equipmentId},
+      );
+
+      if (res.statusCode == 200 || res.statusCode == 201) {
+        return true;
+      } else {
+        return false;
+      }
+    } catch (e) {
+      return false;
+    }
   }
 }

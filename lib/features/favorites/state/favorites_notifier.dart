@@ -1,48 +1,53 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:prokat/features/favorites/state/favorites_service.dart';
+import 'package:prokat/features/favorites/state/favorites_state.dart';
 
-class FavoriteNotifier extends StateNotifier<AsyncValue<Set<String>>> {
+class FavoriteNotifier extends StateNotifier<FavoritesState> {
   final FavoriteService service;
 
-  FavoriteNotifier(this.service) : super(const AsyncLoading()) {
-    loadFavorites();
-  }
+  FavoriteNotifier(this.service) : super(FavoritesState());
 
-  Future<void> loadFavorites() async {
+  Future<bool> getFavorites() async {
     try {
-      final favorites = await service.getFavorites();
-      state = AsyncData(favorites);
-    } catch (e, st) {
-      state = AsyncError(e, st);
+      state = state.copyWith(isLoading: true);
+
+      final favoritesIds = await service.getFavorites();
+
+      state = state.copyWith(isLoading: false, favoritesIds: favoritesIds);
+
+      return true;
+    } catch (e) {
+      state = state.copyWith(isLoading: false, error: e.toString());
+      return false;
     }
   }
 
   bool isFavorite(String id) {
-    return state.valueOrNull?.contains(id) ?? false;
+    return state.favoritesIds?.contains(id) ?? false;
   }
 
-  Future<void> toggle(String equipmentId) async {
-    final current = state.valueOrNull ?? {};
-
-    // 🔥 Optimistic update
-    final isFav = current.contains(equipmentId);
-    final updated = Set<String>.from(current);
-
-    if (isFav) {
-      updated.remove(equipmentId);
-    } else {
-      updated.add(equipmentId);
-    }
-
-   await loadFavorites();
-
-    // state = AsyncData(updated);
-
+  Future<bool> toggleFavorite(String equipmentId) async {
     try {
-      await service.toggleFavorite(equipmentId);
+      final current = state.favoritesIds;
+
+      // 🔥 Optimistic update
+      final isFav = current?.contains(equipmentId);
+      final updated = Set<String>.from(current ?? []);
+
+      if (isFav != null) {
+        updated.remove(equipmentId);
+      } else {
+        updated.add(equipmentId);
+      }
+
+      final res = await service.toggleFavorite(equipmentId);
+
+      await getFavorites();
+
+      return res;
     } catch (e) {
-      // rollback
-      state = AsyncData(current);
+      state = state.copyWith(isLoading: false, error: e.toString());
+      return false;
     }
   }
 }

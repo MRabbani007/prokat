@@ -6,6 +6,7 @@ class UserProfileState {
 
   final String? firstName;
   final String? lastName;
+  final String? phoneNumber;
   final String? darkMode;
 
   final UserProfileModel? userProfile;
@@ -16,6 +17,7 @@ class UserProfileState {
     this.userProfile,
     this.firstName,
     this.lastName,
+    this.phoneNumber,
     this.darkMode,
   });
 
@@ -24,6 +26,7 @@ class UserProfileState {
     String? error,
     String? firstName,
     String? lastName,
+    String? phoneNumber,
     String? darkMode,
     UserProfileModel? userProfile,
   }) {
@@ -32,6 +35,7 @@ class UserProfileState {
       error: error,
       firstName: firstName ?? this.firstName,
       lastName: lastName ?? this.lastName,
+      phoneNumber: phoneNumber ?? this.phoneNumber,
       darkMode: darkMode ?? this.darkMode,
       userProfile: userProfile ?? this.userProfile,
     );

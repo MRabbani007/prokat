@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:prokat/core/widgets/page_header.dart';
+import 'package:prokat/features/requests/models/request_model.dart';
 import 'package:prokat/features/requests/providers/request_provider.dart';
 import 'package:go_router/go_router.dart';
 import 'package:prokat/features/requests/widgets.dart/request_tile.dart';
@@ -12,7 +13,7 @@ class RenterRequestsHistoryScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final state = ref.watch(requestProvider);
     const bgColor = Color(0xFF121417);
-    const accentColor = Color(0xFF4E73DF);
+    // const accentColor = Color(0xFF4E73DF);
 
     final past = state.requests
         .where((r) => ["ACCEPTED", "CANCELLED", "EXPIRED"].contains(r.status))
@@ -51,7 +52,13 @@ class RenterRequestsHistoryScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildContent(context, ref, state, active, past) {
+  Widget _buildContent(
+    BuildContext context,
+    WidgetRef ref,
+    state,
+    List<RequestModel> active,
+    List<RequestModel> past,
+  ) {
     if (state.isLoading) {
       return const Center(
         child: CircularProgressIndicator(color: Color(0xFF4E73DF)),

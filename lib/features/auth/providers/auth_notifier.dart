@@ -10,17 +10,45 @@ class AuthNotifier extends StateNotifier<AuthState> {
   final AuthSecureStorage storage;
 
   AuthNotifier(this.api, this.storage) : super(const AuthState()) {
-    _restoreSession();
+    // restore session in app startup provider: below can cause flickers/async side effect
+    // restoreSession();
   }
 
   /// Restore token from secure storage
-  Future<void> _restoreSession() async {
+  Future<AuthSession?> restoreSession() async {
     final session = await storage.readSession();
 
     if (session != null && session.sessionToken.isNotEmpty) {
       state = state.copyWith(session: session);
+
+      return session;
     }
+
+    return null;
   }
+
+  Future<bool> refreshSession() async {
+  final session = state.session;
+
+  if (session == null) return false;
+
+  try {
+    final refreshed = await api.refreshSession();
+
+    if (refreshed == null) {
+      await logout();
+      return false;
+    }
+
+    state = state.copyWith(session: refreshed);
+    await storage.saveSession(refreshed);
+
+    return true;
+  } catch (_) {
+    await logout();
+    return false;
+  }
+}
 
   /// LOGIN WITH USERNAME/PASSWORD
   Future<bool> login(AuthCredentials credentials) async {

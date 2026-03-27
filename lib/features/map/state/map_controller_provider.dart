@@ -32,12 +32,10 @@ class MapController {
     _ref = ref;
 
     /// Listen to equipment changes
-    ref.listen(equipmentProvider, (prev, next) {
-      next.whenData((items) async {
-        if (_map == null || items.isEmpty) return;
+    ref.listen(equipmentProvider, (prev, next) async {
+      if (_map == null || next.renterEquipment.isEmpty) return;
 
-        await _addEquipmentMarkers(items);
-      });
+      await _addEquipmentMarkers(next.renterEquipment);
     });
   }
 
@@ -118,15 +116,12 @@ class MapController {
     _annotationManager!.tapEvents(onTap: _onAnnotationTapped);
 
     // 🔑 Read equipment data ONCE
-    final equipmentsAsync = ref.read(equipmentProvider);
+    final equipmentState = ref.read(equipmentProvider);
 
-    equipmentsAsync.whenData((items) async {
-      if (items.isEmpty) return; //_markersAdded ||
+    if (equipmentState.renterEquipment.isEmpty) return;
 
-      _equipments = items;
-      await _addEquipmentMarkers(items);
-      // _markersAdded = true;
-    });
+    _equipments = equipmentState.renterEquipment;
+    await _addEquipmentMarkers(equipmentState.renterEquipment);
   }
 
   Future<void> _loadMarkerIcon() async {

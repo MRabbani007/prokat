@@ -8,6 +8,22 @@ class AuthApiService {
 
   AuthApiService(this.dio);
 
+  Future<AuthSession?> refreshSession() async {
+    try {
+      late Response response;
+
+      response = await dio.post('/auth/session/refresh');
+
+      if (response.statusCode == 200) {
+        return AuthSession.fromJson(response.data);
+      }
+
+      return null;
+    } catch (e) {
+      return null;
+    }
+  }
+
   Future<AuthSession> login(AuthCredentials credentials) async {
     try {
       late Response response;

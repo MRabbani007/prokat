@@ -23,7 +23,8 @@ class UserProfileService {
   Future<UserProfileModel?> updateUserProfile({
     String? firstName,
     String? lastName,
-    String? phone,
+    String? phoneNumber,
+    String? phoneCountryCode,
     String? profileImageUrl,
     String? darkMode,
     String? selectedCategoryId,
@@ -35,12 +36,65 @@ class UserProfileService {
         data: {
           if (firstName != null) "firstName": firstName,
           if (lastName != null) "lastName": lastName,
-          if (phone != null) "phone": phone,
+          if (phoneNumber != null) "phoneNumber": phoneNumber,
+          if (phoneCountryCode != null) "phoneCountryCode": phoneCountryCode,
           if (profileImageUrl != null) "profileImageUrl": profileImageUrl,
           if (darkMode != null) "darkMode": darkMode,
-          if (selectedCategoryId != null) "selectedCategoryId": selectedCategoryId,
+          if (selectedCategoryId != null)
+            "selectedCategoryId": selectedCategoryId,
           if (selectedAddressId != null) "selectedAddressId": selectedAddressId,
         },
+      );
+
+      if (res.statusCode == 200 || res.statusCode == 201) {
+        return UserProfileModel.fromJson(res.data['data']);
+      }
+
+      return null;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  Future<UserProfileModel?> updateUserName(String? username) async {
+    try {
+      final res = await _dio.patch(
+        ApiRoutes.username,
+        data: {if (username != null) "username": username},
+      );
+
+      if (res.statusCode == 200 || res.statusCode == 201) {
+        return UserProfileModel.fromJson(res.data['data']);
+      }
+
+      return null;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  Future<UserProfileModel?> selectCategory(String? selectedCategoryId) async {
+    try {
+      final res = await _dio.patch(
+        ApiRoutes.userCategory,
+        data: {if (selectedCategoryId != null) "selectedCategoryId": selectedCategoryId},
+      );
+
+      if (res.statusCode == 200 || res.statusCode == 201) {
+        return UserProfileModel.fromJson(res.data['data']);
+      }
+
+      return null;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  Future<UserProfileModel?> selectAddress(String? addressId) async {
+    try {
+      final res = await _dio.patch(
+        ApiRoutes.userCategory,
+        data: {if (addressId != null) "addressId": addressId},
       );
 
       if (res.statusCode == 200 || res.statusCode == 201) {

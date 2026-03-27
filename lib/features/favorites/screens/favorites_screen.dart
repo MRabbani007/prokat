@@ -28,8 +28,17 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final favoritesAsync = ref.watch(favoriteProvider);
-    final equipmentAsync = ref.watch(equipmentProvider);
+    final favoritesState = ref.watch(favoriteProvider);
+    final equipmentState = ref.watch(equipmentProvider);
+
+    final favoriteIds = favoritesState.favoritesIds;
+
+    final favorites = equipmentState.renterEquipment
+        .where((e) => favoriteIds?.contains(e.id) ?? false)
+        .toList();
+
+    final isLoading = equipmentState.isLoading || favoritesState.isLoading;
+    final error = equipmentState.error ?? favoritesState.error;
 
     return Scaffold(
       backgroundColor: bgColor,
@@ -40,28 +49,13 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
             const PageHeader(title: "Favorites"),
 
             Expanded(
-              child: favoritesAsync.when(
-                loading: () => const Center(child: CircularProgressIndicator()),
-                error: (e, _) => Center(child: Text("Error: $e")),
-                data: (favoriteIds) {
-                  return equipmentAsync.when(
-                    loading: () =>
-                        const Center(child: CircularProgressIndicator()),
-                    error: (e, _) => Center(child: Text("Error: $e")),
-                    data: (equipmentList) {
-                      final favorites = equipmentList
-                          .where((e) => favoriteIds.contains(e.id))
-                          .toList();
-
-                      if (favorites.isEmpty) {
-                        return _buildEmptyState(context);
-                      }
-
-                      return _buildList(context, ref, favorites);
-                    },
-                  );
-                },
-              ),
+              child: isLoading
+                  ? const Center(child: CircularProgressIndicator())
+                  : error != null
+                  ? Center(child: Text("Error: ${error}"))
+                  : equipmentState.renterEquipment.isEmpty
+                  ? _buildEmptyState(context)
+                  : _buildList(context, ref, favorites),
             ),
           ],
         ),
@@ -84,7 +78,7 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
             key: Key(equipment.id),
             direction: DismissDirection.endToStart,
             onDismissed: (_) {
-              notifier.toggle(equipment.id); // 🔥 remove favorite
+              notifier.toggleFavorite(equipment.id); // 🔥 remove favorite
             },
             background: Container(
               alignment: Alignment.centerRight,

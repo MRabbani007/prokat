@@ -1,21 +1,17 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:dio/dio.dart';
-
+import 'package:prokat/features/equipment/state/equipment_notifier.dart';
+import 'package:prokat/features/equipment/state/equipment_state.dart';
 import '../../../core/providers/api_provider.dart';
-import '../models/equipment_model.dart';
-import '../services/equipment_service.dart';
+import '../state/equipment_service.dart';
 
 final equipmentServiceProvider = Provider<EquipmentService>((ref) {
-  final Dio dio = ref.watch(dioProvider);
-  return EquipmentService(dio);
+  final  api = ref.watch(apiClientProvider);
+
+  return EquipmentService(api);
 });
 
-final equipmentProvider = FutureProvider<List<Equipment>>((ref) async {
-  final service = ref.watch(equipmentServiceProvider);
-
-  try {
-    return await service.getEquipment();
-  } catch (e) {
-    return [];
-  }
+final equipmentProvider =
+    StateNotifierProvider<EquipmentNotifier, EquipmentState>((ref) {
+  final service = ref.read(equipmentServiceProvider);
+  return EquipmentNotifier(service);
 });

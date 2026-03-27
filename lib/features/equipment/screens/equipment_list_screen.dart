@@ -25,7 +25,7 @@ class _EquipmentListScreenState extends ConsumerState<EquipmentListScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final equipmentsAsync = ref.watch(equipmentProvider);
+    final equipmentState = ref.watch(equipmentProvider);
     final bookingNotifier = ref.read(bookingProvider.notifier);
 
     return Scaffold(
@@ -117,36 +117,39 @@ class _EquipmentListScreenState extends ConsumerState<EquipmentListScreen> {
 
             /// 2. LIST CONTENT
             Expanded(
-              child: equipmentsAsync.when(
-                data: (items) {
-                  if (items.isEmpty) {
-                    return _buildEmptyState();
-                  }
-                  return ListView.separated(
-                    padding: const EdgeInsets.all(20),
-                    itemCount: items.length,
-                    separatorBuilder: (_, _) => const SizedBox(height: 16),
-                    itemBuilder: (context, index) => EquipmentListTile(
-                      equipment: items[index],
-                      onTap: () {
-                        // Select equipment
-                        bookingNotifier.selectEquipment(items[index]);
-                        // Navigate to booking screen
-                        context.push('/equipment/${items[index].id}/book');
-                      },
+              child: equipmentState.isLoading
+                  ? const Center(
+                      child: CircularProgressIndicator(
+                        color: Color(0xFF4E73DF),
+                      ),
+                    )
+                  : equipmentState.error != null
+                  ? Center(
+                      child: Text(
+                        equipmentState.error.toString(),
+                        style: const TextStyle(color: Colors.redAccent),
+                      ),
+                    )
+                  : equipmentState.renterEquipment.isEmpty
+                  ? _buildEmptyState()
+                  : ListView.separated(
+                      padding: const EdgeInsets.all(20),
+                      itemCount: equipmentState.renterEquipment.length,
+                      separatorBuilder: (_, _) => const SizedBox(height: 16),
+                      itemBuilder: (context, index) => EquipmentListTile(
+                        equipment: equipmentState.renterEquipment[index],
+                        onTap: () {
+                          // Select equipment
+                          bookingNotifier.selectEquipment(
+                            equipmentState.renterEquipment[index],
+                          );
+                          // Navigate to booking screen
+                          context.push(
+                            '/equipment/${equipmentState.renterEquipment[index].id}/book',
+                          );
+                        },
+                      ),
                     ),
-                  );
-                },
-                loading: () => const Center(
-                  child: CircularProgressIndicator(color: Color(0xFF4E73DF)),
-                ),
-                error: (error, _) => Center(
-                  child: Text(
-                    error.toString(),
-                    style: const TextStyle(color: Colors.redAccent),
-                  ),
-                ),
-              ),
             ),
           ],
         ),

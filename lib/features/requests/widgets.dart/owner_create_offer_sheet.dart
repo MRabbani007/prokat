@@ -3,8 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:prokat/core/widgets/edit_sheet.dart';
 import 'package:prokat/core/widgets/industrial_input_container.dart';
 import 'package:prokat/features/categories/providers/category_provider.dart';
+import 'package:prokat/features/equipment/providers/equipment_provider.dart';
 import 'package:prokat/features/offers/providers/offers_provider.dart';
-import 'package:prokat/features/owner/equipment/providers/owner_equipment_provider.dart';
 import 'package:prokat/features/requests/models/request_model.dart';
 
 void openResponseSheet(BuildContext context, RequestModel request) {
@@ -17,11 +17,11 @@ void openResponseSheet(BuildContext context, RequestModel request) {
         builder: (context, ref, _) {
           final offersState = ref.watch(offersProvider);
           final offersNotifier = ref.read(offersProvider.notifier);
-          final equipmentState = ref.watch(ownerEquipmentProvider);
+          final equipmentState = ref.watch(equipmentProvider);
           final selectedCategory = ref
               .watch(categoriesProvider)
               .selectedCategory;
-          final equipmentOptions = equipmentState.equipment
+          final equipmentOptions = equipmentState.ownerEquipment
               .where((e) => e.category?.id == selectedCategory?.id)
               .toList();
 
