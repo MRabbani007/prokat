@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:prokat/features/appstartup/app_startup_provider.dart';
 import 'package:prokat/features/auth/models/auth_session.dart';
 import 'package:prokat/features/auth/services/auth_secure_storage.dart';
 import '../models/auth_credentials.dart';
@@ -6,10 +7,11 @@ import '../services/auth_api_service.dart';
 import 'auth_state.dart';
 
 class AuthNotifier extends StateNotifier<AuthState> {
+  final Ref ref;
   final AuthApiService api;
   final AuthSecureStorage storage;
 
-  AuthNotifier(this.api, this.storage) : super(const AuthState()) {
+  AuthNotifier(this.ref, this.api, this.storage) : super(const AuthState()) {
     // restore session in app startup provider: below can cause flickers/async side effect
     // restoreSession();
   }
@@ -18,7 +20,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
   Future<AuthSession?> restoreSession() async {
     final session = await storage.readSession();
 
-    if (session != null && session.sessionToken.isNotEmpty) {
+    if (session != null && (session.sessionToken !=null && session.sessionToken?.isNotEmpty == true)) {
       state = state.copyWith(session: session);
 
       return session;
@@ -28,27 +30,27 @@ class AuthNotifier extends StateNotifier<AuthState> {
   }
 
   Future<bool> refreshSession() async {
-  final session = state.session;
+    final session = state.session;
 
-  if (session == null) return false;
+    if (session == null) return false;
 
-  try {
-    final refreshed = await api.refreshSession();
+    try {
+      final refreshed = await api.refreshSession();
 
-    if (refreshed == null) {
+      if (refreshed == null) {
+        await logout();
+        return false;
+      }
+
+      state = state.copyWith(session: refreshed);
+      await storage.saveSession(refreshed);
+
+      return true;
+    } catch (_) {
       await logout();
       return false;
     }
-
-    state = state.copyWith(session: refreshed);
-    await storage.saveSession(refreshed);
-
-    return true;
-  } catch (_) {
-    await logout();
-    return false;
   }
-}
 
   /// LOGIN WITH USERNAME/PASSWORD
   Future<bool> login(AuthCredentials credentials) async {
@@ -62,6 +64,8 @@ class AuthNotifier extends StateNotifier<AuthState> {
 
       state = state.copyWith(session: session, isLoading: false);
 
+      await ref.read(appStartupProvider.notifier).reloadApp();
+      
       return true;
     } catch (e) {
       state = state.copyWith(isLoading: false, error: 'Login failed');

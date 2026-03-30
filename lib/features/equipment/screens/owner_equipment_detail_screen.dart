@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:prokat/features/categories/providers/category_provider.dart';
 import 'package:prokat/features/equipment/providers/equipment_provider.dart';
 import 'package:prokat/features/equipment/widgets/owner/delete_equipment_section.dart';
 import 'package:prokat/features/equipment/widgets/owner/edit_equipment_details_form.dart';
@@ -24,8 +25,13 @@ class OwnerEquipmentDetailScreen extends ConsumerWidget {
     const accentColor = Color(0xFF4E73DF);
 
     final state = ref.watch(equipmentProvider);
-    final equipment = state.ownerEquipment
-        .where((e) => e.id == equipmentId)
+
+    final equipment = state.editEquipment;
+
+    final categories = ref.read(categoriesProvider).categories;
+
+    final foundCategory = categories
+        .where((item) => item.id == equipment?.categoryId)
         .firstOrNull;
 
     // Industrial Fallback for Error State
@@ -70,9 +76,7 @@ class OwnerEquipmentDetailScreen extends ConsumerWidget {
     return Scaffold(
       backgroundColor: bgColor,
       body: CustomScrollView(
-        // Using CustomScrollView for a smoother feel with the ImageHeader
         slivers: [
-          // Assuming ImageHeader is updated to industrial style
           SliverToBoxAdapter(
             child: EquipmentImageHeader(
               imageUrl: equipment.imageUrl,
@@ -84,7 +88,11 @@ class OwnerEquipmentDetailScreen extends ConsumerWidget {
             padding: const EdgeInsets.fromLTRB(16, 24, 16, 40),
             sliver: SliverList(
               delegate: SliverChildListDelegate([
-                EditEquipmentDetailsForm(equipment: equipment, ref: ref),
+                EditEquipmentDetailsForm(
+                  equipment: equipment,
+                  ref: ref,
+                  category: foundCategory,
+                ),
 
                 const SizedBox(height: 20),
 

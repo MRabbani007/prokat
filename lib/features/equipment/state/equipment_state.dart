@@ -15,7 +15,7 @@ class EquipmentState {
   final Equipment? editEquipment;
 
   final Category? category;
-  final LocationModel? locaiton;
+  final LocationModel? location;
 
   EquipmentState({
     this.isLoading = false,
@@ -25,7 +25,7 @@ class EquipmentState {
     this.equipment,
     this.editEquipment,
     this.category,
-    this.locaiton,
+    this.location,
   });
 
   EquipmentState copyWith({
@@ -33,7 +33,8 @@ class EquipmentState {
     final String? error,
     List<Equipment>? ownerEquipment,
     List<Equipment>? renterEquipment,
-    Category ?category,
+    Category? category,
+    Equipment? editEquipment,
   }) {
     return EquipmentState(
       isLoading: isLoading ?? this.isLoading,
@@ -41,6 +42,7 @@ class EquipmentState {
       ownerEquipment: ownerEquipment ?? this.ownerEquipment,
       renterEquipment: renterEquipment ?? this.renterEquipment,
       category: category ?? this.category,
+      editEquipment: editEquipment ?? this.editEquipment,
     );
   }
 }

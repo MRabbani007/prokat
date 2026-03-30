@@ -1,94 +1,132 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:prokat/features/equipment/providers/equipment_provider.dart';
+import 'package:prokat/features/locations/state/location_provider.dart';
 
 void openLocationPickerSheet(
   BuildContext context,
   WidgetRef ref,
   String equipmentId,
 ) {
-  // const bgColor = Color(0xFF1E2125); // Industrial Charcoal
   const ghostGray = Color(0x4DFFFFFF);
-  // const accentBlue = Color(0xFF4E73DF);
+  const accentBlue = Color(0xFF4E73DF);
 
   showModalBottomSheet(
     context: context,
     backgroundColor: Colors.transparent,
     isScrollControlled: true,
     builder: (context) {
+      // 1. Fetch locations from your provider
+      final locations = ref.watch(locationProvider).ownerLocations;
+      final topLocations = locations.take(5).toList();
+
       return Container(
         decoration: const BoxDecoration(
-          color: Color(0xFF121417), // Deep Midnight
-          borderRadius: BorderRadius.vertical(
-            top: Radius.circular(28),
-          ), // Large Radius
-          border: Border(
-            top: BorderSide(
-              color: Color(0x14FFFFFF),
-              width: 1,
-            ), // Rim light on top edge
-          ),
+          color: Color(0xFF121417),
+          borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+          border: Border(top: BorderSide(color: Color(0x14FFFFFF), width: 1)),
         ),
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
         child: Column(
           mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start, // Move header to left
           children: [
-            /// Industrial Drag Handle
-            Container(
-              width: 32,
-              height: 4,
-              decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(2),
+            Align(
+              alignment: Alignment.center,
+              child: Container(
+                width: 32,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: Colors.white.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(2),
+                ),
               ),
             ),
-
             const SizedBox(height: 24),
-
             const Text(
-              "Select Location",
+              "SELECT LOCATION",
               style: TextStyle(
                 color: ghostGray,
-                fontSize: 11,
+                fontSize: 10,
                 fontWeight: FontWeight.bold,
                 letterSpacing: 1.5,
               ),
             ),
+            const SizedBox(height: 16),
 
-            const SizedBox(height: 20),
+            // 2. Display Top 3 Locations
+            if (topLocations.isEmpty)
+              const Padding(
+                padding: EdgeInsets.symmetric(vertical: 20),
+                child: Text(
+                  "No saved locations yet",
+                  style: TextStyle(color: Colors.white24, fontSize: 13),
+                ),
+              )
+            else
+              ...topLocations.map(
+                (loc) => _LocationActionTile(
+                  icon: Icons.location_on_outlined,
+                  title: loc.street,
+                  subtitle: loc.city,
+                  onTap: () async {
+                    // Update your notifier with the selection
+                    final res = await ref
+                        .read(equipmentProvider.notifier)
+                        .updateEquipmentLocation(equipmentId, {
+                          "id": equipmentId,
+                          "locationId": loc.id,
+                        });
 
-            /// Actions
-            _LocationActionTile(
-              icon: Icons.history_rounded,
-              title: "Saved Addresses",
-              subtitle: "Select from your frequently used spots",
-              onTap: () {
-                Navigator.pop(context);
-                context.push("/owner/addresses");
-              },
-            ),
+                    if (res == true) {
+                      Navigator.pop(context);
+                    }
+                  },
+                ),
+              ),
 
-            _LocationActionTile(
-              icon: Icons.terminal_rounded,
-              title: "Enter New Address",
-              subtitle: "Type in the address details manually",
-              onTap: () {
-                Navigator.pop(context);
-                context.push("/owner/addresses/create");
-              },
-            ),
+            const SizedBox(height: 8),
+            const Divider(color: Colors.white10),
+            const SizedBox(height: 8),
 
-            _LocationActionTile(
-              icon: Icons.map_outlined,
-              title: "Pick on Map",
-              subtitle: "Drag a pin to the exact location",
+            // 3. Simple "Add New" Button
+            InkWell(
               onTap: () {
                 Navigator.pop(context);
                 context.push("/owner/addresses/map?equipmentId=$equipmentId");
               },
-              isLast: true,
+              borderRadius: BorderRadius.circular(12),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(
+                  vertical: 12,
+                  horizontal: 8,
+                ),
+                child: Row(
+                  children: [
+                    const Icon(
+                      Icons.add_location_alt_rounded,
+                      color: accentBlue,
+                      size: 22,
+                    ),
+                    const SizedBox(width: 12),
+                    const Text(
+                      "Create new on map",
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w600,
+                        fontSize: 14,
+                      ),
+                    ),
+                    const Spacer(),
+                    Icon(
+                      Icons.chevron_right_rounded,
+                      color: Colors.white.withValues(alpha: 0.2),
+                    ),
+                  ],
+                ),
+              ),
             ),
-
             const SizedBox(height: 32),
           ],
         ),

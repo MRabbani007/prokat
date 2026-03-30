@@ -29,7 +29,7 @@ class _EquipmentBookingScreenState
 
     Future.microtask(() {
       ref.read(equipmentProvider.notifier).getRenterEquipment();
-      ref.read(locationProvider.notifier).loadAddresses();
+      ref.read(locationProvider.notifier).getRenterLocations();
     });
   }
 

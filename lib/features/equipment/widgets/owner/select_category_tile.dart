@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:prokat/features/categories/models/category.dart';
+import 'package:prokat/features/equipment/widgets/owner/category_selection_sheet.dart';
 
 Widget SelectCategoryTile({
   required BuildContext context,
@@ -21,14 +22,15 @@ Widget SelectCategoryTile({
   bool useBottomSheet = true,
 }) {
   return GestureDetector(
-    onTap: useBottomSheet
-        ? () => _openCategoryBottomSheet(
-            context: context, // ✅ pass it here
-            categories: categories,
-            selectedId: selectedCategoryId,
-            onSelected: onChanged,
-          )
-        : null,
+    onTap: () {
+      showModalBottomSheet<Category>(
+        context: context,
+        isScrollControlled: true,
+        backgroundColor:
+            Colors.transparent, // Important for our custom border radius
+        builder: (context) => const CategorySelectionSheet(),
+      );
+    },
     child: Container(
       margin: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
       padding: const EdgeInsets.all(16),
@@ -130,39 +132,5 @@ Widget _buildDropdownMode(
         ),
       ),
     ],
-  );
-}
-
-void _openCategoryBottomSheet({
-  required BuildContext context,
-  required List<Category> categories,
-  required String? selectedId,
-  required Function(Category cat) onSelected,
-}) {
-  showModalBottomSheet(
-    context: context,
-    backgroundColor: const Color.fromARGB(255, 74, 74, 109),
-    shape: const RoundedRectangleBorder(
-      borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-    ),
-    builder: (context) {
-      return ListView(
-        padding: const EdgeInsets.all(16),
-        children: categories.map((cat) {
-          final isSelected = cat.id == selectedId;
-
-          return ListTile(
-            title: Text(cat.name),
-            trailing: isSelected
-                ? const Icon(Icons.check, color: Colors.blue)
-                : null,
-            onTap: () {
-              Navigator.pop(context);
-              onSelected(cat);
-            },
-          );
-        }).toList(),
-      );
-    },
   );
 }

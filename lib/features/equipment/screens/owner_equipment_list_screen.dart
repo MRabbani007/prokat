@@ -64,14 +64,14 @@ class _OwnerEquipmentListScreenState
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
               child: Row(
                 children: [
-                  Container(
-                    width: 8,
-                    height: 8,
-                    decoration: const BoxDecoration(
-                      color: Color(0xFFD97706), // Amber/Warning
-                      shape: BoxShape.circle,
-                    ),
-                  ),
+                  // Container(
+                  //   width: 8,
+                  //   height: 8,
+                  //   decoration: const BoxDecoration(
+                  //     color: Color(0xFFD97706), // Amber/Warning
+                  //     shape: BoxShape.circle,
+                  //   ),
+                  // ),
                   const SizedBox(width: 8),
                   Text(
                     "ADMINISTRATIVE ACCESS ACTIVE",
@@ -102,7 +102,7 @@ class _OwnerEquipmentListScreenState
                       itemCount: state.ownerEquipment.length,
                       itemBuilder: (context, index) {
                         return Padding(
-                          padding: const EdgeInsets.only(bottom: 16),
+                          padding: const EdgeInsets.only(bottom: 10),
                           child: OwnerEquipmentCard(
                             equipment: state.ownerEquipment[index],
                           ),

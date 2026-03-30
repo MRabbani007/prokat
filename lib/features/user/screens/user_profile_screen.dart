@@ -18,7 +18,7 @@ class UserProfileScreen extends ConsumerWidget {
     const accentColor = Color(0xFF4E73DF); // Industrial Blue
 
     final state = ref.watch(userProfileProvider);
-    final userAddresses = ref.watch(locationProvider).addresses;
+    final userAddresses = ref.watch(locationProvider).renterLocations;
     final selectedAddress = userAddresses
         .where((address) => state.userProfile?.selectedAddressId == address.id)
         .firstOrNull;

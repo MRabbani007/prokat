@@ -52,7 +52,6 @@ class UserProfileNotifier extends StateNotifier<UserProfileState> {
     String? phoneCountryCode,
     String? profileImageUrl,
     String? darkMode,
-    String? selectedCategoryId,
     String? selectedAddressId,
   }) async {
     try {
@@ -64,7 +63,6 @@ class UserProfileNotifier extends StateNotifier<UserProfileState> {
         phoneNumber: phoneNumber,
         profileImageUrl: profileImageUrl,
         darkMode: darkMode,
-        selectedCategoryId: selectedCategoryId,
         selectedAddressId: selectedAddressId,
       );
 
@@ -87,6 +85,46 @@ class UserProfileNotifier extends StateNotifier<UserProfileState> {
       state = state.copyWith(isLoading: true);
 
       final updated = await service.updateUserName(username);
+
+      if (updated != null) {
+        await getUserProfile();
+
+        return true;
+      }
+
+      state = state.copyWith(isLoading: false);
+      return false;
+    } catch (e) {
+      state = state.copyWith(isLoading: false, error: e.toString());
+      return false;
+    }
+  }
+
+  Future<bool> selectCategory(String selectedCategoryId) async {
+    try {
+      state = state.copyWith(isLoading: true);
+
+      final updated = await service.selectCategory(selectedCategoryId);
+
+      if (updated != null) {
+        await getUserProfile();
+
+        return true;
+      }
+
+      state = state.copyWith(isLoading: false);
+      return false;
+    } catch (e) {
+      state = state.copyWith(isLoading: false, error: e.toString());
+      return false;
+    }
+  }
+
+    Future<bool> selectAddress(String addressId) async {
+    try {
+      state = state.copyWith(isLoading: true);
+
+      final updated = await service.selectAddress(addressId);
 
       if (updated != null) {
         await getUserProfile();

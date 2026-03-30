@@ -2,11 +2,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:prokat/features/equipment/providers/equipment_provider.dart';
 import 'package:prokat/features/locations/models/location_search_result.dart';
 import '../models/location_model.dart';
-import '../services/location_api_service.dart';
+import 'location_service.dart';
 import 'location_state.dart';
 
 class LocationNotifier extends StateNotifier<LocationState> {
-  final LocationApiService api;
+  final LocationService api;
   final Ref ref;
 
   LocationNotifier(this.api, this.ref) : super(const LocationState());
@@ -14,26 +14,29 @@ class LocationNotifier extends StateNotifier<LocationState> {
   List<LocationSearchResult> suggestions = [];
 
   // Fetch user Addresses
-  Future<void> loadAddresses() async {
+  Future<void> getRenterLocations() async {
     try {
       state = state.copyWith(isLoading: true);
 
-      final addresses = await api.getLocations(mode: "ADDRESS");
+      final renterLocations = await api.getRenterLocations(mode: "ADDRESS");
 
-      state = state.copyWith(addresses: addresses, isLoading: false);
+      state = state.copyWith(
+        renterLocations: renterLocations,
+        isLoading: false,
+      );
     } catch (e) {
       state = state.copyWith(isLoading: false, error: e.toString());
     }
   }
 
   // Fetch owner equipment locations
-  Future<void> loadLocations() async {
+  Future<void> getOwnerLocations() async {
     try {
       state = state.copyWith(isLoading: true);
 
-      final locations = await api.getLocations();
+      final ownerLocations = await api.getOwnerLocations();
 
-      state = state.copyWith(locations: locations, isLoading: false);
+      state = state.copyWith(ownerLocations: ownerLocations, isLoading: false);
     } catch (e) {
       state = state.copyWith(isLoading: false, error: e.toString());
     }
@@ -48,17 +51,16 @@ class LocationNotifier extends StateNotifier<LocationState> {
 
       state = state.copyWith(
         isLoading: false,
-        addresses: newLocation.service == "ADDRESS"
-            ? [...state.addresses, newLocation]
-            : [...state.addresses],
-        locations: newLocation.service == "EQUIPMENT"
-            ? [...state.locations, newLocation]
-            : [...state.locations],
+        renterLocations: newLocation.service == "ADDRESS"
+            ? [...state.renterLocations, newLocation]
+            : [...state.renterLocations],
+        ownerLocations: newLocation.service == "EQUIPMENT"
+            ? [...state.ownerLocations, newLocation]
+            : [...state.ownerLocations],
         error: null,
       );
 
       if (newLocation.service == "EQUIPMENT") {
-        // ref.invalidate(equipmentProvider);
         await ref.read(equipmentProvider.notifier).getOwnerEquipment();
       }
 
@@ -72,14 +74,20 @@ class LocationNotifier extends StateNotifier<LocationState> {
   // Update location
   Future<void> updateLocation(String id, LocationModel location) async {
     try {
-      final updated = await api.updateLocation(id, location);
+       await api.updateLocation(id, location);
 
-      final updatedList = state.locations.map((l) {
-        if (l.id == id) return updated;
-        return l;
-      }).toList();
+      if (location.service == "ADDRESS") {
+        await getRenterLocations();
+      } else {
+        await getOwnerLocations();
+      }
 
-      state = state.copyWith(locations: updatedList);
+      // final updatedList = state.ownerLocations.map((l) {
+      //   if (l.id == id) return updated;
+      //   return l;
+      // }).toList();
+
+      // state = state.copyWith(locations: updatedList);
     } catch (e) {
       state = state.copyWith(error: e.toString());
     }
@@ -91,7 +99,8 @@ class LocationNotifier extends StateNotifier<LocationState> {
       await api.deleteLocation(id);
 
       state = state.copyWith(
-        locations: state.locations.where((l) => l.id != id).toList(),
+        ownerLocations: state.ownerLocations.where((l) => l.id != id).toList(),
+        renterLocations: state.renterLocations.where((l) => l.id != id).toList(),
       );
     } catch (e) {
       state = state.copyWith(error: e.toString());

@@ -22,7 +22,7 @@ import 'package:prokat/features/owner/addresses/screens/owner_addresses_screen.d
 import 'package:prokat/features/owner/addresses/screens/owner_select_address_screen.dart';
 import 'package:prokat/features/bookings/screens/owner_bookings_history_screen.dart';
 import 'package:prokat/features/bookings/screens/owner_bookings_screen.dart';
-import 'package:prokat/features/equipment/screens/equipment_detail_screen.dart';
+import 'package:prokat/features/equipment/screens/owner_equipment_detail_screen.dart';
 import 'package:prokat/features/equipment/screens/create_equipment_screen.dart';
 import 'package:prokat/features/equipment/screens/owner_equipment_list_screen.dart';
 import 'package:prokat/features/requests/screens/owner_requests_screen.dart';
@@ -51,7 +51,7 @@ GoRouter createRouter(WidgetRef ref) {
     redirect: (context, state) {
       final authState = ref.read(authProvider);
       final isLoggedIn = authState.isAuthenticated;
-      final role = authState.session?.user.role;
+      final role = authState.session?.user?.role;
 
       final location = state.matchedLocation;
 

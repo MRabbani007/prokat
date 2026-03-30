@@ -1,24 +1,40 @@
 import 'package:dio/dio.dart';
 import 'package:prokat/core/api/api_client.dart';
+import 'package:prokat/core/constants/api_routes.dart';
 import '../models/location_model.dart';
 import '../models/location_search_result.dart';
 
-class LocationApiService {
+class LocationService {
   final ApiClient apiClient;
 
-  LocationApiService(this.apiClient);
+  LocationService(this.apiClient);
 
   Dio get _dio => apiClient.dio;
 
-  Future<List<LocationModel>> getLocations({String? mode}) async {
-    final response = await _dio.get(
-      '/locations',
-      // queryParameters: {'mode': mode ?? "ADDRESS"},
-    );
+  Future<List<LocationModel>> getRenterLocations({String? mode}) async {
+    try {
+      final response = await _dio.get(ApiRoutes.locations);
 
-    return (response.data["data"] as List)
-        .map((e) => LocationModel.fromJson(e))
-        .toList();
+      return (response.data["data"] as List)
+          .map((e) => LocationModel.fromJson(e))
+          .toList();
+    } catch (e) {
+      return [];
+    }
+  }
+
+  Future<List<LocationModel>> getOwnerLocations({String? mode}) async {
+    try {
+      final response = await _dio.get(
+        ApiRoutes.ownerLocations,
+      );
+
+      return (response.data["data"] as List)
+          .map((e) => LocationModel.fromJson(e))
+          .toList();
+    } catch (e) {
+      return [];
+    }
   }
 
   Future<LocationModel> createLocation(LocationModel location) async {

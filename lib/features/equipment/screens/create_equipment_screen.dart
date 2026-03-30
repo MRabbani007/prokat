@@ -58,9 +58,8 @@ class _CreateEquipmentScreenState extends ConsumerState<CreateEquipmentScreen> {
   @override
   Widget build(BuildContext context) {
     final equipmentState = ref.watch(equipmentProvider);
-
     final categoriesState = ref.watch(categoriesProvider);
-print(categoriesState.categories.toString());
+
     return Scaffold(
       backgroundColor: bgColor,
       body: SafeArea(

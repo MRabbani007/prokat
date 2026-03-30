@@ -18,7 +18,7 @@ class DeleteEquipmentSection extends StatelessWidget {
         borderRadius: BorderRadius.circular(28), // Large Item Radius
         border: Border.all(
           // Warning Amber Rim Light
-          color: warningAmber.withValues(alpha: 0.15), 
+          color: warningAmber.withValues(alpha: 0.15),
           width: 1,
         ),
       ),
@@ -28,7 +28,11 @@ class DeleteEquipmentSection extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Icon(Icons.warning_amber_rounded, color: warningAmber, size: 16),
+              const Icon(
+                Icons.warning_amber_rounded,
+                color: warningAmber,
+                size: 16,
+              ),
               const SizedBox(width: 8),
               Text(
                 "DANGER ZONE",
@@ -41,21 +45,17 @@ class DeleteEquipmentSection extends StatelessWidget {
               ),
             ],
           ),
-          
+
           const SizedBox(height: 12),
-          
+
           const Text(
             "Deleting this asset will permanently remove all telemetry and pricing data from the fleet database.",
             textAlign: TextAlign.center,
-            style: TextStyle(
-              color: ghostGray,
-              fontSize: 12,
-              height: 1.4,
-            ),
+            style: TextStyle(color: ghostGray, fontSize: 12, height: 1.4),
           ),
-          
+
           const SizedBox(height: 24),
-          
+
           // Heavy-duty Destructive Button
           SizedBox(
             width: double.infinity,
@@ -65,12 +65,21 @@ class DeleteEquipmentSection extends StatelessWidget {
               icon: const Icon(Icons.delete_forever_rounded, size: 20),
               label: const Text(
                 "Delete Equipment",
-                style: TextStyle(fontWeight: FontWeight.bold, letterSpacing: 1.2),
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  letterSpacing: 1.2,
+                ),
               ),
               style: OutlinedButton.styleFrom(
-                foregroundColor: const Color(0xFFEF4444), // Muted Destructive Red
-                side: BorderSide(color: const Color(0xFFEF4444).withValues(alpha: 0.3)),
-                backgroundColor: const Color(0xFFEF4444).withValues(alpha: 0.05),
+                foregroundColor: const Color(
+                  0xFFEF4444,
+                ), // Muted Destructive Red
+                side: BorderSide(
+                  color: const Color(0xFFEF4444).withValues(alpha: 0.3),
+                ),
+                backgroundColor: const Color(
+                  0xFFEF4444,
+                ).withValues(alpha: 0.05),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(16), // Small Item Radius
                 ),

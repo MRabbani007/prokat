@@ -12,7 +12,7 @@ class SelectAddressSheet extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final locationState = ref.watch(locationProvider);
-    final addresses = locationState.addresses.take(3).toList();
+    final addresses = locationState.renterLocations.take(3).toList();
 
     const bgColor = Color(0xFF121417);
     // const accentColor = Color(0xFF4E73DF);

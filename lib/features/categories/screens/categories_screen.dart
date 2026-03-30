@@ -24,9 +24,7 @@ class CategoriesScreen extends ConsumerWidget {
     ) async {
       ref.read(categoriesProvider.notifier).selectCategory(category);
 
-      final res = await userProfileState.updateUserProfile(
-        selectedCategoryId: category.id,
-      );
+      final res = await userProfileState.selectCategory(category.id);
 
       if (res == true && context.mounted) {
         context.go('/search/map', extra: {'category': category.id});
@@ -121,7 +119,7 @@ class _ServiceCard extends StatelessWidget {
       child: Container(
         decoration: BoxDecoration(
           color: isSelected
-              ? accentColor.withValues(alpha: 0.15) // 🔥 highlight
+              ? accentColor.withValues(alpha: 0.15)
               : cardColor,
           borderRadius: BorderRadius.circular(24),
           border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
@@ -161,15 +159,15 @@ class _ServiceCard extends StatelessWidget {
                 letterSpacing: 1.2,
               ),
             ),
-            const SizedBox(height: 4),
-            Text(
-              "View Equipment", // Subtitle for depth
-              style: TextStyle(
-                color: Colors.white.withValues(alpha: 0.2),
-                fontSize: 10,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
+            // const SizedBox(height: 4),
+            // Text(
+            //   "View Equipment", // Subtitle for depth
+            //   style: TextStyle(
+            //     color: Colors.white.withValues(alpha: 0.2),
+            //     fontSize: 10,
+            //     fontWeight: FontWeight.bold,
+            //   ),
+            // ),
           ],
         ),
       ),

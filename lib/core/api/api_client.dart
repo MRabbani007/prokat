@@ -19,13 +19,14 @@ class ApiClient {
 
     dio.interceptors.add(ApiInterceptor(secureStorage));
 
-    dio.interceptors.add(
-      LogInterceptor(
-        request: true,
-        requestBody: true,
-        responseBody: true,
-        error: true,
-      ),
-    );
+    // Log api requests / responses
+    // dio.interceptors.add(
+    //   LogInterceptor(
+    //     request: true,
+    //     requestBody: true,
+    //     responseBody: true,
+    //     error: true,
+    //   ),
+    // );
   }
 }

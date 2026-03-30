@@ -1,8 +1,28 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:prokat/core/widgets/page_header.dart';
+import 'package:prokat/features/auth/providers/auth_provider.dart';
+import 'package:go_router/go_router.dart';
 
-class UserSettingsScreen extends StatelessWidget {
+class UserSettingsScreen extends ConsumerStatefulWidget {
   const UserSettingsScreen({super.key});
+
+  @override
+  ConsumerState<UserSettingsScreen> createState() => _UserSettingsScreenState();
+}
+
+class _UserSettingsScreenState extends ConsumerState<UserSettingsScreen> {
+  void _handleLogout(BuildContext context, WidgetRef ref) async {
+    try {
+      await ref.read(authProvider.notifier).logout();
+
+      context.push('/search/map');
+    } catch (e) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Logout failed: $e')));
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -68,7 +88,7 @@ class UserSettingsScreen extends StatelessWidget {
                       label: "Logout",
                       icon: Icons.logout_rounded,
                       color: Colors.white.withValues(alpha: 0.7),
-                      onPressed: () {},
+                      onPressed: () => _handleLogout(context, ref),
                     ),
                     const SizedBox(height: 12),
                     _DangerActionBtn(

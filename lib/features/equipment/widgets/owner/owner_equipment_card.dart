@@ -1,21 +1,27 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:go_router/go_router.dart'; // Add this
 import 'package:cached_network_image/cached_network_image.dart'; // Better for fallbacks
 import 'package:prokat/features/equipment/models/equipment_model.dart';
-class OwnerEquipmentCard extends StatelessWidget {
+import 'package:prokat/features/equipment/providers/equipment_provider.dart';
+
+class OwnerEquipmentCard extends ConsumerWidget {
   final Equipment equipment;
 
   const OwnerEquipmentCard({super.key, required this.equipment});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     const cardColor = Color(0xFF1E2125);
     const accentColor = Color(0xFF4E73DF);
     const ghostGray = Color(0x4DFFFFFF); // White @ 30%
-    
-    String testImage = "https://insqvwqlfhbfcqqnvzxu.supabase.co/storage/v1/object/public/Media/kamaz1.jpg";
-    final displayUrl = equipment.imageUrl?.isNotEmpty == true ? equipment.imageUrl! : testImage;
+
+    String testImage =
+        "https://insqvwqlfhbfcqqnvzxu.supabase.co/storage/v1/object/public/Media/kamaz1.jpg";
+    final displayUrl = equipment.imageUrl?.isNotEmpty == true
+        ? equipment.imageUrl!
+        : testImage;
 
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 8),
@@ -35,7 +41,7 @@ class OwnerEquipmentCard extends StatelessWidget {
             children: [
               SlidableAction(
                 onPressed: (context) {},
-                backgroundColor: accentColor.withOpacity(0.2),
+                backgroundColor: accentColor.withValues(alpha: 0.2),
                 foregroundColor: accentColor,
                 icon: Icons.visibility_off_outlined,
                 label: 'HIDE',
@@ -48,7 +54,7 @@ class OwnerEquipmentCard extends StatelessWidget {
             children: [
               SlidableAction(
                 onPressed: (context) {},
-                backgroundColor: const Color(0xFFD97706).withOpacity(0.1),
+                backgroundColor: const Color(0xFFD97706).withValues(alpha: 0.1),
                 foregroundColor: const Color(0xFFD97706),
                 icon: Icons.delete_outline_rounded,
                 label: 'DELETE',
@@ -56,7 +62,13 @@ class OwnerEquipmentCard extends StatelessWidget {
             ],
           ),
           child: InkWell(
-            onTap: () => context.push('/owner/equipment/${equipment.id}'),
+            onTap: () => {
+              ref
+                  .read(equipmentProvider.notifier)
+                  .selectEditEquipment(equipment),
+                  
+              context.push('/owner/equipment/${equipment.id}'),
+            },
             child: Padding(
               padding: const EdgeInsets.all(16.0),
               child: Row(
@@ -66,11 +78,14 @@ class OwnerEquipmentCard extends StatelessWidget {
                     width: 72,
                     height: 72,
                     child: ClipRRect(
-                      borderRadius: BorderRadius.circular(16), // Small Item Radius
+                      borderRadius: BorderRadius.circular(
+                        16,
+                      ), // Small Item Radius
                       child: CachedNetworkImage(
                         imageUrl: displayUrl,
                         fit: BoxFit.cover,
-                        placeholder: (context, url) => Container(color: Colors.black26),
+                        placeholder: (context, url) =>
+                            Container(color: Colors.black26),
                         errorWidget: (context, url, error) => Container(
                           color: Colors.black26,
                           child: const Icon(Icons.bolt, color: ghostGray),
@@ -124,17 +139,16 @@ class _StatusBadge extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final bool isActive = status.toLowerCase() == 'active';
-    final Color statusColor = isActive ? const Color(0xFF4E73DF) : const Color(0xFFD97706);
+    final Color statusColor = isActive
+        ? const Color(0xFF4E73DF)
+        : const Color(0xFFD97706);
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
       decoration: BoxDecoration(
-        color: statusColor.withOpacity(0.1),
+        color: statusColor.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: statusColor.withOpacity(0.5),
-          width: 1,
-        ),
+        border: Border.all(color: statusColor.withValues(alpha: 0.5), width: 1),
       ),
       child: Text(
         status.toUpperCase(),

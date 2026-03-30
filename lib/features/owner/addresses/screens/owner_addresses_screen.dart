@@ -18,12 +18,12 @@ class OwnerAddressesScreen extends ConsumerWidget {
       ),
       body: state.isLoading
           ? const Center(child: CircularProgressIndicator())
-          : state.locations.isEmpty
+          : state.ownerLocations.isEmpty
               ? const AddressEmptyState()
               : ListView.builder(
-                  itemCount: state.locations.length,
+                  itemCount: state.ownerLocations.length,
                   itemBuilder: (context, index) {
-                    final location = state.locations[index];
+                    final location = state.ownerLocations[index];
 
                     return AddressListTile(location: location);
                   },

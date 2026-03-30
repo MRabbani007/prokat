@@ -67,7 +67,23 @@ class EquipmentService {
     try {
       final response = await _dio.patch('/equipment/$equipmentId', data: data);
 
-      return Equipment.fromJson(response.data);
+      return Equipment.fromJson(response.data['data']);
+    } on DioException catch (e) {
+      throw Exception(e.response?.data ?? 'Failed to update equipment');
+    }
+  }
+
+  Future<Equipment> updateEquipmentLocation(
+    String equipmentId,
+    Map<String, dynamic> data,
+  ) async {
+    try {
+      final response = await _dio.patch(
+        '/equipment/$equipmentId/location',
+        data: data,
+      );
+
+      return Equipment.fromJson(response.data['data']);
     } on DioException catch (e) {
       throw Exception(e.response?.data ?? 'Failed to update equipment');
     }

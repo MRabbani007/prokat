@@ -16,16 +16,83 @@ final appStartupProvider =
 
 class AppStartupController extends StateNotifier<AppStartupState> {
   final Ref ref;
+  bool _initialized = false;
+  bool _isInitializing = false;
 
   AppStartupController(this.ref) : super(AppStartupState.loading) {
-    init();
+    Future.microtask(() async {
+      final authState = ref.read(authProvider);
+
+      /// ✅ If already logged in → run init
+      if (authState.session != null) {
+        await init();
+      } else {
+        /// ✅ Otherwise don't run init at all
+        state = AppStartupState.guest;
+      }
+    });
+  }
+
+  Future<void> reloadApp() async {
+    // state = AppStartupState.loading;
+    state = await loadAppData();
+  }
+
+  Future<AppStartupState> loadAppData() async {
+    /// Fetch profile
+    await ref.read(userProfileProvider.notifier).getUserProfile();
+
+    final profile = ref.read(userProfileProvider).userProfile;
+
+    if (profile == null) {
+      return AppStartupState.guest;
+    }
+
+    /// Category restore
+    final selectedCategory = profile.selectedCategoryId;
+    final categories = ref.read(categoriesProvider).categories;
+
+    final foundCategory = categories
+        .where((cat) => cat.id == selectedCategory)
+        .firstOrNull;
+
+    if (foundCategory != null) {
+      ref.read(categoriesProvider.notifier).selectCategory(foundCategory);
+    }
+
+    /// Shared data
+    await Future.wait([ref.read(locationProvider.notifier).getRenterLocations()]);
+
+    /// Role-based
+    if (profile.role?.toLowerCase() == "owner") {
+      await Future.wait([
+        ref.read(bookingProvider.notifier).getOwnerBookings(),
+        ref.read(equipmentProvider.notifier).getOwnerEquipment(),
+        ref.read(locationProvider.notifier).getOwnerLocations(),
+      ]);
+
+      return AppStartupState.owner;
+    } else {
+      await Future.wait([
+        ref.read(bookingProvider.notifier).getUserBookings(),
+        ref.read(requestProvider.notifier).getUserRequests(),
+      ]);
+
+      return AppStartupState.renter;
+    }
   }
 
   Future<void> init() async {
+    if (_initialized || _isInitializing) return;
+
+    _isInitializing = true;
+
     try {
+      await ref.read(categoriesProvider.notifier).getCategories();
+
       final auth = ref.read(authProvider.notifier);
 
-      /// 1️⃣ Restore session
+      /// Restore session
       final session = await auth.restoreSession();
 
       if (session == null) {
@@ -33,7 +100,7 @@ class AppStartupController extends StateNotifier<AppStartupState> {
         return;
       }
 
-      /// 2️⃣ Refresh / validate
+      /// Refresh / validate
       final isValid = await auth.refreshSession();
 
       if (!isValid) {
@@ -41,41 +108,13 @@ class AppStartupController extends StateNotifier<AppStartupState> {
         return;
       }
 
-      /// 3️⃣ Fetch user profile
-       await ref
-          .read(userProfileProvider.notifier).getUserProfile();
-  
-  final profile = ref.watch(userProfileProvider).userProfile;
+      state = await loadAppData();
 
-      if (profile == null) {
-        state = AppStartupState.guest;
-        return;
-      }
-
-      /// 4️⃣ Load shared data
-      await Future.wait([
-        ref.read(categoriesProvider.notifier).getCategories(),
-        ref.read(locationProvider.notifier).loadAddresses(),
-      ]);
-
-      /// 5️⃣ Role-based loading
-      if (profile.role == "owner") {
-        await Future.wait([
-          ref.read(bookingProvider.notifier).getOwnerBookings(),
-          ref.read(equipmentProvider.notifier).getOwnerEquipment(),
-        ]);
-
-        state = AppStartupState.owner;
-      } else {
-        await Future.wait([
-          ref.read(bookingProvider.notifier).getUserBookings(),
-          ref.read(requestProvider.notifier).getUserRequests(),
-        ]);
-
-        state = AppStartupState.renter;
-      }
+      _initialized = true;
     } catch (e) {
       state = AppStartupState.error;
+    } finally {
+      _isInitializing = false;
     }
   }
 }

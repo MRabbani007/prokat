@@ -13,6 +13,10 @@ class EquipmentNotifier extends StateNotifier<EquipmentState> {
     state = state.copyWith(category: category);
   }
 
+  void selectEditEquipment(Equipment equipment) {
+    state = state.copyWith(editEquipment: equipment);
+  }
+
   Future<void> getOwnerEquipment() async {
     state = state.copyWith(isLoading: true, error: null);
 
@@ -73,6 +77,30 @@ class EquipmentNotifier extends StateNotifier<EquipmentState> {
       state = state.copyWith(ownerEquipment: updatedList);
     } catch (e) {
       state = state.copyWith(error: e.toString());
+    }
+  }
+
+  Future<bool> updateEquipmentLocation(
+    String id,
+    Map<String, dynamic> data,
+  ) async {
+    try {
+      final updated = await api.updateEquipmentLocation(id, data);
+
+      final updatedList = state.ownerEquipment.map((e) {
+        if (e.id == id) {
+          return updated;
+        }
+        return e;
+      }).toList();
+
+      state = state.copyWith(ownerEquipment: updatedList, editEquipment: updated);
+
+      return true;
+    } catch (e) {
+      print(e);
+      state = state.copyWith(error: e.toString());
+      return false;
     }
   }
 

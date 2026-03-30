@@ -15,8 +15,12 @@ class Equipment {
   final bool isVisible;
   final User? owner;
   final String? imageUrl;
+
   final List<PriceEntry> prices;
+
   final List<EquipmentLocation> locations;
+
+  final String? categoryId;
   final Category? category;
 
   Equipment({
@@ -31,6 +35,7 @@ class Equipment {
     this.imageUrl,
     required this.isVisible,
     this.owner,
+    this.categoryId,
     this.category,
     required this.locations,
     required this.prices,
@@ -72,24 +77,36 @@ class Equipment {
   factory Equipment.fromJson(Map<String, dynamic> json) {
     try {
       return Equipment(
-        id: json["id"],
-        name: json["name"],
-        model: json["model"],
+        id: json["id"] ?? '',
+        name: json["name"] ?? '',
+        model: json["model"] ?? '',
+
         capacity: json["capacity"].toString(),
         capacityUnit: json["capacityUnit"]?.toString() ?? '',
+
         ownerComment: json["ownerComment"],
         rentCondition: json["rentCondition"],
+
         status: json["status"],
+
         prices: (json["prices"] as List<dynamic>? ?? [])
             .map((e) => PriceEntry.fromJson(e as Map<String, dynamic>))
             .toList(),
+
         imageUrl: json["imageUrl"] as String?,
+
         isVisible: json["isVisible"],
+
         owner: json["owner"] != null ? User.fromJson(json["owner"]) : null,
+
         locations: (json['locations'] as List<dynamic>? ?? [])
             .map((e) => EquipmentLocation.fromJson(e as Map<String, dynamic>))
             .toList(),
-        category: json["category"] != null ? Category.fromJson(json["category"]) : null,
+
+        categoryId: json["categoryId"] ?? '',
+        category: json["category"] != null
+            ? Category.fromJson(json["category"])
+            : null,
       );
     } catch (e, stack) {
       print("❌ Equipment parsing failed");

@@ -14,8 +14,7 @@ class LoginWithUsernameForm extends ConsumerStatefulWidget {
       _LoginWithUsernameFormState();
 }
 
-class _LoginWithUsernameFormState
-    extends ConsumerState<LoginWithUsernameForm> {
+class _LoginWithUsernameFormState extends ConsumerState<LoginWithUsernameForm> {
   final usernameController = TextEditingController();
   final passwordController = TextEditingController();
 
@@ -27,15 +26,18 @@ class _LoginWithUsernameFormState
   }
 
   Future<void> _login() async {
-    try{
+    try {
+      final credentials = UsernamePasswordCredentials(
+        username: usernameController.text.trim(),
+        password: passwordController.text,
+      );
 
+      final res = await ref.read(authProvider.notifier).login(credentials);
 
-    final credentials = UsernamePasswordCredentials(username:usernameController.text.trim(), password: passwordController.text);
-
-    final res = await ref.read(authProvider.notifier).login(credentials);
-
-    if(res == true){context.push("/search/map");}
-        }catch(e){}
+      if (res == true) {
+        context.push("/search/map");
+      }
+    } catch (e) {}
   }
 
   @override

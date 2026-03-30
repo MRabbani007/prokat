@@ -1,6 +1,8 @@
 class ApiRoutes {
   static const categories = "/categories";
   static const equipment = "/equipment";
+  static const locations = "/locations";
+  static const ownerLocations = "/locations/owner";
   // User
   static const profile = "/user/profile";
   static const username = "/user/profile/username";

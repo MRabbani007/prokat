@@ -53,7 +53,7 @@ class _VisibilityStatusSectionState extends State<VisibilityStatusSection> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 const Text(
-                  "SYSTEM AVAILABILITY",
+                  "Status",
                   style: TextStyle(
                     color: ghostGray,
                     fontSize: 10,
@@ -65,7 +65,7 @@ class _VisibilityStatusSectionState extends State<VisibilityStatusSection> {
                   TextButton.icon(
                     onPressed: () => widget.onSave(_tempVisible, _tempStatus),
                     icon: const Icon(Icons.sync_rounded, size: 16),
-                    label: const Text("UPDATE STATE"),
+                    label: const Text("Save"),
                     style: TextButton.styleFrom(
                       foregroundColor: Colors.white,
                       backgroundColor: accentBlue,
@@ -89,8 +89,8 @@ class _VisibilityStatusSectionState extends State<VisibilityStatusSection> {
 
           // 1. Visibility Toggle Panel
           _IndustrialControlRow(
-            label: "MARKETPLACE VISIBILITY",
-            subtitle: _tempVisible ? "UNIT IS DISCOVERABLE" : "UNIT IS HIDDEN",
+            label: "Visible",
+            subtitle: _tempVisible ? "Visible" : "Hidden",
             trailing: Switch.adaptive(
               value: _tempVisible,
               activeColor: accentBlue,
@@ -102,7 +102,7 @@ class _VisibilityStatusSectionState extends State<VisibilityStatusSection> {
           const Padding(
             padding: EdgeInsets.fromLTRB(20, 16, 20, 8),
             child: Text(
-              "OPERATIONAL STATUS",
+              "Operating Status",
               style: TextStyle(
                 color: ghostGray,
                 fontSize: 9,
