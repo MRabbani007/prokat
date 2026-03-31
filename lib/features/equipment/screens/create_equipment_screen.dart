@@ -35,13 +35,22 @@ class _CreateEquipmentScreenState extends ConsumerState<CreateEquipmentScreen> {
     setState(() => _loading = true);
 
     try {
+      final equipmentState = ref.watch(equipmentProvider);
+      final category = equipmentState.category;
+
+      if(category ==null){
+        return;
+      }
+
       await ref.read(equipmentProvider.notifier).createEquipment({
         "name": _name.text.trim(),
         "model": _model.text.trim(),
         "capacity": int.tryParse(_capacity.text.trim()) ?? 0,
         "rentCondition": _rentCondition.text.trim(),
         "ownerComment": _ownerComment.text.trim(),
+        "categoryId": category.id,
       });
+      
       if (mounted) context.pop();
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -126,6 +135,7 @@ class _CreateEquipmentScreenState extends ConsumerState<CreateEquipmentScreen> {
                               controller: _capacity,
                               hint: "0",
                               isNumeric: true,
+                              suffixText: equipmentState.category?.capacityUnit,
                             ),
                             _AssetInputField(
                               label: "RENTAL CONDITIONS",
@@ -168,8 +178,8 @@ class _CreateEquipmentScreenState extends ConsumerState<CreateEquipmentScreen> {
                           style: ElevatedButton.styleFrom(
                             backgroundColor: accentBlue,
                             foregroundColor: Colors.white,
-                            disabledBackgroundColor: accentBlue.withOpacity(
-                              0.3,
+                            disabledBackgroundColor: accentBlue.withValues(
+                              alpha: 0.3,
                             ),
                             elevation: 0,
                             shape: RoundedRectangleBorder(
@@ -213,6 +223,7 @@ class _AssetInputField extends StatelessWidget {
   final String hint;
   final bool isNumeric;
   final bool isLast;
+  final String? suffixText;
   final String? Function(String?)? validator;
 
   const _AssetInputField({
@@ -222,10 +233,13 @@ class _AssetInputField extends StatelessWidget {
     this.isNumeric = false,
     this.isLast = false,
     this.validator,
+    this.suffixText,
   });
 
   @override
   Widget build(BuildContext context) {
+    const accentColor = Color(0xFF4E73DF);
+
     return Container(
       padding: const EdgeInsets.fromLTRB(20, 14, 20, 10),
       decoration: BoxDecoration(
@@ -246,31 +260,59 @@ class _AssetInputField extends StatelessWidget {
               fontWeight: FontWeight.bold,
             ),
           ),
-          TextFormField(
-            controller: controller,
-            validator: validator,
-            keyboardType: isNumeric ? TextInputType.number : TextInputType.text,
-            cursorColor: const Color(0xFF4E73DF),
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 16,
-              fontWeight: FontWeight.w500,
-            ),
-            decoration: InputDecoration(
-              hintText: hint,
-              hintStyle: TextStyle(
-                color: Colors.white.withOpacity(0.1),
-                fontSize: 14,
+          Row(
+            children: [
+              Expanded(
+                child: TextFormField(
+                  controller: controller,
+                  validator: validator,
+                  keyboardType: isNumeric
+                      ? TextInputType.number
+                      : TextInputType.text,
+                  cursorColor: const Color(0xFF4E73DF),
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w500,
+                  ),
+                  decoration: InputDecoration(
+                    hintText: hint,
+                    hintStyle: TextStyle(
+                      color: Colors.white.withValues(alpha: 0.1),
+                      fontSize: 14,
+                    ),
+                    isDense: true,
+                    contentPadding: const EdgeInsets.symmetric(vertical: 8),
+                    border: InputBorder.none,
+                    errorStyle: const TextStyle(
+                      color: Color(0xFFD97706),
+                      fontWeight: FontWeight.bold,
+                      fontSize: 10,
+                    ),
+                  ),
+                ),
               ),
-              isDense: true,
-              contentPadding: const EdgeInsets.symmetric(vertical: 8),
-              border: InputBorder.none,
-              errorStyle: const TextStyle(
-                color: Color(0xFFD97706),
-                fontWeight: FontWeight.bold,
-                fontSize: 10,
-              ),
-            ),
+              if (suffixText != null)
+                Container(
+                  margin: const EdgeInsets.only(left: 8),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 4,
+                  ),
+                  decoration: BoxDecoration(
+                    color: accentColor.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(6),
+                  ),
+                  child: Text(
+                    suffixText!,
+                    style: const TextStyle(
+                      color: accentColor,
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+            ],
           ),
         ],
       ),

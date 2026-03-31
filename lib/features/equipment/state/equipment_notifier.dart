@@ -35,8 +35,10 @@ class EquipmentNotifier extends StateNotifier<EquipmentState> {
     try {
       final equipment = await api.getRenterEquipment();
 
+      print(equipment.toString());
       state = state.copyWith(renterEquipment: equipment, isLoading: false);
     } catch (e) {
+      print(e.toString());
       state = state.copyWith(isLoading: false, error: e.toString());
     }
   }
@@ -57,6 +59,7 @@ class EquipmentNotifier extends StateNotifier<EquipmentState> {
       state = state.copyWith(
         ownerEquipment: [...state.ownerEquipment, newEquipment],
       );
+
     } catch (e) {
       state = state.copyWith(error: e.toString());
     }

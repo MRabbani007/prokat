@@ -191,7 +191,7 @@ class _EquipmentBookingScreenState
                     const SizedBox(height: 24),
 
                     /// 3. LOGISTICS (Address & Schedule)
-                    _buildSectionHeader("LOGISTICS"),
+                    _buildSectionHeader("Address & Schedule"),
                     AddressPickerCard(
                       selectedAddress: selectedAddress,
                       onTap: () => _openAddressSheet(context, ref),
@@ -255,7 +255,7 @@ class _EquipmentBookingScreenState
                     const SizedBox(height: 24),
 
                     /// 4. ADDITIONAL NOTES
-                    _buildSectionHeader("OPERATIONAL NOTES"),
+                    _buildSectionHeader("Note to Operator"),
                     TextField(
                       maxLines: 3,
                       style: const TextStyle(color: Colors.white, fontSize: 14),

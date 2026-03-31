@@ -1,17 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:prokat/features/auth/providers/auth_provider.dart';
+import 'package:prokat/features/auth/widgets/auth_button.dart';
+import 'package:prokat/features/auth/widgets/auth_text_field.dart';
+import 'package:go_router/go_router.dart';
 
 class RegisterWithUsernameForm extends ConsumerStatefulWidget {
-  const RegisterWithUsernameForm({super.key});
+  final Function(String?) onError;
+
+  const RegisterWithUsernameForm({super.key, required this.onError});
 
   @override
   ConsumerState<RegisterWithUsernameForm> createState() =>
       _RegisterWithUsernameFormState();
 }
 
-class _RegisterWithUsernameFormState
-    extends ConsumerState<RegisterWithUsernameForm> {
+class _RegisterWithUsernameFormState extends ConsumerState<RegisterWithUsernameForm> {
   final nameController = TextEditingController();
   final usernameController = TextEditingController();
   final passwordController = TextEditingController();
@@ -25,92 +29,85 @@ class _RegisterWithUsernameFormState
   }
 
   Future<void> _register() async {
-    List<String> name = nameController.text.trim().split(" ");
+    final fullName = nameController.text.trim();
+    final username = usernameController.text.trim();
+    final password = passwordController.text;
 
-    await ref
-        .read(authProvider.notifier)
-        .register(
-          "PASSWORD",
-          usernameController.text.trim(),
-          passwordController.text,
-          name[0],
-          name.length > 1 ? name[1] : "",
-        );
+    // 1. Frontend Validation: Prevent submission if empty
+    if (fullName.isEmpty || username.isEmpty || password.isEmpty) {
+      widget.onError("Please fill in all registration fields");
+      return;
+    }
+
+    // Clear previous errors
+    widget.onError(null);
+
+    try {
+      List<String> nameParts = fullName.split(" ");
+      String firstName = nameParts[0];
+      String lastName = nameParts.length > 1 ? nameParts.sublist(1).join(" ") : "";
+
+      final success = await ref.read(authProvider.notifier).register(
+            "PASSWORD",
+            username,
+            password,
+            firstName,
+            lastName,
+          );
+
+      if (success == true && mounted) {
+        context.push("/search/map");
+      }
+    } catch (e) {
+      // 2. Handle Backend/Connection Errors
+      widget.onError(e.toString().replaceAll('Exception: ', ''));
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     final authState = ref.watch(authProvider);
 
-    ref.listen(authProvider, (_, next) {
-      if (next.error != null) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text(next.error!)));
-      }
-    });
-
     return SingleChildScrollView(
+      physics: const BouncingScrollPhysics(),
       child: Column(
         children: [
-          const SizedBox(height: 40),
+          const SizedBox(height: 20),
 
-          _field("Full Name", Icons.person_outline, nameController),
+          AuthTextField(
+            label: "Full Name",
+            icon: Icons.person_outline,
+            controller: nameController,
+          ),
 
           const SizedBox(height: 16),
 
-          _field("Username", Icons.alternate_email, usernameController),
+          AuthTextField(
+            label: "Username",
+            icon: Icons.alternate_email,
+            controller: usernameController,
+          ),
 
           const SizedBox(height: 16),
 
-          _field(
-            "Password",
-            Icons.lock_outline,
-            passwordController,
+          AuthTextField(
+            label: "Password",
+            icon: Icons.lock_outline,
+            controller: passwordController,
             isPassword: true,
           ),
 
           const SizedBox(height: 24),
 
-          _button(authState.isLoading),
+          AuthButton(
+            loading: authState.isLoading,
+            text: "CREATE ACCOUNT",
+            loadingText: "CREATING...",
+            onPressed: _register,
+          ),
+          
+          const SizedBox(height: 20),
         ],
-      ),
-    );
-  }
-
-  Widget _field(
-    String label,
-    IconData icon,
-    TextEditingController controller, {
-    bool isPassword = false,
-  }) {
-    return TextField(
-      controller: controller,
-      obscureText: isPassword,
-      decoration: InputDecoration(
-        labelText: label,
-        prefixIcon: Icon(icon, size: 20),
-        filled: true,
-        fillColor: Colors.grey[50],
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(16),
-          borderSide: BorderSide.none,
-        ),
-      ),
-    );
-  }
-
-  Widget _button(bool loading) {
-    return ElevatedButton(
-      style: ElevatedButton.styleFrom(
-        backgroundColor: Colors.black,
-        minimumSize: const Size(double.infinity, 56),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      ),
-      onPressed: loading ? null : _register,
-      child: Text(
-        loading ? "Creating..." : "CREATE ACCOUNT",
-        style: const TextStyle(color: Colors.white),
       ),
     );
   }

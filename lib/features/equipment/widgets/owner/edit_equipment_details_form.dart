@@ -87,13 +87,13 @@ class _EditEquipmentDetailsFormState extends State<EditEquipmentDetailsForm> {
           _isSaving = false;
         });
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("EQUIPMENT DATABASE UPDATED")),
+          const SnackBar(content: Text("Equipment Updated")),
         );
       }
     } catch (e) {
       setState(() => _isSaving = false);
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("UPDATE FAILED: CONNECTION ERROR")),
+        const SnackBar(content: Text("Update Failed!")),
       );
     }
   }

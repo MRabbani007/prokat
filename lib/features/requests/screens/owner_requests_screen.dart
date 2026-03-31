@@ -50,13 +50,6 @@ class _OwnerRequestsScreenState extends ConsumerState<OwnerRequestsScreen> {
       offersByRequest[requestId]!.add(offer);
     }
 
-    print("owner_requests_screen");
-    print(offersByRequest);
-
-    // final past = state.requests
-    //     .where((r) => ["ACCEPTED", "CANCELLED", "EXPIRED"].contains(r.status))
-    //     .toList();
-
     return Scaffold(
       backgroundColor: const Color(0xFF121417),
       body: SafeArea(

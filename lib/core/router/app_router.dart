@@ -2,6 +2,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:prokat/core/router/app_routes.dart';
 import 'package:prokat/core/router/refresh_stream.dart';
+import 'package:prokat/features/appstartup/app_startup_provider.dart';
+import 'package:prokat/features/appstatic/screens/error_screen.dart';
 import 'package:prokat/features/auth/providers/auth_provider.dart';
 import 'package:prokat/features/auth/screens/register_screen.dart';
 import 'package:prokat/features/bookings/screens/equipment_booking_screen.dart';
@@ -44,11 +46,20 @@ GoRouter createRouter(WidgetRef ref) {
 
     /// 🔁 REFRESH WHEN AUTH CHANGES
     refreshListenable: GoRouterRefreshStream(
-      ref.watch(authProvider.notifier).stream,
+      // ref.watch(authProvider.notifier).stream,
+      ref.watch(appStartupProvider.notifier).stream,
     ),
 
     /// 🔐 AUTH GUARD
     redirect: (context, state) {
+      final startupState = ref.read(appStartupProvider);
+
+      if (startupState == AppStartupState.loading) {
+        return '/launch';
+      } else if (startupState == AppStartupState.error) {
+        return '/error';
+      }
+
       final authState = ref.read(authProvider);
       final isLoggedIn = authState.isAuthenticated;
       final role = authState.session?.user?.role;
@@ -59,8 +70,8 @@ GoRouter createRouter(WidgetRef ref) {
       final requiresAuth = <String>[
         AppRoutes.profile,
         AppRoutes.settings,
-        AppRoutes.favorites,
-        AppRoutes.myRentals,
+        // AppRoutes.favorites,
+        // AppRoutes.myRentals,
       ].any((path) => location.startsWith(path));
 
       /// 🔒 BOOKING (nested route)
@@ -91,6 +102,7 @@ GoRouter createRouter(WidgetRef ref) {
     routes: [
       /// 🚀 PUBLIC
       GoRoute(path: AppRoutes.launch, builder: (_, _) => const LaunchScreen()),
+      GoRoute(path: AppRoutes.error, builder: (_, _) => const ErrorScreen()),
 
       /// 🧱 MAIN APP
       StatefulShellRoute.indexedStack(
@@ -154,7 +166,7 @@ GoRouter createRouter(WidgetRef ref) {
                     path: 'book',
                     builder: (context, state) {
                       final id = state.pathParameters['id']!;
-                      return EquipmentBookingScreen(equipmentId: id);//
+                      return EquipmentBookingScreen(equipmentId: id); //
                     },
                   ),
                 ],
@@ -169,7 +181,7 @@ GoRouter createRouter(WidgetRef ref) {
                   GoRoute(
                     path: 'pintomap',
                     builder: (context, state) {
-                      return MapRenterPinAddressScreen();//
+                      return MapRenterPinAddressScreen(); //
                     },
                   ),
                 ],
@@ -247,7 +259,8 @@ GoRouter createRouter(WidgetRef ref) {
               GoRoute(
                 path: AppRoutes.ownerAddressMap,
                 builder: (context, state) {
-                  final equipmentId = state.uri.queryParameters['equipmentId'] ?? "";
+                  final equipmentId =
+                      state.uri.queryParameters['equipmentId'] ?? "";
                   return MapOwnerPinLocationScreen(equipmentId: equipmentId);
                 },
               ),

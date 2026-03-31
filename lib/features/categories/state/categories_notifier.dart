@@ -7,7 +7,7 @@ class CategoriesNotifier extends StateNotifier<CategoryState> {
   final CategoryService service;
 
   CategoriesNotifier(this.service) : super(CategoryState()){
-    getCategories();
+    // getCategories();
   }
 
   void selectCategory(Category category) {

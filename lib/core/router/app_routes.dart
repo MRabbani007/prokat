@@ -1,6 +1,7 @@
 class AppRoutes {
   // Public
   static const String launch = '/';
+  static const String error = '/error';
   static const String landing = '/landing';
 
   // Auth

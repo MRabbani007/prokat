@@ -5,20 +5,25 @@ class RegisterHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Column(
+    // Define theme constants locally or use your global ones
+    const ghostGray = Color(0x4DFFFFFF); // White @ 30%
+
+    return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
+      children: const [
         Text(
           "Get Started",
           style: TextStyle(
+            color: Colors.white, // Pop against bgColor
             fontSize: 32,
             fontWeight: FontWeight.bold,
             letterSpacing: -1,
           ),
         ),
+        SizedBox(height: 4), // Tight industrial spacing
         Text(
           "Select your preferred registration method",
-          style: TextStyle(color: Colors.grey, fontSize: 16),
+          style: TextStyle(color: ghostGray, fontSize: 16),
         ),
       ],
     );

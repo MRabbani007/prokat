@@ -15,23 +15,3 @@ void main() {
   runApp(const ProviderScope(child: MyApp()));
 }
 
-// class AppInitializer extends ConsumerWidget {
-//   final Widget child;
-
-//   const AppInitializer({required this.child, super.key});
-
-//   @override
-//   Widget build(BuildContext context, WidgetRef ref) {
-//     final profileAsync = ref.watch(userProfileProvider);
-
-//     return profileAsync.when(
-//       loading: () => const SplashScreen(),
-//       error: (e, _) => ErrorScreen(e),
-//       data: (_) => child,
-//     );
-//   }
-// }
-
-// AppInitializer(
-//   child: MyApp(),
-// )

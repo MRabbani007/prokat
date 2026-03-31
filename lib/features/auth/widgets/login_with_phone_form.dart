@@ -6,19 +6,28 @@ import '../widgets/auth_button.dart';
 import 'otp_verification_form.dart';
 
 class LoginWithPhoneForm extends ConsumerStatefulWidget {
-  const LoginWithPhoneForm({super.key});
+  final Function(String?) onError;
+
+  const LoginWithPhoneForm({super.key, required this.onError});
 
   @override
   ConsumerState<LoginWithPhoneForm> createState() => _LoginWithPhoneFormState();
 }
 
 class _LoginWithPhoneFormState extends ConsumerState<LoginWithPhoneForm> {
-  final phoneController = TextEditingController();
+  final phoneController = TextEditingController(text: "+7");
 
   bool showOtp = false;
   String phone = "";
 
+  @override
+  void dispose() {
+    phoneController.dispose();
+    super.dispose();
+  }
+
   bool isValidKazakhstanPhone(String phone) {
+    // Matches +7 followed by 10 digits
     final regex = RegExp(r'^\+7\d{10}$');
     return regex.hasMatch(phone);
   }
@@ -26,22 +35,34 @@ class _LoginWithPhoneFormState extends ConsumerState<LoginWithPhoneForm> {
   Future<void> requestOtp() async {
     final value = phoneController.text.trim();
 
-    if (!isValidKazakhstanPhone(value)) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Enter a valid Kazakhstan phone number")),
-      );
+    // 1. Frontend Validation: No submit if empty or invalid
+    if (value == "+7" || value.isEmpty) {
+      widget.onError("Please enter your phone number");
       return;
     }
 
-    final success = await ref
-        .read(authProvider.notifier)
-        .requestOtp(value);
+    if (!isValidKazakhstanPhone(value)) {
+      widget.onError("Enter a valid Kazakhstan phone (+7XXXXXXXXXX)");
+      return;
+    }
 
-    if (success) {
-      setState(() {
-        phone = value;
-        showOtp = true;
-      });
+    // Clear previous errors
+    widget.onError(null);
+
+    try {
+      final success = await ref.read(authProvider.notifier).requestOtp(value);
+
+      if (success) {
+        setState(() {
+          phone = value;
+          showOtp = true;
+        });
+      } else {
+        widget.onError("Failed to send OTP. Please try again.");
+      }
+    } catch (e) {
+      // 2. Handle Backend/Connection Errors
+      widget.onError(e.toString().replaceAll('Exception: ', ''));
     }
   }
 
@@ -50,12 +71,13 @@ class _LoginWithPhoneFormState extends ConsumerState<LoginWithPhoneForm> {
     final authState = ref.watch(authProvider);
 
     if (showOtp) {
-      return OtpVerificationForm(phone: phone);
+      // Passing onError to the next form as well
+      return OtpVerificationForm(phone: phone, onError: widget.onError);
     }
 
     return Column(
       children: [
-        const SizedBox(height: 40),
+        const SizedBox(height: 20),
 
         AuthTextField(
           label: "Phone Number",
@@ -68,7 +90,7 @@ class _LoginWithPhoneFormState extends ConsumerState<LoginWithPhoneForm> {
 
         AuthButton(
           loading: authState.isLoading,
-          text: "CONTINUE WITH OTP",
+          text: "Send Otp",
           loadingText: "Sending...",
           onPressed: requestOtp,
         ),

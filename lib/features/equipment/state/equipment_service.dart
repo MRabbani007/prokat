@@ -20,27 +20,28 @@ class EquipmentService {
         return <Equipment>[];
       }
 
+
       final parsed = data
           .whereType<Map<String, dynamic>>() // safety check
           .map((json) => Equipment.fromJson(json))
-          .where(
-            (e) =>
-                e.isVisible &&
-                e.locations.isNotEmpty &&
-                e.locations.first.latitude != null &&
-                e.locations.first.longitude != null,
-          )
+          // .where(
+          //   (e) =>
+          //       e.isVisible &&
+          //       e.location != null &&
+          //       e.location?.latitude != null &&
+          //       e.location?.longitude != null,
+          // )
           .toList();
 
       return parsed;
     } catch (e) {
-      return <Equipment>[];
+      throw Exception(e);
     }
   }
 
   Future<List<Equipment>> getOwnerEquipment() async {
     try {
-      final response = await _dio.get(ApiRoutes.equipment);
+      final response = await _dio.get(ApiRoutes.ownerEquipment);
 
       final List data = response.data["data"];
 

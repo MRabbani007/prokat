@@ -74,7 +74,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
   }
 
   /// REGISTER USER
-  Future<void> register(
+  Future<bool> register(
     String method,
     String username,
     String password,
@@ -96,8 +96,12 @@ class AuthNotifier extends StateNotifier<AuthState> {
       await storage.saveSession(session);
 
       state = state.copyWith(session: session, isLoading: false);
+
+      return true;
     } catch (e) {
       state = state.copyWith(isLoading: false, error: 'Registration failed');
+
+      return false;
     }
   }
 

@@ -28,24 +28,33 @@ class BookingApiService {
       return (res.data["data"] as List)
           .map((e) => BookingModel.fromJson(e))
           .toList();
-          
     } catch (e) {
       print(e);
       return [];
     }
   }
 
-  Future<BookingModel?> createBooking(BookingModel booking) async {
+  Future<bool> createBooking(Map<String, dynamic> data) async {
     try {
-      final res = await _dio.post("/bookings", data: booking.toJson());
+      print(data.toString());
+      final res = await _dio.post("/bookings", data: data);
+
+      print(res.toString());
 
       if (res.statusCode == 200 || res.statusCode == 201) {
-        return BookingModel.fromJson(res.data["data"]);
+        return true;
       }
 
-      return null;
+      return false;
     } catch (e) {
-      return null;
+      if (e is DioException) {
+        print("❌ DIO ERROR: ${e.message}");
+        print("❌ STATUS: ${e.response?.statusCode}");
+        print("❌ DATA: ${e.response?.data}");
+      } else {
+        print("❌ ERROR: $e");
+      }
+      return false;
     }
   }
 
@@ -56,7 +65,6 @@ class BookingApiService {
     try {
       print("updating");
       final res = await _dio.patch("/bookings/$id/status", data: data);
-
 
       if (res.statusCode == 200 || res.statusCode == 201) {
         return BookingModel.fromJson(res.data["data"]);

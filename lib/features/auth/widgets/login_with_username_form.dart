@@ -7,7 +7,9 @@ import '../widgets/auth_text_field.dart';
 import 'package:go_router/go_router.dart';
 
 class LoginWithUsernameForm extends ConsumerStatefulWidget {
-  const LoginWithUsernameForm({super.key});
+  final Function(String?) onError;
+
+  const LoginWithUsernameForm({super.key, required this.onError});
 
   @override
   ConsumerState<LoginWithUsernameForm> createState() =>
@@ -27,17 +29,32 @@ class _LoginWithUsernameFormState extends ConsumerState<LoginWithUsernameForm> {
 
   Future<void> _login() async {
     try {
+      final username = usernameController.text.trim();
+      final password = passwordController.text;
+
+      if (username.isEmpty || password.isEmpty) {
+        widget.onError("Please enter both username and password");
+        return;
+      }
+
+      widget.onError(null);
+
       final credentials = UsernamePasswordCredentials(
-        username: usernameController.text.trim(),
-        password: passwordController.text,
+        username: username,
+        password: password,
       );
 
       final res = await ref.read(authProvider.notifier).login(credentials);
 
       if (res == true) {
-        context.push("/search/map");
+        if (mounted) context.push("/search/map");
+      } else {
+        // Handle case where res is false but no exception was thrown
+        widget.onError("Invalid username or password");
       }
-    } catch (e) {}
+    } catch (e) {
+      widget.onError(e.toString().replaceAll('Exception: ', ''));
+    }
   }
 
   @override
@@ -46,12 +63,14 @@ class _LoginWithUsernameFormState extends ConsumerState<LoginWithUsernameForm> {
 
     return Column(
       children: [
-        const SizedBox(height: 40),
+        const SizedBox(height: 20),
 
         AuthTextField(
           label: "Username",
           icon: Icons.alternate_email,
           controller: usernameController,
+          // fillColor: Colors.white.withOpacity(0.05)
+          // textColor: Colors.white
         ),
 
         const SizedBox(height: 16),
@@ -70,6 +89,7 @@ class _LoginWithUsernameFormState extends ConsumerState<LoginWithUsernameForm> {
           text: "LOGIN",
           loadingText: "Signing in...",
           onPressed: _login,
+          // Button should use accentColor (0xFF4E73DF)
         ),
       ],
     );

@@ -47,9 +47,7 @@ class EquipmentListTile extends StatelessWidget {
     final priceEntry = equipment.prices.isNotEmpty
         ? equipment.prices.first
         : null;
-    final location = equipment.locations.isNotEmpty
-        ? equipment.locations.first
-        : null;
+    final location = equipment.location;
 
     return Container(
       margin: const EdgeInsets.only(bottom: 4), // Small gap if used in ListView

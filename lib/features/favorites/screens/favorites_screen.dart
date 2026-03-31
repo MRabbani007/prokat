@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:prokat/core/widgets/page_header.dart';
+import 'package:prokat/features/auth/providers/auth_provider.dart';
+import 'package:prokat/features/equipment/models/equipment_model.dart';
 import 'package:prokat/features/equipment/providers/equipment_provider.dart';
 import 'package:prokat/features/favorites/state/favorites_provider.dart';
 
@@ -18,7 +20,9 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
     super.initState();
 
     Future.microtask(() {
-      ref.invalidate(favoriteProvider); // refetch ONCE when entering screen
+      ref
+          .read(favoriteProvider.notifier)
+          .getFavorites(); // refetch ONCE when entering screen
     });
   }
 
@@ -28,6 +32,8 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final authSession = ref.watch(authProvider).session;
+
     final favoritesState = ref.watch(favoriteProvider);
     final equipmentState = ref.watch(equipmentProvider);
 
@@ -48,15 +54,37 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
           children: [
             const PageHeader(title: "Favorites"),
 
-            Expanded(
-              child: isLoading
-                  ? const Center(child: CircularProgressIndicator())
-                  : error != null
-                  ? Center(child: Text("Error: ${error}"))
-                  : equipmentState.renterEquipment.isEmpty
-                  ? _buildEmptyState(context)
-                  : _buildList(context, ref, favorites),
-            ),
+            authSession == null
+                ? Expanded(
+                    child: Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.login_outlined,
+                            size: 64,
+                            color: Colors.white.withValues(alpha: 0.2),
+                          ),
+                          const SizedBox(height: 16),
+                          Text(
+                            "Login to add and view favorites",
+                            style: TextStyle(
+                              color: Colors.white.withValues(alpha: 0.70),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  )
+                : Expanded(
+                    child: isLoading
+                        ? const Center(child: CircularProgressIndicator())
+                        : error != null
+                        ? Center(child: Text("Error: $error"))
+                        : equipmentState.renterEquipment.isEmpty
+                        ? _buildEmptyState(context)
+                        : _buildList(context, ref, favorites),
+                  ),
           ],
         ),
       ),
@@ -147,7 +175,7 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
 }
 
 class _FavoriteCard extends StatelessWidget {
-  final dynamic equipment;
+  final Equipment equipment;
   final Color accentColor;
   final Color cardColor;
   final VoidCallback onTap;
@@ -161,8 +189,8 @@ class _FavoriteCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final location = equipment.locations.isNotEmpty
-        ? "${equipment.locations.first.city}"
+    final location = equipment.location != null
+        ? "${equipment.location?.city}"
         : "Unknown location";
 
     final price = equipment.prices.isNotEmpty

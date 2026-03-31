@@ -18,7 +18,7 @@ class Equipment {
 
   final List<PriceEntry> prices;
 
-  final List<EquipmentLocation> locations;
+  final EquipmentLocation? location;
 
   final String? categoryId;
   final Category? category;
@@ -37,7 +37,7 @@ class Equipment {
     this.owner,
     this.categoryId,
     this.category,
-    required this.locations,
+     this.location,
     required this.prices,
   });
 
@@ -67,8 +67,8 @@ class Equipment {
       data["prices"] = prices.map((e) => e.toJson()).toList();
     }
 
-    if (locations.isNotEmpty) {
-      data["locations"] = locations.map((e) => e.toJson()).toList();
+    if (location != null) {
+      data["location"] = location;
     }
 
     return data;
@@ -99,9 +99,7 @@ class Equipment {
 
         owner: json["owner"] != null ? User.fromJson(json["owner"]) : null,
 
-        locations: (json['locations'] as List<dynamic>? ?? [])
-            .map((e) => EquipmentLocation.fromJson(e as Map<String, dynamic>))
-            .toList(),
+        location: json['location'] !=null ? EquipmentLocation.fromJson(json['location']) : null,
 
         categoryId: json["categoryId"] ?? '',
         category: json["category"] != null

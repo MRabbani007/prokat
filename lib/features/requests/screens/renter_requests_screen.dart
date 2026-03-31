@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:prokat/core/widgets/page_header.dart';
+import 'package:prokat/features/auth/providers/auth_provider.dart';
 import 'package:prokat/features/offers/providers/offers_provider.dart';
 import 'package:prokat/features/requests/providers/request_provider.dart';
 import 'package:prokat/features/requests/widgets.dart/request_with_offers.dart';
@@ -27,6 +28,7 @@ class _RenterRequestsScreenState extends ConsumerState<RenterRequestsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final authSession = ref.watch(authProvider).session;
     final state = ref.watch(requestProvider);
     final offersState = ref.watch(offersProvider);
     const bgColor = Color(0xFF121417);
@@ -52,10 +54,6 @@ class _RenterRequestsScreenState extends ConsumerState<RenterRequestsScreen> {
       offersByRequest[requestId]!.add(offer);
     }
 
-    // final past = state.requests
-    //     .where((r) => ["ACCEPTED", "CANCELLED", "EXPIRED"].contains(r.status))
-    //     .toList();
-
     return Scaffold(
       backgroundColor: bgColor,
       body: SafeArea(
@@ -66,11 +64,14 @@ class _RenterRequestsScreenState extends ConsumerState<RenterRequestsScreen> {
               padding: const EdgeInsets.only(right: 12.0),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   const Expanded(child: PageHeader(title: "My Requests")),
                   // Small technical Archive button
                   IconButton(
-                    onPressed: () => context.push('/requests/history'),
+                    onPressed: () => authSession == null
+                        ? null
+                        : context.push('/requests/history'),
                     icon: const Icon(
                       Icons.history_toggle_off_rounded,
                       color: Color(0x4DFFFFFF),
@@ -82,15 +83,100 @@ class _RenterRequestsScreenState extends ConsumerState<RenterRequestsScreen> {
               ),
             ),
 
-            Expanded(
-              child: _buildContent(
-                context,
-                ref,
-                state,
-                active,
-                offersByRequest,
-              ),
-            ),
+            authSession == null
+                ? Expanded(
+                    child: Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.login_outlined,
+                            size: 64,
+                            color: Colors.white.withValues(alpha: 0.2),
+                          ),
+                          const SizedBox(height: 16),
+                          Text(
+                            "Login to create and view requests",
+                            style: TextStyle(
+                              color: Colors.white.withValues(alpha: 0.70),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  )
+                : Expanded(
+                    child: state.isLoading
+                        ? const Center(
+                            child: CircularProgressIndicator(
+                              color: Color(0xFF4E73DF),
+                            ),
+                          )
+                        : state.error != null
+                        ? Center(
+                            child: Text(
+                              "Error: ${state.error}",
+                              style: const TextStyle(color: Colors.redAccent),
+                            ),
+                          )
+                        : state.requests.isEmpty
+                        ? Center(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(
+                                  Icons.description_outlined,
+                                  size: 64,
+                                  color: Colors.white.withValues(alpha: 0.1),
+                                ),
+                                const SizedBox(height: 16),
+                                Text(
+                                  "No requests found",
+                                  style: TextStyle(
+                                    color: Colors.white.withValues(alpha: 0.90),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          )
+                        : ListView(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 20,
+                              vertical: 10,
+                            ),
+                            children: [
+                              if (active.isNotEmpty) ...[
+                                Text(
+                                  "ACTIVE REQUESTS",
+                                  style: TextStyle(
+                                    color: Colors.white.withValues(alpha: 0.3),
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.bold,
+                                    letterSpacing: 1.5,
+                                  ),
+                                ),
+
+                                const SizedBox(height: 12),
+                                ...active.map((r) {
+                                  final requestOffers =
+                                      offersByRequest[r.id] ?? [];
+
+                                  return Padding(
+                                    padding: const EdgeInsets.only(bottom: 12),
+                                    child: RequestWithOffers(
+                                      request: r,
+                                      offers: requestOffers,
+                                      onCancel: () => ref
+                                          .read(requestProvider.notifier)
+                                          .cancelRequest(r.id),
+                                    ),
+                                  );
+                                }),
+                                const SizedBox(height: 24),
+                              ],
+                            ],
+                          ),
+                  ),
 
             /// ➕ CREATE REQUEST FOOTER
             Container(
@@ -105,7 +191,9 @@ class _RenterRequestsScreenState extends ConsumerState<RenterRequestsScreen> {
                 width: double.infinity,
                 height: 56,
                 child: ElevatedButton.icon(
-                  onPressed: () => context.push('/requests/create'),
+                  onPressed: () => authSession == null
+                      ? null
+                      : context.push('/requests/create'),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: accentColor,
                     foregroundColor: Colors.white,
@@ -127,101 +215,6 @@ class _RenterRequestsScreenState extends ConsumerState<RenterRequestsScreen> {
             ),
           ],
         ),
-      ),
-    );
-  }
-
-  Widget _buildContent(
-    BuildContext context,
-    WidgetRef ref,
-    state,
-    active,
-    offersByRequest,
-  ) {
-    if (state.isLoading) {
-      return const Center(
-        child: CircularProgressIndicator(color: Color(0xFF4E73DF)),
-      );
-    }
-
-    if (state.error != null) {
-      return Center(
-        child: Text(
-          "Error: ${state.error}",
-          style: const TextStyle(color: Colors.redAccent),
-        ),
-      );
-    }
-
-    if (state.requests.isEmpty) {
-      return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              Icons.description_outlined,
-              size: 64,
-              color: Colors.white.withValues(alpha: 0.1),
-            ),
-            const SizedBox(height: 16),
-            Text(
-              "No requests found",
-              style: TextStyle(color: Colors.white.withValues(alpha: 0.3)),
-            ),
-          ],
-        ),
-      );
-    }
-
-    return ListView(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-      children: [
-        if (active.isNotEmpty) ...[
-          _SectionLabel(label: "ACTIVE REQUESTS"),
-          const SizedBox(height: 12),
-          ...active.map((r) {
-            final requestOffers = offersByRequest[r.id] ?? [];
-
-            return Padding(
-              padding: const EdgeInsets.only(bottom: 12),
-              child: RequestWithOffers(
-                request: r,
-                offers: requestOffers,
-                onCancel: () =>
-                    ref.read(requestProvider.notifier).cancelRequest(r.id),
-              ),
-            );
-          }),
-          const SizedBox(height: 24),
-        ],
-        // if (past.isNotEmpty) ...[
-        //   _SectionLabel(label: "PAST HISTORY"),
-        //   const SizedBox(height: 12),
-        //   ...past.map(
-        //     (r) => Padding(
-        //       padding: const EdgeInsets.only(bottom: 12),
-        //       child: RequestTile(request: r),
-        //     ),
-        //   ),
-        // ],
-      ],
-    );
-  }
-}
-
-class _SectionLabel extends StatelessWidget {
-  final String label;
-  const _SectionLabel({required this.label});
-
-  @override
-  Widget build(BuildContext context) {
-    return Text(
-      label,
-      style: TextStyle(
-        color: Colors.white.withValues(alpha: 0.3),
-        fontSize: 11,
-        fontWeight: FontWeight.bold,
-        letterSpacing: 1.5,
       ),
     );
   }

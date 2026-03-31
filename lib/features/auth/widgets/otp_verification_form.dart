@@ -1,15 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:prokat/core/router/app_routes.dart';
 import 'package:prokat/features/auth/providers/auth_provider.dart';
 import '../widgets/auth_button.dart';
 import '../widgets/otp_field.dart';
 
 class OtpVerificationForm extends ConsumerStatefulWidget {
   final String phone;
+  final Function(String?) onError;
 
-  const OtpVerificationForm({super.key, required this.phone});
+  const OtpVerificationForm({
+    super.key,
+    required this.phone,
+    required this.onError,
+  });
 
   @override
   ConsumerState<OtpVerificationForm> createState() =>
@@ -22,19 +26,33 @@ class _OtpVerificationFormState extends ConsumerState<OtpVerificationForm> {
   Future<void> verifyOtp() async {
     final otp = otpController.text.trim();
 
-    if (otp.length != 6) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Enter valid OTP")),
-      );
+    // 1. Frontend Validation
+    if (otp.isEmpty) {
+      widget.onError("Please enter the verification code");
       return;
     }
 
-    final success = await ref
-        .read(authProvider.notifier)
-        .verifyOtp(widget.phone, otp);
+    if (otp.length != 6) {
+      widget.onError("The OTP must be 6 digits");
+      return;
+    }
 
-    if (success !=null && mounted) {
-      context.go(AppRoutes.main);
+    // Clear previous errors
+    widget.onError(null);
+
+    try {
+      final success = await ref
+          .read(authProvider.notifier)
+          .verifyOtp(widget.phone, otp);
+
+      if (success != null) {
+        if (mounted) context.go('/search/map');
+      } else {
+        widget.onError("Invalid or expired OTP");
+      }
+    } catch (e) {
+      // 2. Handle Backend/Network Errors
+      widget.onError(e.toString().replaceAll('Exception: ', ''));
     }
   }
 
@@ -44,24 +62,51 @@ class _OtpVerificationFormState extends ConsumerState<OtpVerificationForm> {
 
     return Column(
       children: [
-        const SizedBox(height: 40),
+        const SizedBox(height: 20),
 
         Text(
-          "Enter the OTP sent to ${widget.phone}",
-          style: const TextStyle(color: Colors.grey),
+          "Enter the 6-digit code sent to ${widget.phone}",
+          style: TextStyle(
+            color: Colors.white.withValues(alpha: 0.5),
+            fontSize: 14,
+          ),
+        ),
+        Text(
+          widget.phone,
+          style: const TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+
+        const SizedBox(height: 24),
+
+        OtpField(controller: otpController),
+
+        const SizedBox(height: 32),
+
+        AuthButton(
+          loading: authState.isLoading,
+          text: "Verify Otp",
+          loadingText: "Verifying...",
+          onPressed: verifyOtp,
         ),
 
         const SizedBox(height: 16),
 
-        OtpField(controller: otpController),
-
-        const SizedBox(height: 24),
-
-        AuthButton(
-          loading: authState.isLoading,
-          text: "VERIFY OTP",
-          loadingText: "Verifying...",
-          onPressed: verifyOtp,
+        Center(
+          child: TextButton(
+            onPressed: authState.isLoading
+                ? null
+                : () => Navigator.of(context).pop(),
+            child: const Text(
+              "Change Phone Number",
+              style: TextStyle(
+                color: Color(0xFF4E73DF),
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
         ),
       ],
     );

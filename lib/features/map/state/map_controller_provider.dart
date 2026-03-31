@@ -180,16 +180,16 @@ class MapController {
     final List<PointAnnotationOptions> optionsList = [];
 
     for (final equipment in equipments) {
-      if (equipment.locations.isEmpty) continue;
+      if (equipment.location == null) continue;
 
-      final location = equipment.locations.first;
+      final location = equipment.location;
 
       optionsList.add(
         PointAnnotationOptions(
           geometry: Point(
             coordinates: Position(
-              location.longitude ?? 0,
-              location.latitude ?? 0,
+              location?.longitude ?? 0,
+              location?.latitude ?? 0,
             ),
           ),
           // Provide the iconImage ID registered above

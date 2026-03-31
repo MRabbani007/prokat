@@ -125,7 +125,7 @@ class _OwnerHeader extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          const Expanded(child: PageHeader(title: "Fleet Ops")),
+          const Expanded(child: PageHeader(title: "Bookings")),
           // Small technical Archive button
           IconButton(
             onPressed: onArchiveTap,

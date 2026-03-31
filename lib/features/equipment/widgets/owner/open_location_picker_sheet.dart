@@ -140,14 +140,12 @@ class _LocationActionTile extends StatelessWidget {
   final String title;
   final String subtitle;
   final VoidCallback onTap;
-  final bool isLast;
 
   const _LocationActionTile({
     required this.icon,
     required this.title,
     required this.subtitle,
     required this.onTap,
-    this.isLast = false,
   });
 
   @override

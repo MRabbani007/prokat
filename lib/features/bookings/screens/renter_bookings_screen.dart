@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:prokat/core/widgets/page_header.dart';
+import 'package:prokat/features/auth/providers/auth_provider.dart';
 import 'package:prokat/features/bookings/state/booking_provider.dart';
 import 'package:prokat/features/bookings/widgets/booking_card.dart';
 
@@ -21,13 +22,68 @@ class _RenterBookingsScreenState extends ConsumerState<RenterBookingsScreen>
   final bgColor = const Color(0xFF121417);
   final accentColor = const Color(0xFF4E73DF);
 
+  Widget _buildTabs(List upcoming, List history) {
+    return Column(
+      children: [
+        Container(
+          margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+          height: 48,
+          decoration: BoxDecoration(
+            color: Colors.white.withValues(alpha: 0.03),
+            borderRadius: BorderRadius.circular(14),
+            border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
+          ),
+          child: TabBar(
+            controller: _tabController,
+            indicatorSize: TabBarIndicatorSize.tab,
+            dividerColor: Colors.transparent,
+            indicator: BoxDecoration(
+              color: const Color(0xFF1E2125), // Lighter charcoal for active tab
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.3),
+                  blurRadius: 4,
+                  offset: const Offset(0, 2),
+                ),
+              ],
+            ),
+            labelColor: Colors.white,
+            unselectedLabelColor: Colors.white.withValues(alpha: 0.3),
+            labelStyle: const TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 13,
+              letterSpacing: 0.5,
+            ),
+            tabs: const [
+              Tab(text: 'UPCOMING'),
+              Tab(text: 'HISTORY'),
+            ],
+          ),
+        ),
+
+        Expanded(
+          child: TabBarView(
+            controller: _tabController,
+            children: [
+              _BookingList(bookings: upcoming),
+              _BookingList(bookings: history),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
-    Future.microtask(
-      () => ref.read(bookingProvider.notifier).getUserBookings(),
-    );
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(bookingProvider.notifier).getUserBookings();
+    });
   }
 
   @override
@@ -38,6 +94,8 @@ class _RenterBookingsScreenState extends ConsumerState<RenterBookingsScreen>
 
   @override
   Widget build(BuildContext context) {
+    final authSession = ref.watch(authProvider).session;
+
     final bookingState = ref.watch(bookingProvider);
 
     final upcoming = bookingState.bookings
@@ -68,57 +126,33 @@ class _RenterBookingsScreenState extends ConsumerState<RenterBookingsScreen>
             // 1. High-Priority Draft Card (Refined Orange)
             if (draft.isNotEmpty) _EnhancedDraftCard(booking: draft.first),
 
-            // 2. Industrial Segmented TabBar
-            Container(
-              margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-              height: 48,
-              decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.03),
-                borderRadius: BorderRadius.circular(14),
-                border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
-              ),
-              child: TabBar(
-                controller: _tabController,
-                indicatorSize: TabBarIndicatorSize.tab,
-                dividerColor: Colors.transparent,
-                indicator: BoxDecoration(
-                  color: const Color(
-                    0xFF1E2125,
-                  ), // Lighter charcoal for active tab
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(
-                    color: Colors.white.withValues(alpha: 0.1),
+            if (authSession == null)
+              Expanded(
+                child: Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.login_outlined,
+                        size: 64,
+                        color: Colors.white.withValues(alpha: 0.2),
+                      ),
+                      const SizedBox(height: 16),
+                      Text(
+                        "Login to create and view bookings",
+                        style: TextStyle(
+                          color: Colors.white.withValues(alpha: 0.70),
+                        ),
+                      ),
+                    ],
                   ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.3),
-                      blurRadius: 4,
-                      offset: const Offset(0, 2),
-                    ),
-                  ],
                 ),
-                labelColor: Colors.white,
-                unselectedLabelColor: Colors.white.withValues(alpha: 0.3),
-                labelStyle: const TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 13,
-                  letterSpacing: 0.5,
-                ),
-                tabs: const [
-                  Tab(text: 'UPCOMING'),
-                  Tab(text: 'HISTORY'),
-                ],
               ),
-            ),
 
             Expanded(
-              child: TabBarView(
-                controller: _tabController,
-                children: [
-                  _BookingList(bookings: upcoming),
-                  _BookingList(bookings: history),
-                ],
-              ),
+              child: authSession == null
+                  ? _buildLoginPrompt()
+                  : _buildTabs(upcoming, history),
             ),
           ],
         ),
@@ -232,4 +266,24 @@ class _EnhancedDraftCard extends StatelessWidget {
       ),
     );
   }
+}
+
+Widget _buildLoginPrompt() {
+  return Center(
+    child: Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Icon(
+          Icons.login_outlined,
+          size: 64,
+          color: Colors.white.withValues(alpha: 0.2),
+        ),
+        const SizedBox(height: 16),
+        Text(
+          "Login to create and view bookings",
+          style: TextStyle(color: Colors.white.withValues(alpha: 0.70)),
+        ),
+      ],
+    ),
+  );
 }

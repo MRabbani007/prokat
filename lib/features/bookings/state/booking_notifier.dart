@@ -1,5 +1,4 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:prokat/features/bookings/models/booking_model.dart';
 import 'package:prokat/features/bookings/service/booking_api_service.dart';
 import 'package:prokat/features/bookings/state/booking_state.dart';
 import 'package:prokat/features/equipment/models/equipment_model.dart';
@@ -43,50 +42,6 @@ class BookingNotifier extends StateNotifier<BookingState> {
   }
 
   /// -------------------------
-  /// CREATE BOOKING
-  /// -------------------------
-
-  Future<bool> createBooking() async {
-    try {
-      if (state.selectedEquipment == null || state.selectedLocation == null) {
-        return false;
-      }
-
-      state = state.copyWith(isLoading: true);
-
-      final booking = BookingModel(
-        id: "",
-        status: "CREATED",
-        bookedOn: state.selectedDate!,
-        bookedAt: state.selectedTime!,
-        price: state.selectedPriceEntry?.price ?? 0,
-        priceRate: state.selectedPriceEntry?.priceRate ?? "",
-        comment: state.comment,
-        instructions: null,
-        equipment: state.selectedEquipment as Equipment,
-        location: state.selectedLocation as LocationModel,
-      );
-
-      final created = await api.createBooking(booking);
-
-      if (created != null) {
-        state = state.copyWith(
-          isLoading: false,
-          currentBooking: null,
-          bookings: [...state.bookings, created],
-        );
-
-        return true;
-      }
-
-      return false;
-    } catch (e) {
-      state = state.copyWith(isLoading: false, error: e.toString());
-      return false;
-    }
-  }
-
-  /// -------------------------
   /// LOAD BOOKINGS
   /// -------------------------
 
@@ -111,6 +66,42 @@ class BookingNotifier extends StateNotifier<BookingState> {
       state = state.copyWith(isLoading: false, ownerBookings: ownerBookings);
     } catch (e) {
       state = state.copyWith(isLoading: false, error: e.toString());
+    }
+  }
+
+  /// -------------------------
+  /// CREATE BOOKING
+  /// -------------------------
+
+  Future<bool> createBooking() async {
+    try {
+      if (state.selectedEquipment == null || state.selectedLocation == null) {
+        return false;
+      }
+
+      print("create_booking");
+      state = state.copyWith(isLoading: true);
+
+      final created = await api.createBooking({
+        "bookedOn": state.selectedDate!.toIso8601String(),
+        "bookedAt": state.selectedTime!.toIso8601String(),
+        "price": (int.tryParse(state.selectedPriceEntry?.price.toString() ?? '0')).toString(),
+        "priceRate": state.selectedPriceEntry?.priceRate ?? "",
+        "comment": state.comment,
+        "equipmentId": state.selectedEquipment?.id,
+        "locationId": state.selectedLocation?.id,
+      });
+
+      if (created != null) {
+        await getUserBookings();
+
+        return true;
+      }
+
+      return false;
+    } catch (e) {
+      state = state.copyWith(isLoading: false, error: e.toString());
+      return false;
     }
   }
 

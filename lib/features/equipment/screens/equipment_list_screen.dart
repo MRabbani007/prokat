@@ -24,10 +24,18 @@ class _EquipmentListScreenState extends ConsumerState<EquipmentListScreen> {
   final accentColor = const Color(0xFF4E73DF);
 
   @override
+  void initState() {
+    super.initState();
+
+    Future.microtask(() {
+      ref.read(equipmentProvider.notifier).getRenterEquipment();
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     final equipmentState = ref.watch(equipmentProvider);
     final bookingNotifier = ref.read(bookingProvider.notifier);
-
     return Scaffold(
       backgroundColor: bgColor,
       body: SafeArea(
@@ -123,13 +131,13 @@ class _EquipmentListScreenState extends ConsumerState<EquipmentListScreen> {
                         color: Color(0xFF4E73DF),
                       ),
                     )
-                  : equipmentState.error != null
-                  ? Center(
-                      child: Text(
-                        equipmentState.error.toString(),
-                        style: const TextStyle(color: Colors.redAccent),
-                      ),
-                    )
+                  // : equipmentState.error != null
+                  // ? Center(
+                  //     child: Text(
+                  //       equipmentState.error.toString(),
+                  //       style: const TextStyle(color: Colors.redAccent),
+                  //     ),
+                  //   )
                   : equipmentState.renterEquipment.isEmpty
                   ? _buildEmptyState()
                   : ListView.separated(

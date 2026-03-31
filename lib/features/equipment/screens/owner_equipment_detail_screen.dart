@@ -113,8 +113,8 @@ class OwnerEquipmentDetailScreen extends ConsumerWidget {
 
                 // 3. LOGISTICS PANEL
                 LocationSection(
-                  location: equipment.locations.isNotEmpty
-                      ? '${equipment.locations[0].street}, ${equipment.locations[0].city}'
+                  location: equipment.location != null
+                      ? '${equipment.location?.street}, ${equipment.location?.city}'
                       : "NO LOCATION SET",
                   onAction: () =>
                       openLocationPickerSheet(context, ref, equipment.id),
