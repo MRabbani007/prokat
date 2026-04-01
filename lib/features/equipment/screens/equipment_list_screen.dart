@@ -2,11 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:prokat/core/widgets/page_header.dart';
+import 'package:prokat/features/auth/providers/auth_provider.dart';
 import 'package:prokat/features/bookings/state/booking_provider.dart';
 import 'package:prokat/features/equipment/providers/equipment_provider.dart';
 import 'package:prokat/features/equipment/widgets/list/equipment_city_selector.dart';
-import 'package:prokat/features/equipment/widgets/list/equipment_list_tile.dart';
 import 'package:prokat/features/equipment/widgets/list/equipment_map_button.dart';
+import 'package:prokat/features/equipment/widgets/list/swipeable_list_tile.dart';
+import 'package:prokat/features/favorites/state/favorites_provider.dart';
 
 class EquipmentListScreen extends ConsumerStatefulWidget {
   final String? q, category, city;
@@ -29,6 +31,7 @@ class _EquipmentListScreenState extends ConsumerState<EquipmentListScreen> {
 
     Future.microtask(() {
       ref.read(equipmentProvider.notifier).getRenterEquipment();
+      ref.read(favoriteProvider.notifier).getFavorites();
     });
   }
 
@@ -36,13 +39,37 @@ class _EquipmentListScreenState extends ConsumerState<EquipmentListScreen> {
   Widget build(BuildContext context) {
     final equipmentState = ref.watch(equipmentProvider);
     final bookingNotifier = ref.read(bookingProvider.notifier);
+    final authSession = ref.watch(authProvider).session;
+    final isRenter = authSession !=null ? true : false;
+
     return Scaffold(
       backgroundColor: bgColor,
       body: SafeArea(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            PageHeader(title: "Search"),
+            Padding(
+              padding: const EdgeInsets.only(right: 12.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  const Expanded(child: PageHeader(title: "Search")),
+                  // Small technical Archive button
+                  IconButton(
+                    onPressed: () => authSession == null
+                        ? null
+                        : context.push('/requests/history'),
+                    icon: const Icon(
+                      Icons.history_toggle_off_rounded,
+                      color: Color(0x4DFFFFFF),
+                      size: 24,
+                    ),
+                    tooltip: "Requests History",
+                  ),
+                ],
+              ),
+            ),
 
             /// 1. INDUSTRIAL COMMAND HEADER
             Container(
@@ -141,11 +168,12 @@ class _EquipmentListScreenState extends ConsumerState<EquipmentListScreen> {
                   : equipmentState.renterEquipment.isEmpty
                   ? _buildEmptyState()
                   : ListView.separated(
-                      padding: const EdgeInsets.all(20),
+                      padding: const EdgeInsets.all(0),
                       itemCount: equipmentState.renterEquipment.length,
-                      separatorBuilder: (_, _) => const SizedBox(height: 16),
-                      itemBuilder: (context, index) => EquipmentListTile(
+                      separatorBuilder: (_, _) => const SizedBox(height: 12),
+                      itemBuilder: (context, index) => SwipeableListTile(
                         equipment: equipmentState.renterEquipment[index],
+                        isRenter: isRenter,
                         onTap: () {
                           // Select equipment
                           bookingNotifier.selectEquipment(

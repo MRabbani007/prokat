@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:prokat/features/favorites/state/favorites_provider.dart';
 import '../../models/equipment_model.dart'; // Adjust path
 
-class EquipmentListTile extends StatelessWidget {
+class EquipmentListTile extends ConsumerWidget {
   final Equipment equipment;
   final VoidCallback onTap;
   final bool isRenter;
@@ -14,159 +16,207 @@ class EquipmentListTile extends StatelessWidget {
     this.isRenter = false,
   });
 
-  // Industrial Fallback for missing images
   Widget _fallback() {
     return Container(
-      color: Colors.white.withValues(alpha: 0.03),
-      child: Center(
+      color: Colors.white.withValues(alpha: 0.05),
+      child: const Center(
         child: Icon(
           Icons.precision_manufacturing_rounded,
           size: 28,
-          color: Colors.white.withValues(alpha: 0.1),
+          color: Colors.white24,
         ),
       ),
     );
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     const cardColor = Color(0xFF1E2125);
     const accentColor = Color(0xFF4E73DF);
 
-    // Hardcoded test image logic from your snippet
-    String testImage =
-        "https://insqvwqlfhbfcqqnvzxu.supabase.co/storage/v1/object/public/Media/kamaz1.jpg";
+    final notifier = ref.read(favoriteProvider.notifier);
+    final bool isFavorite = notifier.isFavorite(equipment.id);
+
     final displayUrl = equipment.imageUrl?.isNotEmpty == true
         ? equipment.imageUrl!
-        : testImage;
-
-    if (isRenter && equipment.status == "MAINTENANCE") {
-      return const SizedBox.shrink();
-    }
+        : "https://insqvwqlfhbfcqqnvzxu.supabase.co/storage/v1/object/public/Media/kamaz1.jpg";
 
     final priceEntry = equipment.prices.isNotEmpty
         ? equipment.prices.first
         : null;
     final location = equipment.location;
 
+    final priceRate = priceEntry != null
+        ? priceEntry.priceRate.toUpperCase() == "PER_TRIP"
+              ? "/ Trip"
+              : priceEntry.priceRate.toUpperCase() == "PER_CUBIC_METER"
+              ? "/ M3"
+              : priceEntry.priceRate.toUpperCase() == "PER_HOUR"
+              ? "/ Hour"
+              : priceEntry.priceRate.toUpperCase()
+        : "";
+
     return Container(
-      margin: const EdgeInsets.only(bottom: 4), // Small gap if used in ListView
+      margin: const EdgeInsets.only(bottom: 12, left: 12, right: 12),
       decoration: BoxDecoration(
         color: cardColor,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.15),
-            blurRadius: 10,
+            color: Colors.black.withValues(alpha: 0.2),
+            blurRadius: 8,
             offset: const Offset(0, 4),
           ),
         ],
       ),
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(16),
         child: InkWell(
           onTap: onTap,
-          child: Padding(
-            padding: const EdgeInsets.all(12),
-            child: Row(
-              children: [
-                /// 1. IMAGE BOX
-                Container(
-                  width: 100,
-                  height: 80,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(14),
-                    border: Border.all(
-                      color: Colors.white.withValues(alpha: 0.05),
-                    ),
-                  ),
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(14),
-                    child: CachedNetworkImage(
-                      imageUrl: displayUrl,
-                      fit: BoxFit.cover,
-                      placeholder: (_, _) => _fallback(),
-                      errorWidget: (_, _, _) => _fallback(),
-                    ),
-                  ),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              /// 1. IMAGE (Filled to left edges)
+              SizedBox(
+                width: 120,
+                height: 140, // Increased height to match new content density
+                child: CachedNetworkImage(
+                  imageUrl: displayUrl,
+                  fit: BoxFit.cover,
+                  placeholder: (_, _) => _fallback(),
+                  errorWidget: (_, _, _) => _fallback(),
                 ),
+              ),
 
-                const SizedBox(width: 16),
-
-                /// 2. CONTENT
-                Expanded(
+              /// 2. CONTENT
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.all(12),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Status & Category Row
+                      // Top Row: Owner & Status
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          _StatusBadge(status: equipment.status),
-                          Text(
-                            "ID: ${equipment.id.split('-').last.toUpperCase()}",
-                            style: TextStyle(
-                              color: Colors.white.withValues(alpha: 0.15),
-                              fontSize: 9,
-                              fontWeight: FontWeight.bold,
+                          Expanded(
+                            child: Text(
+                              equipment.owner?.displayName.toUpperCase() ??
+                                  "PRIVATE OWNER",
+                              style: TextStyle(
+                                color: Colors.white.withValues(alpha: 0.4),
+                                fontSize: 10,
+                                fontWeight: FontWeight.bold,
+                                letterSpacing: 0.5,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
                             ),
                           ),
+                          if (isFavorite)
+                            const Padding(
+                              padding: EdgeInsets.only(right: 8.0),
+                              child: Icon(
+                                Icons.favorite,
+                                color: Colors.redAccent,
+                                size: 14,
+                              ),
+                            ),
+                          _StatusIndicator(status: equipment.status),
                         ],
                       ),
-                      const SizedBox(height: 8),
 
-                      // Name
+                      const SizedBox(height: 4),
+
+                      // Equipment Name
                       Text(
-                        equipment.name.toUpperCase(),
+                        equipment.name,
                         style: const TextStyle(
                           color: Colors.white,
-                          fontSize: 15,
+                          fontSize: 16,
                           fontWeight: FontWeight.bold,
-                          letterSpacing: 0.5,
                         ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
 
-                      // Sub-specs
+                      // Model & Capacity
                       Text(
                         "${equipment.model} • ${equipment.capacity} ${equipment.capacityUnit}",
                         style: TextStyle(
-                          color: Colors.white.withValues(alpha: 0.4),
+                          color: Colors.white.withValues(alpha: 0.7),
                           fontSize: 12,
-                          fontWeight: FontWeight.w500,
                         ),
                       ),
 
-                      const SizedBox(height: 10),
+                      const SizedBox(height: 6),
 
-                      // Location & Price Footer
+                      // Reviews & Location Row
                       Row(
                         children: [
-                          Icon(
-                            Icons.location_on_rounded,
-                            size: 12,
-                            color: accentColor,
+                          const Icon(
+                            Icons.star_rounded,
+                            size: 14,
+                            color: Colors.amber,
                           ),
-                          const SizedBox(width: 4),
+                          const SizedBox(width: 2),
+                          Text(
+                            "4.8 (24)", // Replace with equipment.rating and equipment.reviewCount
+                            style: const TextStyle(
+                              color: Colors.white70,
+                              fontSize: 11,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                        ],
+                      ),
+
+                      const SizedBox(height: 8),
+
+                      // Price Row
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.baseline,
+                        textBaseline: TextBaseline.alphabetic,
+                        children: [
                           Expanded(
-                            child: Text(
-                              location != null ? "${location.city}" : "Global",
-                              style: TextStyle(
-                                color: Colors.white.withValues(alpha: 0.6),
-                                fontSize: 11,
-                                fontWeight: FontWeight.bold,
-                              ),
+                            child: Row(
+                              children: [
+                                Icon(
+                                  Icons.location_on_outlined,
+                                  size: 13,
+                                  color: accentColor,
+                                ),
+                                const SizedBox(width: 2),
+                                Text(
+                                  "${location?.street}, ${location?.city} • 5.2 km", // Distance calculated via backend
+                                  style: TextStyle(
+                                    color: Colors.white.withValues(alpha: 0.5),
+                                    fontSize: 11,
+                                  ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ],
+                            ),
+                          ),
+
+                          Text(
+                            priceEntry != null
+                                ? "${priceEntry.price} ₸ "
+                                : "POA",
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 15,
+                              fontWeight: FontWeight.bold,
                             ),
                           ),
                           Text(
-                            priceEntry != null
-                                ? "${priceEntry.price} ₸"
-                                : "POA",
-                            style: const TextStyle(
-                              color: accentColor,
-                              fontSize: 14,
+                            priceRate,
+                            style: TextStyle(
+                              color: Colors.white.withValues(alpha: 0.4),
+                              fontSize: 10,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
@@ -175,8 +225,8 @@ class EquipmentListTile extends StatelessWidget {
                     ],
                   ),
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
       ),
@@ -184,18 +234,19 @@ class EquipmentListTile extends StatelessWidget {
   }
 }
 
-class _StatusBadge extends StatelessWidget {
+class _StatusIndicator extends StatelessWidget {
   final String status;
-  const _StatusBadge({required this.status});
+  const _StatusIndicator({required this.status});
 
   @override
   Widget build(BuildContext context) {
     Color color;
-    switch (status) {
+    switch (status.toUpperCase()) {
       case "AVAILABLE":
         color = Colors.greenAccent;
         break;
-      case "OCCUPIED":
+      case "BOOKED":
+      case "BUSY":
         color = Colors.orangeAccent;
         break;
       case "MAINTENANCE":
@@ -206,20 +257,14 @@ class _StatusBadge extends StatelessWidget {
     }
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+      width: 10,
+      height: 10,
       decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(4),
-        border: Border.all(color: color.withValues(alpha: 0.2)),
-      ),
-      child: Text(
-        status,
-        style: TextStyle(
-          fontSize: 9,
-          fontWeight: FontWeight.bold,
-          color: color,
-          letterSpacing: 0.5,
-        ),
+        color: color,
+        shape: BoxShape.circle,
+        boxShadow: [
+          BoxShadow(color: color.withValues(alpha: 0.4), blurRadius: 4),
+        ],
       ),
     );
   }

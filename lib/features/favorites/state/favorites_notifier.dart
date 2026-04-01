@@ -28,9 +28,11 @@ class FavoriteNotifier extends StateNotifier<FavoritesState> {
 
   Future<bool> toggleFavorite(String equipmentId) async {
     try {
+      state = state.copyWith(isLoading: true);
+
       final current = state.favoritesIds;
 
-      // 🔥 Optimistic update
+      // Optimistic update
       final isFav = current?.contains(equipmentId);
       final updated = Set<String>.from(current ?? []);
 
@@ -40,8 +42,11 @@ class FavoriteNotifier extends StateNotifier<FavoritesState> {
         updated.add(equipmentId);
       }
 
+      state = state.copyWith(favoritesIds: updated);
+      print(updated.toString());
       final res = await service.toggleFavorite(equipmentId);
 
+      state = state.copyWith(isLoading: false);
       await getFavorites();
 
       return res;

@@ -126,29 +126,28 @@ class _RenterBookingsScreenState extends ConsumerState<RenterBookingsScreen>
             // 1. High-Priority Draft Card (Refined Orange)
             if (draft.isNotEmpty) _EnhancedDraftCard(booking: draft.first),
 
-            if (authSession == null)
-              Expanded(
-                child: Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        Icons.login_outlined,
-                        size: 64,
-                        color: Colors.white.withValues(alpha: 0.2),
-                      ),
-                      const SizedBox(height: 16),
-                      Text(
-                        "Login to create and view bookings",
-                        style: TextStyle(
-                          color: Colors.white.withValues(alpha: 0.70),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-
+            // if (authSession == null)
+            //   Expanded(
+            //     child: Center(
+            //       child: Column(
+            //         mainAxisAlignment: MainAxisAlignment.center,
+            //         children: [
+            //           Icon(
+            //             Icons.login_outlined,
+            //             size: 64,
+            //             color: Colors.white.withValues(alpha: 0.2),
+            //           ),
+            //           const SizedBox(height: 16),
+            //           Text(
+            //             "Login to create and view bookings",
+            //             style: TextStyle(
+            //               color: Colors.white.withValues(alpha: 0.70),
+            //             ),
+            //           ),
+            //         ],
+            //       ),
+            //     ),
+            //   ),
             Expanded(
               child: authSession == null
                   ? _buildLoginPrompt()

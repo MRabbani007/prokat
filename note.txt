@@ -126,3 +126,6 @@ Booking
 
 
 Industrial Dark theme, we’ll use the #121417 background
+
+
+POA: Price on Application (or sometimes Price on Asking)
