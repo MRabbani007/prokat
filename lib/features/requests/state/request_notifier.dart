@@ -1,10 +1,11 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:prokat/features/categories/models/category.dart';
 import 'package:prokat/features/locations/models/location_model.dart';
 import 'package:prokat/features/requests/services/request_service.dart';
 import 'package:prokat/features/requests/state/request_state.dart';
 
 class RequestNotifier extends StateNotifier<RequestState> {
-  final RequestService service; 
+  final RequestService service;
 
   RequestNotifier(this.service) : super(RequestState()) {
     getUserRequests();
@@ -15,6 +16,12 @@ class RequestNotifier extends StateNotifier<RequestState> {
       selectedLocationId: location.id,
       selectedLocation: location,
     );
+  }
+
+  void selectCategory(Category category) {
+    state = state.copyWith(categoryId: category.id, selectedCategory: category);
+
+    print(state.toString());
   }
 
   void setDate(DateTime date) {
@@ -80,7 +87,7 @@ class RequestNotifier extends StateNotifier<RequestState> {
       state = state.copyWith(isLoading: true);
 
       final created = await service.createRequest(
-        categoryId: state.categoryId ?? "",
+        categoryId: state.selectedCategory?.id ?? "",
         locationId: state.selectedLocation?.id ?? "",
         capacity: state.capacity ?? "",
         requiredOn: state.selectedDate ?? DateTime(2026),
@@ -89,11 +96,9 @@ class RequestNotifier extends StateNotifier<RequestState> {
         offeredRate: state.offeredRate ?? 0,
       );
 
-      if (created != null) {
-        state = state.copyWith(
-          isLoading: false,
-          requests: [...state.requests, created],
-        );
+      if (created == true) {
+        await getUserRequests();
+        state = state.copyWith(isLoading: false);
 
         return true;
       }
@@ -109,7 +114,7 @@ class RequestNotifier extends StateNotifier<RequestState> {
     }
   }
 
-  Future<void> updateRequest({
+  Future<bool> updateRequest({
     required String id,
     String? locationId,
     DateTime? requiredOn,
@@ -129,15 +134,34 @@ class RequestNotifier extends StateNotifier<RequestState> {
 
       if (updated != null) {
         await getUserRequests();
-        state = state.copyWith(isLoading: false);
+
+        return true;
       }
+
+      state = state.copyWith(isLoading: false);
+
+      return false;
     } catch (e) {
       state = state.copyWith(isLoading: false, error: e.toString());
+      return false;
     }
   }
 
-  Future<void> cancelRequest(String id) async {
-    await service.cancelRequest(id);
-    await getUserRequests();
+  Future<bool> cancelRequest(String id) async {
+    try {
+      state = state.copyWith(isLoading: true);
+      final res = await service.cancelRequest(id);
+
+      if (res == true) {
+        await getUserRequests();
+      }
+
+      state = state.copyWith(isLoading: false);
+      
+      return res;
+    } catch (e) {
+      state = state.copyWith(isLoading: false, error: e.toString());
+      return false;
+    }
   }
 }

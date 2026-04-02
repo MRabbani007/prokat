@@ -71,9 +71,6 @@ class _EquipmentBookingScreenState
     }
 
     final priceEntries = equipment.prices;
-    // final location = equipment.locations.isNotEmpty
-    //     ? equipment.locations.first
-    //     : null;
 
     String testImage =
         "https://insqvwqlfhbfcqqnvzxu.supabase.co/storage/v1/object/public/Media/kamaz1.jpg";

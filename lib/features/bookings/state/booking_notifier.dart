@@ -79,20 +79,21 @@ class BookingNotifier extends StateNotifier<BookingState> {
         return false;
       }
 
-      print("create_booking");
       state = state.copyWith(isLoading: true);
 
       final created = await api.createBooking({
         "bookedOn": state.selectedDate!.toIso8601String(),
         "bookedAt": state.selectedTime!.toIso8601String(),
-        "price": (int.tryParse(state.selectedPriceEntry?.price.toString() ?? '0')).toString(),
+        "price": (int.tryParse(
+          state.selectedPriceEntry?.price.toString() ?? '0',
+        )).toString(),
         "priceRate": state.selectedPriceEntry?.priceRate ?? "",
         "comment": state.comment,
         "equipmentId": state.selectedEquipment?.id,
         "locationId": state.selectedLocation?.id,
       });
 
-      if (created != null) {
+      if (created == true) {
         await getUserBookings();
 
         return true;

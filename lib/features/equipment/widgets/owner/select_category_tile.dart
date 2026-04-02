@@ -28,7 +28,7 @@ Widget SelectCategoryTile({
         isScrollControlled: true,
         backgroundColor:
             Colors.transparent, // Important for our custom border radius
-        builder: (context) => const CategorySelectionSheet(),
+        builder: (context) => const CategorySelectionSheet(service: "equipment"),
       );
     },
     child: Container(

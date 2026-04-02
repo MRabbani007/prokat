@@ -37,10 +37,10 @@ class LocationSection extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 const Text(
-                  "Location",
+                  "LOCATION",
                   style: TextStyle(
-                    color: ghostGray,
-                    fontSize: 10,
+                    color: Color.fromARGB(255, 190, 190, 190),
+                    fontSize: 16,
                     fontWeight: FontWeight.bold,
                     letterSpacing: 1.5,
                   ),

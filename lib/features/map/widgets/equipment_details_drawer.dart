@@ -2,10 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:prokat/features/bookings/state/booking_provider.dart';
+import 'package:prokat/features/equipment/models/equipment_model.dart';
 import 'package:prokat/features/favorites/state/favorites_provider.dart';
 
 class EquipmentDetailsDrawer extends ConsumerWidget {
-  final dynamic equipment; // Use your Equipment model
+  final Equipment equipment; // Use your Equipment model
 
   const EquipmentDetailsDrawer({super.key, required this.equipment});
 
@@ -127,7 +128,7 @@ class EquipmentDetailsDrawer extends ConsumerWidget {
                           const SizedBox(height: 24),
 
                           /// 📍 Location Card
-                          if (equipment.locations.isNotEmpty)
+                          if (equipment.location != null)
                             Container(
                               padding: const EdgeInsets.all(16),
                               decoration: BoxDecoration(
@@ -147,7 +148,7 @@ class EquipmentDetailsDrawer extends ConsumerWidget {
                                   const SizedBox(width: 12),
                                   Expanded(
                                     child: Text(
-                                      "${equipment.locations[0].street}, ${equipment.locations[0].city}",
+                                      "${equipment.location?.street}, ${equipment.location?.city}",
                                       style: const TextStyle(
                                         color: Colors.white70,
                                         fontSize: 14,

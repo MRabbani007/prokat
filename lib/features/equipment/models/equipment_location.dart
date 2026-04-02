@@ -1,5 +1,3 @@
-// features/equipment/models/equipment_location.dart
-
 class EquipmentLocation {
   final String id;
   final String street;

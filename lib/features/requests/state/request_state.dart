@@ -1,3 +1,4 @@
+import 'package:prokat/features/categories/models/category.dart';
 import 'package:prokat/features/locations/models/location_model.dart';
 import '../models/request_model.dart';
 
@@ -23,6 +24,7 @@ class RequestState {
   final LocationModel? selectedLocation;
   final String? selectedLocationId;
 
+  final Category? selectedCategory;
   final String? categoryId;
 
   RequestState({
@@ -38,6 +40,7 @@ class RequestState {
     this.selectedTime,
     this.selectedLocation,
     this.selectedLocationId,
+    this.selectedCategory,
     this.categoryId,
   });
 
@@ -54,6 +57,7 @@ class RequestState {
     DateTime? selectedTime,
     LocationModel? selectedLocation,
     String? selectedLocationId,
+    Category? selectedCategory,
     String? categoryId,
   }) {
     return RequestState(
@@ -69,6 +73,7 @@ class RequestState {
       selectedTime: selectedTime ?? this.selectedTime,
       selectedLocation: selectedLocation ?? this.selectedLocation,
       selectedLocationId: selectedLocationId ?? this.selectedLocationId,
+      selectedCategory: selectedCategory ?? this.selectedCategory,
       categoryId: categoryId ?? this.categoryId,
     );
   }

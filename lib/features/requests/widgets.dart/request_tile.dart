@@ -1,18 +1,26 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:prokat/features/requests/models/request_model.dart';
+import 'package:prokat/features/requests/providers/request_provider.dart';
 import 'package:prokat/features/requests/widgets.dart/request_status_badge.dart';
 
-class RequestTile extends StatelessWidget {
+class RequestTile extends ConsumerStatefulWidget {
   final RequestModel request;
-  final VoidCallback? onCancel;
 
-  const RequestTile({super.key, required this.request, this.onCancel});
+  const RequestTile({super.key, required this.request});
 
+  @override
+  ConsumerState<RequestTile> createState() => _RequestTileState();
+}
+
+class _RequestTileState extends ConsumerState<RequestTile> {
   @override
   Widget build(BuildContext context) {
     const cardColor = Color.fromARGB(255, 52, 57, 63); // 0xFF1E2125
     const accentColor = Color(0xFF4E73DF);
+
+    final request = widget.request;
 
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
@@ -101,7 +109,7 @@ class RequestTile extends StatelessWidget {
             ),
 
             /// 4. Action Bar (Conditional)
-            if (request.status == "CREATED" && onCancel != null)
+            if (request.status == "CREATED")
               Container(
                 decoration: BoxDecoration(
                   border: Border(
@@ -115,7 +123,13 @@ class RequestTile extends StatelessWidget {
                     children: [
                       Expanded(
                         child: TextButton.icon(
-                          onPressed: onCancel,
+                          onPressed: () async {
+                           final res = await ref
+                                .read(requestProvider.notifier)
+                                .cancelRequest(request.id);
+
+                                if(res == true){}
+                          },
                           icon: const Icon(Icons.close_rounded, size: 18),
                           label: const Text("CANCEL REQUEST"),
                           style: TextButton.styleFrom(

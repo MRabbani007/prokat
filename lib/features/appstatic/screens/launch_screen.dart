@@ -115,20 +115,21 @@ class _LaunchScreenState extends State<LaunchScreen>
                     Text(
                       'PROKAT',
                       style: TextStyle(
-                        fontSize: 42,
+                        fontSize: 56,
                         fontWeight: FontWeight.bold,
                         letterSpacing: 6,
-                        color: Colors.white.withValues(alpha: 0.95),
+                        color: Colors.white,
+                        fontFamily: 'Oswald', // Teko
                       ),
                     ),
                     const SizedBox(height: 12),
                     Text(
-                      'HEAVY EQUIPMENT LOGISTICS',
+                      'HEAVY EQUIPMENT RENTALS',
                       style: TextStyle(
-                        fontSize: 10,
+                        fontSize: 16,
                         fontWeight: FontWeight.w800,
                         letterSpacing: 2.5,
-                        color: Colors.white.withValues(alpha: 0.25),
+                        color: Colors.white.withValues(alpha: 0.8),
                       ),
                     ),
                   ],
@@ -154,12 +155,12 @@ class _LaunchScreenState extends State<LaunchScreen>
                   ),
                   const SizedBox(height: 24),
                   Text(
-                    "INITIALIZING SYSTEM",
+                    "LOADING",
                     style: TextStyle(
-                      fontSize: 9,
+                      fontSize: 12,
                       fontWeight: FontWeight.bold,
                       letterSpacing: 2,
-                      color: Colors.white.withValues(alpha: 0.15),
+                      color: Colors.white.withValues(alpha: 0.90),
                     ),
                   ),
                 ],

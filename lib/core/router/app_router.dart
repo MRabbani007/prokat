@@ -34,6 +34,7 @@ import 'package:prokat/features/requests/screens/renter_requests_screen.dart';
 import 'package:prokat/features/user/screens/owner_dashboard_screen.dart';
 import 'package:prokat/features/user/screens/owner_profile_screen.dart';
 import 'package:prokat/features/user/screens/owner_settings_screen.dart';
+import 'package:prokat/features/user/screens/user_dashboard_screen.dart';
 import 'package:prokat/features/user/screens/user_profile_screen.dart';
 import 'package:prokat/features/user/screens/user_settings_screen.dart';
 import 'package:prokat/features/appstatic/screens/launch_screen.dart';
@@ -185,6 +186,12 @@ GoRouter createRouter(WidgetRef ref) {
                     },
                   ),
                 ],
+              ),
+              GoRoute(
+                path: '/dashboard',
+                builder: (context, state) {
+                  return UserDashboardPage(); //
+                },
               ),
               GoRoute(
                 path: '/requests',

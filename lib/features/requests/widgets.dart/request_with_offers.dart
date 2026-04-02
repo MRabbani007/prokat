@@ -31,7 +31,6 @@ class _RequestWithOffersState extends State<RequestWithOffers> {
         /// 🔹 MAIN REQUEST TILE
         RequestTile(
           request: widget.request,
-          onCancel: widget.onCancel,
         ),
 
         if (hasOffers) ...[

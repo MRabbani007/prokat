@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:prokat/core/widgets/page_header.dart';
 import 'package:prokat/features/auth/providers/auth_provider.dart';
+import 'package:prokat/features/bookings/models/booking_model.dart';
 import 'package:prokat/features/bookings/state/booking_provider.dart';
 import 'package:prokat/features/bookings/widgets/booking_card.dart';
 
@@ -202,7 +203,7 @@ class _BookingList extends StatelessWidget {
 }
 
 class _EnhancedDraftCard extends StatelessWidget {
-  final dynamic booking;
+  final BookingModel booking;
   const _EnhancedDraftCard({required this.booking});
 
   @override
@@ -247,7 +248,7 @@ class _EnhancedDraftCard extends StatelessWidget {
           ),
           TextButton(
             onPressed: () =>
-                context.push('/equipment/${booking.equipmentId}/book'),
+                context.push('/equipment/${booking.equipment.id}/book'),
             style: TextButton.styleFrom(
               foregroundColor: Colors.white,
               backgroundColor: draftColor,

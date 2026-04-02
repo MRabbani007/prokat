@@ -33,7 +33,7 @@ class RequestService {
     }
   }
 
-  Future<RequestModel?> createRequest({
+  Future<bool> createRequest({
     required String categoryId,
     required String locationId,
     required String capacity,
@@ -57,12 +57,14 @@ class RequestService {
       );
 
       if (res.statusCode == 200 || res.statusCode == 201) {
-        return RequestModel.fromJson(res.data['data']);
+        return true;
+        // return RequestModel.fromJson(res.data['data']);
       }
 
-      return null;
+      return false;
     } catch (e) {
-      return null;
+      print("request service Error");
+      return false;
     }
   }
 
@@ -94,19 +96,19 @@ class RequestService {
     }
   }
 
-  Future<RequestModel?> cancelRequest(String id) async {
+  Future<bool> cancelRequest(String id) async {
     try {
       final res = await _dio.patch(
         '/requests/$id/status',
         data: {"id": id, "status": "CANCELLED"},
       );
       if (res.statusCode == 200 || res.statusCode == 201) {
-        return RequestModel.fromJson(res.data['data']);
+        return true;
       }
 
-      return null;
+      return false;
     } catch (e) {
-      return null;
+      return false;
     }
   }
 }

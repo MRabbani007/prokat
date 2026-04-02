@@ -69,7 +69,7 @@ class _EditEquipmentDetailsFormState extends State<EditEquipmentDetailsForm> {
     setState(() => _isSaving = true);
 
     try {
-      await widget.ref
+      final res = await widget.ref
           .read(equipmentProvider.notifier)
           .updateEquipment(widget.equipment.id, {
             "id": widget.equipment.id,
@@ -81,20 +81,25 @@ class _EditEquipmentDetailsFormState extends State<EditEquipmentDetailsForm> {
             "categoryId": _selectedCategory?.id,
           });
 
-      if (mounted) {
+      if (mounted && res == true) {
         setState(() {
           _isDirty = false;
           _isSaving = false;
         });
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Equipment Updated")),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text("Equipment Updated")));
+      } else if (mounted) {
+        setState(() {
+          _isDirty = true;
+          _isSaving = false;
+        });
       }
     } catch (e) {
       setState(() => _isSaving = false);
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Update Failed!")),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text("Update Failed!")));
     }
   }
 
@@ -111,7 +116,8 @@ class _EditEquipmentDetailsFormState extends State<EditEquipmentDetailsForm> {
         isScrollControlled: true,
         backgroundColor:
             Colors.transparent, // Important for our custom border radius
-        builder: (context) => const CategorySelectionSheet(),
+        builder: (context) =>
+            const CategorySelectionSheet(service: "equipment"),
       );
 
       // If the user actually picked something, update local form state
@@ -139,10 +145,10 @@ class _EditEquipmentDetailsFormState extends State<EditEquipmentDetailsForm> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 const Text(
-                  "Information",
+                  "INFORMATION",
                   style: TextStyle(
-                    color: ghostGray,
-                    fontSize: 10,
+                    color: Color.fromARGB(255, 150, 150, 150),
+                    fontSize: 16,
                     fontWeight: FontWeight.bold,
                     letterSpacing: 1.5,
                   ),
@@ -263,8 +269,8 @@ class _IndustrialInputField extends StatelessWidget {
           Text(
             label.toUpperCase(),
             style: const TextStyle(
-              color: Color(0x4DFFFFFF),
-              fontSize: 10,
+              color: Color.fromARGB(255, 190, 190, 190),
+              fontSize: 14,
               fontWeight: FontWeight.bold,
               letterSpacing: 1.2,
             ),

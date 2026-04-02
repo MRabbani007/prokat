@@ -8,7 +8,6 @@ class DeleteEquipmentSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     const warningAmber = Color(0xFFD97706);
-    const ghostGray = Color(0x4DFFFFFF); // White @ 30%
 
     return Container(
       margin: const EdgeInsets.only(top: 12, bottom: 40),
@@ -39,7 +38,7 @@ class DeleteEquipmentSection extends StatelessWidget {
                 style: TextStyle(
                   color: warningAmber.withValues(alpha: 0.8),
                   fontWeight: FontWeight.bold,
-                  fontSize: 10,
+                  fontSize: 16,
                   letterSpacing: 2.0,
                 ),
               ),
@@ -51,7 +50,11 @@ class DeleteEquipmentSection extends StatelessWidget {
           const Text(
             "Deleting this asset will permanently remove all telemetry and pricing data from the fleet database.",
             textAlign: TextAlign.center,
-            style: TextStyle(color: ghostGray, fontSize: 12, height: 1.4),
+            style: TextStyle(
+              color: Color.fromARGB(255, 170, 170, 170),
+              fontSize: 14,
+              height: 1.8,
+            ),
           ),
 
           const SizedBox(height: 24),
@@ -67,6 +70,7 @@ class DeleteEquipmentSection extends StatelessWidget {
                 "Delete Equipment",
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
+                  fontSize: 16,
                   letterSpacing: 1.2,
                 ),
               ),

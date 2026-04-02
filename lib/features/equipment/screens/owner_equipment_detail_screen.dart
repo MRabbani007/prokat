@@ -26,7 +26,9 @@ class OwnerEquipmentDetailScreen extends ConsumerWidget {
 
     final state = ref.watch(equipmentProvider);
 
-    final equipment = state.editEquipment;
+    final equipment = state.ownerEquipment
+        .where((item) => item.id == state.editEquipment?.id)
+        .firstOrNull;
 
     final categories = ref.read(categoriesProvider).categories;
 

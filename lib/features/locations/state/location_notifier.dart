@@ -74,20 +74,13 @@ class LocationNotifier extends StateNotifier<LocationState> {
   // Update location
   Future<void> updateLocation(String id, LocationModel location) async {
     try {
-       await api.updateLocation(id, location);
+      await api.updateLocation(id, location);
 
       if (location.service == "ADDRESS") {
         await getRenterLocations();
       } else {
         await getOwnerLocations();
       }
-
-      // final updatedList = state.ownerLocations.map((l) {
-      //   if (l.id == id) return updated;
-      //   return l;
-      // }).toList();
-
-      // state = state.copyWith(locations: updatedList);
     } catch (e) {
       state = state.copyWith(error: e.toString());
     }
@@ -100,7 +93,9 @@ class LocationNotifier extends StateNotifier<LocationState> {
 
       state = state.copyWith(
         ownerLocations: state.ownerLocations.where((l) => l.id != id).toList(),
-        renterLocations: state.renterLocations.where((l) => l.id != id).toList(),
+        renterLocations: state.renterLocations
+            .where((l) => l.id != id)
+            .toList(),
       );
     } catch (e) {
       state = state.copyWith(error: e.toString());

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:prokat/core/widgets/page_header.dart';
+import 'package:prokat/features/bookings/models/booking_model.dart';
 import 'package:prokat/features/bookings/state/booking_provider.dart';
 import 'package:go_router/go_router.dart';
 import 'package:prokat/features/bookings/widgets/owner_booking_card.dart';
@@ -170,7 +171,7 @@ class _OwnerBookingList extends StatelessWidget {
 }
 
 class _SwipeableBookingCard extends ConsumerWidget {
-  final dynamic booking;
+  final BookingModel booking;
   final bool isNew;
 
   const _SwipeableBookingCard({required this.booking, required this.isNew});

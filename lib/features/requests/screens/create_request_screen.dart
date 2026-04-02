@@ -3,11 +3,16 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:prokat/core/widgets/industrial_text_field.dart';
 import 'package:prokat/core/widgets/page_header.dart';
+import 'package:prokat/features/categories/models/category.dart';
+import 'package:prokat/features/categories/providers/category_provider.dart';
+import 'package:prokat/features/equipment/widgets/owner/category_selection_sheet.dart';
+import 'package:prokat/features/equipment/widgets/owner/category_selector_tile.dart';
 import 'package:prokat/features/locations/state/location_provider.dart';
 import 'package:prokat/features/locations/widgets/address_picker_card.dart';
 import 'package:prokat/features/locations/widgets/select_address_sheet.dart';
 import 'package:prokat/features/requests/providers/request_provider.dart';
 import 'package:go_router/go_router.dart';
+import 'package:prokat/features/user/state/user_profile_provider.dart';
 
 class CreateRequestScreen extends ConsumerStatefulWidget {
   const CreateRequestScreen({super.key});
@@ -22,6 +27,8 @@ class _CreateRequestScreenState extends ConsumerState<CreateRequestScreen> {
   final rateController = TextEditingController();
   final commentController = TextEditingController();
 
+  Category? _selectedCategory;
+
   // Theme Constants
   final bgColor = const Color(0xFF121417);
   final cardColor = const Color(0xFF1E2125);
@@ -34,6 +41,22 @@ class _CreateRequestScreenState extends ConsumerState<CreateRequestScreen> {
       isScrollControlled: true,
       builder: (context) => const SelectAddressSheet(),
     );
+  }
+
+  void onCategoryTap() async {
+    final Category? picked = await showModalBottomSheet<Category>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor:
+          Colors.transparent, 
+      builder: (context) => const CategorySelectionSheet(service: "request"),
+    );
+
+    if (picked != null) {
+      setState(() {
+        _selectedCategory = picked;
+      });
+    }
   }
 
   @override
@@ -50,6 +73,7 @@ class _CreateRequestScreenState extends ConsumerState<CreateRequestScreen> {
     final locationState = ref.watch(locationProvider);
     final requestState = ref.watch(requestProvider);
     final requestNotifier = ref.read(requestProvider.notifier);
+    final categoriesProv = ref.watch(categoriesProvider);
 
     // Auto sync address
     ref.listen(locationProvider, (previous, next) {
@@ -57,6 +81,18 @@ class _CreateRequestScreenState extends ConsumerState<CreateRequestScreen> {
 
       if (address != null && address.id != null) {
         ref.read(requestProvider.notifier).selectLocation(address);
+      }
+    });
+
+    ref.listen(userProfileProvider, (previous, next) {
+      final profileCategoryId = next.userProfile?.selectedCategoryId;
+
+      final foundCategory = categoriesProv.categories
+          .where((item) => item.id == profileCategoryId)
+          .firstOrNull;
+
+      if (profileCategoryId != null && foundCategory != null) {
+        ref.read(requestProvider.notifier).selectCategory(foundCategory);
       }
     });
 
@@ -71,6 +107,11 @@ class _CreateRequestScreenState extends ConsumerState<CreateRequestScreen> {
               child: ListView(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 children: [
+                  CategorySelectorTile(
+                    selectedCategory: _selectedCategory,
+                    onTap: onCategoryTap,
+                  ),
+
                   _buildSectionLabel("DELIVERY LOCATION"),
                   AddressPickerCard(
                     selectedAddress: locationState.selectedAddress,
@@ -87,7 +128,9 @@ class _CreateRequestScreenState extends ConsumerState<CreateRequestScreen> {
                     icon: Icons.high_quality_rounded,
                     keyboardType: TextInputType.text,
                     onChanged: (value) {
-                      ref.read(requestProvider.notifier).setCapacity(value.toString());
+                      ref
+                          .read(requestProvider.notifier)
+                          .setCapacity(value.toString());
                     },
                   ),
                   IndustrialTextField(
@@ -199,7 +242,7 @@ class _CreateRequestScreenState extends ConsumerState<CreateRequestScreen> {
                       );
 
                       context.pop();
-                    } else if(context.mounted){
+                    } else if (context.mounted) {
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(content: Text("Something went wrong!")),
                       );

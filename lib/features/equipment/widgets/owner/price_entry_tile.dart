@@ -59,7 +59,7 @@ class PriceEntryTile extends StatelessWidget {
                         .toUpperCase(),
                     style: const TextStyle(
                       color: ghostGray,
-                      fontSize: 10,
+                      fontSize: 14,
                       fontWeight: FontWeight.bold,
                       letterSpacing: 1.1,
                     ),

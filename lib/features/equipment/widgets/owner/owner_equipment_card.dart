@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:go_router/go_router.dart'; // Add this
 import 'package:cached_network_image/cached_network_image.dart'; // Better for fallbacks
 import 'package:prokat/features/equipment/models/equipment_model.dart';
@@ -17,113 +16,167 @@ class OwnerEquipmentCard extends ConsumerWidget {
     const accentColor = Color(0xFF4E73DF);
     const ghostGray = Color(0x4DFFFFFF); // White @ 30%
 
-    String testImage =
-        "https://insqvwqlfhbfcqqnvzxu.supabase.co/storage/v1/object/public/Media/kamaz1.jpg";
+    final equipmentNotifier = ref.read(equipmentProvider.notifier);
+
     final displayUrl = equipment.imageUrl?.isNotEmpty == true
         ? equipment.imageUrl!
-        : testImage;
+        : "https://insqvwqlfhbfcqqnvzxu.supabase.co/storage/v1/object/public/Media/kamaz1.jpg";
+
+    final String locationText =
+        equipment.location?.street ??
+        equipment.location?.city ??
+        "No location set";
+
+    final String priceDisplay = equipment.prices.isNotEmpty
+        ? "\$${equipment.prices[0].price}/${equipment.prices[0].priceRate}"
+        : "No price set";
 
     return Container(
-      margin: const EdgeInsets.symmetric(vertical: 8),
+      margin: const EdgeInsets.symmetric(vertical: 0, horizontal: 0),
       decoration: BoxDecoration(
         color: cardColor,
-        borderRadius: BorderRadius.circular(28), // Large Item Radius
-        border: Border.all(
-          color: Colors.white.withValues(alpha: 0.08), // Rim Lighting
-          width: 1,
-        ),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.2)),
       ),
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(28),
-        child: Slidable(
-          startActionPane: ActionPane(
-            motion: const DrawerMotion(),
-            children: [
-              SlidableAction(
-                onPressed: (context) {},
-                backgroundColor: accentColor.withValues(alpha: 0.2),
-                foregroundColor: accentColor,
-                icon: Icons.visibility_off_outlined,
-                label: 'HIDE',
-              ),
-            ],
-          ),
-          endActionPane: ActionPane(
-            motion: const DrawerMotion(),
-            extentRatio: 0.25,
-            children: [
-              SlidableAction(
-                onPressed: (context) {},
-                backgroundColor: const Color(0xFFD97706).withValues(alpha: 0.1),
-                foregroundColor: const Color(0xFFD97706),
-                icon: Icons.delete_outline_rounded,
-                label: 'DELETE',
-              ),
-            ],
-          ),
-          child: InkWell(
-            onTap: () => {
-              ref
-                  .read(equipmentProvider.notifier)
-                  .selectEditEquipment(equipment),
-                  
-              context.push('/owner/equipment/${equipment.id}'),
-            },
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Row(
-                children: [
-                  // Image with Industrial Radius
-                  SizedBox(
-                    width: 72,
-                    height: 72,
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(
-                        16,
-                      ), // Small Item Radius
+        borderRadius: BorderRadius.circular(24),
+        child: InkWell(
+          onTap: () {
+            ref.read(equipmentProvider.notifier).selectEditEquipment(equipment);
+            context.push('/owner/equipment/${equipment.id}');
+          },
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              children: [
+                // FIRST ROW: Image + Name/Model + Toggle
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(12),
                       child: CachedNetworkImage(
                         imageUrl: displayUrl,
+                        width: 64,
+                        height: 64,
                         fit: BoxFit.cover,
-                        placeholder: (context, url) =>
-                            Container(color: Colors.black26),
-                        errorWidget: (context, url, error) => Container(
-                          color: Colors.black26,
-                          child: const Icon(Icons.bolt, color: ghostGray),
-                        ),
                       ),
                     ),
-                  ),
-                  const SizedBox(width: 16),
-                  // Equipment Info
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            equipment.name,
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 18,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            "MODEL: ${equipment.model.toUpperCase()}",
+                            style: const TextStyle(
+                              color: Color.fromARGB(255, 230, 230, 230),
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
+                              letterSpacing: 0.5,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    // Availability Toggle in top right
+                    Column(
                       children: [
-                        Text(
-                          "MODEL: ${equipment.model.toUpperCase()}",
-                          style: const TextStyle(
-                            color: ghostGray,
+                        const Text(
+                          "AVAILABLE",
+                          style: TextStyle(
+                            color: Color.fromARGB(255, 230, 230, 230),
                             fontSize: 10,
                             fontWeight: FontWeight.bold,
-                            letterSpacing: 1.1,
                           ),
                         ),
-                        const SizedBox(height: 4),
-                        Text(
-                          equipment.name,
-                          style: const TextStyle(
-                            color: Colors.white, // Pure White
-                            fontWeight: FontWeight.bold,
-                            fontSize: 18,
-                          ),
+                        Switch(
+                          value: equipment.isVisible,
+                          onChanged: (val) async {
+                            /* Toggle Logic */
+                            final res = await equipmentNotifier
+                                .updateVisibilityStatus(
+                                  equipment.id,
+                                  val,
+                                  equipment.status,
+                                );
+                            if (res == true) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text("Equipment Updated"),
+                                ),
+                              );
+                            }
+                          },
+                          activeColor: accentColor,
                         ),
                       ],
                     ),
-                  ),
-                  // Status Badge
-                  _StatusBadge(status: equipment.status),
-                ],
-              ),
+                  ],
+                ),
+
+                const Padding(
+                  padding: EdgeInsets.symmetric(vertical: 12),
+                  child: Divider(color: Colors.white10, height: 1),
+                ),
+
+                // SECOND ROW: Status + Location/Price
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    _StatusBadge(status: equipment.status),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              const Icon(
+                                Icons.location_on,
+                                size: 14,
+                                color: ghostGray,
+                              ),
+                              const SizedBox(width: 4),
+                              Flexible(
+                                child: Text(
+                                  locationText,
+                                  style: const TextStyle(
+                                    color: Colors.white70,
+                                    fontSize: 13,
+                                  ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            priceDisplay,
+                            style: const TextStyle(
+                              color: accentColor,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ],
             ),
           ),
         ),

@@ -60,31 +60,31 @@ class _OwnerEquipmentListScreenState
             PageHeader(title: "My Equipment"),
 
             // Subtle "Owner Mode" Indicator
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-              child: Row(
-                children: [
-                  // Container(
-                  //   width: 8,
-                  //   height: 8,
-                  //   decoration: const BoxDecoration(
-                  //     color: Color(0xFFD97706), // Amber/Warning
-                  //     shape: BoxShape.circle,
-                  //   ),
-                  // ),
-                  const SizedBox(width: 8),
-                  Text(
-                    "ADMINISTRATIVE ACCESS ACTIVE",
-                    style: TextStyle(
-                      color: ghostGray,
-                      fontSize: 10,
-                      fontWeight: FontWeight.bold,
-                      letterSpacing: 1.5,
-                    ),
-                  ),
-                ],
-              ),
-            ),
+            // Padding(
+            //   padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+            //   child: Row(
+            //     children: [
+            //       Container(
+            //         width: 8,
+            //         height: 8,
+            //         decoration: const BoxDecoration(
+            //           color: Color(0xFFD97706), // Amber/Warning
+            //           shape: BoxShape.circle,
+            //         ),
+            //       ),
+            //       const SizedBox(width: 8),
+            //       Text(
+            //         "ADMINISTRATIVE ACCESS ACTIVE",
+            //         style: TextStyle(
+            //           color: ghostGray,
+            //           fontSize: 10,
+            //           fontWeight: FontWeight.bold,
+            //           letterSpacing: 1.5,
+            //         ),
+            //       ),
+            //     ],
+            //   ),
+            // ),
 
             // 2. Scrollable Content
             Expanded(
@@ -94,15 +94,15 @@ class _OwnerEquipmentListScreenState
                     )
                   : ListView.builder(
                       padding: const EdgeInsets.fromLTRB(
-                        20,
+                        16,
                         10,
                         20,
-                        100,
+                        90,
                       ), // Extra bottom padding for the bar
                       itemCount: state.ownerEquipment.length,
                       itemBuilder: (context, index) {
                         return Padding(
-                          padding: const EdgeInsets.only(bottom: 10),
+                          padding: const EdgeInsets.only(bottom: 16),
                           child: OwnerEquipmentCard(
                             equipment: state.ownerEquipment[index],
                           ),

@@ -2,9 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:prokat/features/categories/providers/category_provider.dart';
 import 'package:prokat/features/equipment/providers/equipment_provider.dart';
+import 'package:prokat/features/requests/providers/request_provider.dart';
 
 class CategorySelectionSheet extends ConsumerWidget {
-  const CategorySelectionSheet({super.key});
+  final service;
+
+  const CategorySelectionSheet({super.key, required this.service});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -50,23 +53,42 @@ class CategorySelectionSheet extends ConsumerWidget {
               itemBuilder: (context, index) {
                 final category = categories[index];
                 return ListTile(
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 4),
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 24,
+                    vertical: 4,
+                  ),
                   leading: Container(
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
                       color: accentColor.withValues(alpha: 0.1),
                       shape: BoxShape.circle,
                     ),
-                    child: Icon(Icons.construction_rounded, color: accentColor, size: 20),
+                    child: Icon(
+                      Icons.construction_rounded,
+                      color: accentColor,
+                      size: 20,
+                    ),
                   ),
                   title: Text(
                     category.name,
-                    style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                   onTap: () {
-                    // 3. Update the Equipment Notifier
-                    ref.read(equipmentProvider.notifier).selectCategory(category);
-                    
+                    if (service == "request") {
+                      // 3. Update the Request Notifier
+                      ref
+                          .read(requestProvider.notifier)
+                          .selectCategory(category);
+                    } else if (service == "equipment") {
+                      // 3. Update the Equipment Notifier
+                      ref
+                          .read(equipmentProvider.notifier)
+                          .selectCategory(category);
+                    }
+
                     // 4. Close the sheet and return the category to the form
                     Navigator.pop(context, category);
                   },

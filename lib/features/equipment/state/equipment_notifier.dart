@@ -52,7 +52,7 @@ class EquipmentNotifier extends StateNotifier<EquipmentState> {
   }
 
   /// CREATE
-  Future<void> createEquipment(Map<String, dynamic> data) async {
+  Future<bool> createEquipment(Map<String, dynamic> data) async {
     try {
       final newEquipment = await api.createEquipment(data);
 
@@ -60,13 +60,18 @@ class EquipmentNotifier extends StateNotifier<EquipmentState> {
         ownerEquipment: [...state.ownerEquipment, newEquipment],
       );
 
+      await getOwnerEquipment();
+
+      return true;
     } catch (e) {
       state = state.copyWith(error: e.toString());
+
+      return false;
     }
   }
 
   /// UPDATE
-  Future<void> updateEquipment(String id, Map<String, dynamic> data) async {
+  Future<bool> updateEquipment(String id, Map<String, dynamic> data) async {
     try {
       final updated = await api.updateEquipment(id, data);
 
@@ -78,8 +83,12 @@ class EquipmentNotifier extends StateNotifier<EquipmentState> {
       }).toList();
 
       state = state.copyWith(ownerEquipment: updatedList);
+
+      return true;
     } catch (e) {
       state = state.copyWith(error: e.toString());
+
+      return false;
     }
   }
 
@@ -97,7 +106,10 @@ class EquipmentNotifier extends StateNotifier<EquipmentState> {
         return e;
       }).toList();
 
-      state = state.copyWith(ownerEquipment: updatedList, editEquipment: updated);
+      state = state.copyWith(
+        ownerEquipment: updatedList,
+        editEquipment: updated,
+      );
 
       return true;
     } catch (e) {
@@ -107,7 +119,7 @@ class EquipmentNotifier extends StateNotifier<EquipmentState> {
     }
   }
 
-  Future<void> updateVisibilityStatus(
+  Future<bool> updateVisibilityStatus(
     String equipmentId,
     bool isVisible,
     String status,
@@ -127,8 +139,10 @@ class EquipmentNotifier extends StateNotifier<EquipmentState> {
       }).toList();
 
       state = state.copyWith(ownerEquipment: updatedList);
+
+      return true;
     } catch (e) {
-      rethrow;
+      return false;
     }
   }
 

@@ -66,6 +66,11 @@ class SidebarDrawer extends ConsumerWidget {
                 ),
 
                 SidebarTile(
+                  icon: Icons.home,
+                  label: "Dashboard",
+                  route: "/dashboard",
+                ),
+                SidebarTile(
                   icon: Icons.search,
                   label: "Search",
                   route: AppRoutes.searchMap,

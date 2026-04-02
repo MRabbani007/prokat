@@ -53,10 +53,10 @@ class _VisibilityStatusSectionState extends State<VisibilityStatusSection> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 const Text(
-                  "Status",
+                  "STATUS",
                   style: TextStyle(
-                    color: ghostGray,
-                    fontSize: 10,
+                    color: Color.fromARGB(255, 190, 190, 190),
+                    fontSize: 16,
                     fontWeight: FontWeight.bold,
                     letterSpacing: 1.5,
                   ),
@@ -87,25 +87,44 @@ class _VisibilityStatusSectionState extends State<VisibilityStatusSection> {
             ),
           ),
 
-          // 1. Visibility Toggle Panel
-          _IndustrialControlRow(
-            label: "Visible",
-            subtitle: _tempVisible ? "Visible" : "Hidden",
-            trailing: Switch.adaptive(
-              value: _tempVisible,
-              activeColor: accentBlue,
-              activeTrackColor: accentBlue.withValues(alpha: 0.3),
-              onChanged: (v) => setState(() => _tempVisible = v),
+          // is Visibile / available for rent
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            // decoration: BoxDecoration(
+            //   color: Colors.black.withValues(alpha: 0.2),
+            //   borderRadius: BorderRadius.circular(16),
+            //   border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
+            // ),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    "Available for rent",
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+                Switch.adaptive(
+                  value: _tempVisible,
+                  activeColor: accentBlue,
+                  activeTrackColor: accentBlue.withValues(alpha: 0.3),
+                  onChanged: (v) => setState(() => _tempVisible = v),
+                ),
+              ],
             ),
           ),
 
+          // Equipment Status: Booked / Maintenance
           const Padding(
-            padding: EdgeInsets.fromLTRB(20, 16, 20, 8),
+            padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             child: Text(
               "Operating Status",
               style: TextStyle(
-                color: ghostGray,
-                fontSize: 9,
+                color: Colors.white,
+                fontSize: 16,
                 fontWeight: FontWeight.bold,
               ),
             ),
@@ -113,7 +132,7 @@ class _VisibilityStatusSectionState extends State<VisibilityStatusSection> {
 
           // 2. Industrial Status Selector
           Padding(
-            padding: const EdgeInsets.fromLTRB(20, 0, 20, 24),
+            padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
             child: SingleChildScrollView(
               scrollDirection: Axis.horizontal,
               child: Row(
@@ -148,7 +167,7 @@ class _VisibilityStatusSectionState extends State<VisibilityStatusSection> {
                       child: Text(
                         s,
                         style: TextStyle(
-                          fontSize: 10,
+                          fontSize: 14,
                           fontWeight: FontWeight.bold,
                           letterSpacing: 1,
                           color: isSelected ? activeColor : ghostGray,
@@ -160,57 +179,6 @@ class _VisibilityStatusSectionState extends State<VisibilityStatusSection> {
               ),
             ),
           ),
-        ],
-      ),
-    );
-  }
-}
-
-class _IndustrialControlRow extends StatelessWidget {
-  final String label;
-  final String subtitle;
-  final Widget trailing;
-  const _IndustrialControlRow({
-    required this.label,
-    required this.subtitle,
-    required this.trailing,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.black.withValues(alpha: 0.2),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                label,
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 12,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              Text(
-                subtitle,
-                style: const TextStyle(
-                  color: Color(0x4DFFFFFF),
-                  fontSize: 10,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ],
-          ),
-          trailing,
         ],
       ),
     );

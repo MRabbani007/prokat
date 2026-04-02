@@ -43,10 +43,10 @@ class PricingSection extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 const Text(
-                  "Prices",
+                  "PRICES",
                   style: TextStyle(
-                    color: ghostGray,
-                    fontSize: 10,
+                    color: Color.fromARGB(255, 190, 190, 190),
+                    fontSize: 16,
                     fontWeight: FontWeight.bold,
                     letterSpacing: 1.5,
                   ),
