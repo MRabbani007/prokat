@@ -2,6 +2,8 @@ import '../models/location_model.dart';
 import '../models/location_search_result.dart';
 
 class LocationState {
+  final String? city;
+
   final List<LocationModel> renterLocations;
   final List<LocationModel> ownerLocations;
 
@@ -13,6 +15,8 @@ class LocationState {
   final String? error;
 
   const LocationState({
+    this.city,
+
     this.renterLocations = const [],
     this.ownerLocations = const [],
 
@@ -25,6 +29,8 @@ class LocationState {
   });
 
   LocationState copyWith({
+    String? city,
+
     List<LocationModel>? renterLocations,
     List<LocationModel>? ownerLocations,
 
@@ -35,6 +41,7 @@ class LocationState {
     String? error,
   }) {
     return LocationState(
+      city: city ?? this.city,
       renterLocations: renterLocations ?? this.renterLocations,
       ownerLocations: ownerLocations ?? this.ownerLocations,
 

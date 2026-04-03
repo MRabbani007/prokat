@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:prokat/core/router/app_router.dart';
 import 'package:prokat/features/appstartup/app_startup_provider.dart';
+import 'package:prokat/core/theme/app_theme.dart';
+import 'package:prokat/core/theme/theme_provider.dart';
 
 class MyApp extends ConsumerStatefulWidget {
   const MyApp({super.key});
@@ -23,24 +25,15 @@ class _MyAppState extends ConsumerState<MyApp> {
   @override
   Widget build(BuildContext context) {
     final router = createRouter(ref);
+    final themeMode = ref.watch(themeModeProvider);
 
     return MaterialApp.router(
       title: 'Prokat',
       debugShowCheckedModeBanner: false,
       routerConfig: router,
-      theme: ThemeData(
-        useMaterial3: true, // Recommended for modern Flutter apps
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: const Color(0xFF1A237E), // Deep Navy
-          brightness: Brightness.light,
-        ),
-      ),
-      darkTheme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: const Color(0xFF1A237E),
-          brightness: Brightness.dark,
-        ),
-      ),
+      themeMode: themeMode,
+      theme: AppTheme.lightTheme,
+      darkTheme: AppTheme.darkTheme,
     );
   }
 }

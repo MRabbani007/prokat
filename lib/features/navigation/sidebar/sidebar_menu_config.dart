@@ -42,7 +42,7 @@ const List<SidebarMenuItem> userMenu = [
   SidebarMenuItem(
     label: 'My Rentals',
     icon: Icons.local_shipping_rounded,
-    route: AppRoutes.myRentals,
+    route: AppRoutes.myOrders,
   ),
 ];
 

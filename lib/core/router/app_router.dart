@@ -214,7 +214,7 @@ GoRouter createRouter(WidgetRef ref) {
                 ],
               ),
               GoRoute(
-                path: AppRoutes.myRentals,
+                path: AppRoutes.myOrders,
                 builder: (_, _) => const RenterBookingsScreen(),
               ),
               GoRoute(

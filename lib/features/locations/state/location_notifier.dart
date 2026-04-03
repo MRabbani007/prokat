@@ -13,6 +13,10 @@ class LocationNotifier extends StateNotifier<LocationState> {
 
   List<LocationSearchResult> suggestions = [];
 
+  void selectCity(String city) {
+    state = state.copyWith(city: city);
+  }
+
   // Fetch user Addresses
   Future<void> getRenterLocations() async {
     try {

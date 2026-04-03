@@ -119,14 +119,14 @@ class _AddressHistoryTile extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.only(bottom: 8),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.03),
+        color: Colors.white.withValues(alpha: 0.03),
         borderRadius: BorderRadius.circular(12),
       ),
       child: ListTile(
         onTap: onTap,
         leading: Icon(
           Icons.history,
-          color: Colors.white.withOpacity(0.3),
+          color: Colors.white.withValues(alpha: 0.3),
           size: 20,
         ),
         title: Text(
@@ -135,7 +135,7 @@ class _AddressHistoryTile extends StatelessWidget {
         ),
         trailing: Icon(
           Icons.chevron_right,
-          color: Colors.white.withOpacity(0.1),
+          color: Colors.white.withValues(alpha: 0.1),
           size: 18,
         ),
       ),

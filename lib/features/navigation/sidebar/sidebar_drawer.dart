@@ -87,8 +87,8 @@ class SidebarDrawer extends ConsumerWidget {
                 ),
                 SidebarTile(
                   icon: Icons.calendar_month_outlined,
-                  label: "My Rentals",
-                  route: AppRoutes.myRentals,
+                  label: "My Orders",
+                  route: AppRoutes.myOrders,
                 ),
 
                 if (isOwner) ...[

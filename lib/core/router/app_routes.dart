@@ -9,8 +9,11 @@ class AppRoutes {
   static const String register = '/register';
   static const String forgotPassword = '/forgot-password';
 
+  // Guest Screens
+  static const String main = '/main'; // Landing page with limited information
+
   // User Screens
-  static const String main = '/main';
+  static const String dashboard = '/dashboard';
   static const String categories = '/categories';
   static const String searchList = '/search/list';
   static const String searchMap = '/search/map';
@@ -18,7 +21,7 @@ class AppRoutes {
   static const String booking = '/equipment/:id/book';
   static const String myRequests = '/requests';
   static const String createRequest = '/requests/create';
-  static const String myRentals = '/myrentals';
+  static const String myOrders = '/myOrders';
   static const String favorites = '/favorites';
 
   static const String profile = '/profile';

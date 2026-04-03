@@ -7,10 +7,13 @@ class CategoryState {
   final List<Category> categories;
   final Category? selectedCategory;
 
+  final bool? showSelect;
+
   CategoryState({
     this.isLoading = false,
     this.error,
     this.selectedCategory,
+    this.showSelect,
     this.categories = const [],
   });
 
@@ -19,12 +22,14 @@ class CategoryState {
     String? error,
     List<Category>? categories,
     Category? selectedCategory,
+    bool? showSelect,
   }) {
     return CategoryState(
       isLoading: isLoading ?? this.isLoading,
       error: error,
       categories: categories ?? this.categories,
       selectedCategory: selectedCategory ?? this.selectedCategory,
+      showSelect: showSelect ?? this.showSelect,
     );
   }
 }

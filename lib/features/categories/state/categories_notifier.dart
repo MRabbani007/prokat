@@ -10,8 +10,12 @@ class CategoriesNotifier extends StateNotifier<CategoryState> {
     // getCategories();
   }
 
-  void selectCategory(Category category) {
-    state = state.copyWith(selectedCategory: category);
+  void selectCategory(Category? category) {
+    state = state.copyWith(selectedCategory: category, showSelect: false);
+  }
+
+  void clearCategory(){
+    state = state.copyWith(showSelect: true);
   }
 
   Future<void> getCategories() async {

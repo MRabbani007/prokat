@@ -42,7 +42,7 @@ class _LaunchScreenState extends State<LaunchScreen>
     _controller.forward();
 
     Future.delayed(const Duration(seconds: 3), () {
-      if (mounted) context.go(AppRoutes.searchMap);
+      if (mounted) context.go(AppRoutes.dashboard); //
     });
   }
 
