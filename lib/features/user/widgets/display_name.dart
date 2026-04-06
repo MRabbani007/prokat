@@ -11,7 +11,7 @@ class DisplayName extends ConsumerStatefulWidget {
 
 class _DisplayNameState extends ConsumerState<DisplayName> {
   bool isEditing = false;
-  late TextEditingController controller;
+  late final TextEditingController controller;
 
   @override
   void initState() {
@@ -38,73 +38,109 @@ class _DisplayNameState extends ConsumerState<DisplayName> {
     final newName = controller.text.trim();
     if (newName.isEmpty) return;
 
-    final nameArray = newName.split(" ");
+    final parts = newName.split(' ');
 
-    final res = await ref
+    final success = await ref
         .read(userProfileProvider.notifier)
         .updateUserProfile(
-          firstName: nameArray[0],
-          lastName: nameArray.length > 1 ? nameArray[1] : "",
+          firstName: parts.first,
+          lastName: parts.length > 1 ? parts.sublist(1).join(' ') : '',
         );
 
-    if (res == true) {
+    if (success == true) {
       setState(() => isEditing = false);
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final textTheme = theme.textTheme;
+    final colorScheme = theme.colorScheme;
+
     final state = ref.watch(userProfileProvider);
-    final name = state.userProfile?.displayName ?? "";
+    final name = state.userProfile?.displayName ?? '';
     final isLoading = state.isLoading;
 
     if (isEditing) {
-      return Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          TextField(
-            controller: controller,
-            autofocus: true,
-            style: const TextStyle(color: Colors.white),
-            decoration: const InputDecoration(
-              hintText: "Enter name",
-              hintStyle: TextStyle(color: Colors.white54),
-            ),
-          ),
-          const SizedBox(height: 8),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              TextButton(onPressed: cancelEditing, child: const Text("Cancel")),
-              const SizedBox(width: 8),
-              ElevatedButton(
-                onPressed: isLoading ? null : submit,
-                child: const Text("Save"),
+      return Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 24),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            /// Constrained width input
+            TextField(
+              controller: controller,
+              autofocus: true,
+              textInputAction: TextInputAction.done,
+              onSubmitted: (_) => submit(),
+              style: textTheme.bodyLarge?.copyWith(
+                color: colorScheme.onSurface,
               ),
-            ],
-          ),
-        ],
+              decoration: InputDecoration(
+                hintText: 'Enter name',
+                hintStyle: textTheme.bodyMedium?.copyWith(
+                  color: colorScheme.onSurface.withOpacity(0.5),
+                ),
+                filled: true,
+                fillColor: theme.cardColor,
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 14,
+                ),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(14),
+                  borderSide: BorderSide.none,
+                ),
+              ),
+            ),
+
+            const SizedBox(height: 12),
+
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                TextButton(
+                  onPressed: cancelEditing,
+                  child: const Text('Cancel'),
+                ),
+                const SizedBox(width: 12),
+                ElevatedButton(
+                  onPressed: isLoading ? null : submit,
+                  child: const Text('Save'),
+                ),
+              ],
+            ),
+          ],
+        ),
       );
     }
 
     /// 👇 Display mode
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Text(
-          name,
-          style: const TextStyle(
-            color: Colors.white,
-            fontSize: 22,
-            fontWeight: FontWeight.bold,
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 24),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text(
+            name,
+            style: textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w700),
           ),
-        ),
-        const SizedBox(width: 8),
-        GestureDetector(
-          onTap: () => startEditing(name),
-          child: const Icon(Icons.edit, color: Colors.white70, size: 18),
-        ),
-      ],
+          const SizedBox(width: 8),
+          InkWell(
+            borderRadius: BorderRadius.circular(20),
+            onTap: () => startEditing(name),
+            child: Padding(
+              padding: const EdgeInsets.all(4),
+              child: Icon(
+                Icons.edit,
+                size: 18,
+                color: colorScheme.onSurface.withOpacity(0.7),
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

@@ -48,13 +48,17 @@ class UserCategorySelector extends ConsumerWidget {
           child: FadeTransition(opacity: animation, child: child),
         );
       },
-      child: categoriesState.showSelect == true
+      child:
+          categoriesState.showSelect == true ||
+              categoriesState.selectedCategory == null
           ? SizedBox(
               key: const ValueKey('service_list'),
-              height: 140, // your existing height
+              height: 150, // your existing height
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  SizedBox(height: 8),
+
                   const Padding(
                     padding: EdgeInsets.symmetric(horizontal: 16, vertical: 0),
                     child: Text(
@@ -65,6 +69,7 @@ class UserCategorySelector extends ConsumerWidget {
                       ),
                     ),
                   ),
+
                   SizedBox(
                     height: 110, // Increased height to fit larger icons
                     child: ListView.builder(

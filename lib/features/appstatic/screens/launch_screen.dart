@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:prokat/core/router/app_routes.dart';
@@ -16,10 +15,6 @@ class _LaunchScreenState extends State<LaunchScreen>
   late final Animation<double> _fadeAnimation;
   late final Animation<double> _scaleAnimation;
 
-  // Theme Constants matching your Sidebar & Header
-  final bgColor = const Color(0xFF121417);
-  final accentColor = const Color(0xFF4E73DF);
-
   @override
   void initState() {
     super.initState();
@@ -34,15 +29,16 @@ class _LaunchScreenState extends State<LaunchScreen>
       curve: const Interval(0.0, 0.8, curve: Curves.easeIn),
     );
 
-    _scaleAnimation = Tween<double>(
-      begin: 0.85,
-      end: 1.0,
-    ).animate(CurvedAnimation(parent: _controller, curve: _OutProposedCurve()));
+    _scaleAnimation = Tween<double>(begin: 0.85, end: 1.0).animate(
+      CurvedAnimation(parent: _controller, curve: const _OutProposedCurve()),
+    );
 
     _controller.forward();
 
     Future.delayed(const Duration(seconds: 3), () {
-      if (mounted) context.go(AppRoutes.dashboard); //
+      if (mounted) {
+        context.go(AppRoutes.dashboard);
+      }
     });
   }
 
@@ -54,23 +50,27 @@ class _LaunchScreenState extends State<LaunchScreen>
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final textTheme = theme.textTheme;
+
     return Scaffold(
-      backgroundColor: bgColor,
+      backgroundColor: theme.scaffoldBackgroundColor,
       body: SizedBox.expand(
         child: Stack(
           alignment: Alignment.center,
           children: [
-            // 1. Subtle Background Radial Glow
+            /// 1. Subtle background radial glow
             Positioned(
-              top: -100,
+              top: -120,
               child: Container(
-                width: 400,
-                height: 400,
+                width: 420,
+                height: 420,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   gradient: RadialGradient(
                     colors: [
-                      accentColor.withValues(alpha: 0.08),
+                      colorScheme.primary.withOpacity(0.08),
                       Colors.transparent,
                     ],
                   ),
@@ -78,7 +78,7 @@ class _LaunchScreenState extends State<LaunchScreen>
               ),
             ),
 
-            // 2. Central Branding
+            /// 2. Branding
             FadeTransition(
               opacity: _fadeAnimation,
               child: ScaleTransition(
@@ -86,18 +86,18 @@ class _LaunchScreenState extends State<LaunchScreen>
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    // Icon with Neo-Industrial Style
+                    /// Icon container
                     Container(
                       padding: const EdgeInsets.all(24),
                       decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.03),
+                        color: colorScheme.onSurface.withOpacity(0.03),
                         borderRadius: BorderRadius.circular(32),
                         border: Border.all(
-                          color: Colors.white.withValues(alpha: 0.08),
+                          color: colorScheme.onSurface.withOpacity(0.08),
                         ),
                         boxShadow: [
                           BoxShadow(
-                            color: accentColor.withValues(alpha: 0.15),
+                            color: colorScheme.primary.withOpacity(0.15),
                             blurRadius: 40,
                             spreadRadius: 2,
                           ),
@@ -106,30 +106,31 @@ class _LaunchScreenState extends State<LaunchScreen>
                       child: Icon(
                         Icons.precision_manufacturing_rounded,
                         size: 64,
-                        color: accentColor,
+                        color: colorScheme.primary,
                       ),
                     ),
+
                     const SizedBox(height: 40),
 
-                    // Clean Typography Stack
+                    /// App name
                     Text(
                       'PROKAT',
-                      style: TextStyle(
-                        fontSize: 56,
+                      style: textTheme.displayLarge?.copyWith(
                         fontWeight: FontWeight.bold,
                         letterSpacing: 6,
-                        color: Colors.white,
-                        fontFamily: 'Oswald', // Teko
+                        fontFamily: 'Oswald',
                       ),
                     ),
+
                     const SizedBox(height: 12),
+
+                    /// Tagline
                     Text(
                       'HEAVY EQUIPMENT RENTALS',
-                      style: TextStyle(
-                        fontSize: 16,
+                      style: textTheme.bodyMedium?.copyWith(
                         fontWeight: FontWeight.w800,
                         letterSpacing: 2.5,
-                        color: Colors.white.withValues(alpha: 0.8),
+                        color: colorScheme.onSurface.withOpacity(0.8),
                       ),
                     ),
                   ],
@@ -137,7 +138,7 @@ class _LaunchScreenState extends State<LaunchScreen>
               ),
             ),
 
-            // 3. Technical Loader
+            /// 3. Loader
             Positioned(
               bottom: 80,
               child: Column(
@@ -147,20 +148,16 @@ class _LaunchScreenState extends State<LaunchScreen>
                     height: 40,
                     child: CircularProgressIndicator(
                       strokeWidth: 2,
-                      valueColor: AlwaysStoppedAnimation<Color>(
-                        accentColor.withValues(alpha: 0.5),
-                      ),
-                      backgroundColor: Colors.white.withValues(alpha: 0.05),
+                      color: colorScheme.primary.withOpacity(0.5),
+                      backgroundColor: colorScheme.onSurface.withOpacity(0.05),
                     ),
                   ),
                   const SizedBox(height: 24),
                   Text(
-                    "LOADING",
-                    style: TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.bold,
+                    'LOADING',
+                    style: textTheme.labelLarge?.copyWith(
                       letterSpacing: 2,
-                      color: Colors.white.withValues(alpha: 0.90),
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
                 ],
@@ -173,16 +170,12 @@ class _LaunchScreenState extends State<LaunchScreen>
   }
 }
 
-// Custom curve for a "Heavy" feel
+/// Custom curve for a "heavy / industrial" feel
 class _OutProposedCurve extends Curve {
-  const _OutProposedCurve(); // Add 'const' here!
+  const _OutProposedCurve();
 
   @override
   double transformInternal(double t) {
-    return 1.0 - (1.0 - t) * (1.0 - t) * (1.0 - t); // Cubic Out
+    return 1.0 - (1.0 - t) * (1.0 - t) * (1.0 - t);
   }
-}
-
-extension on Curves {
-  // static const outProposed = _OutProposedCurve();
 }

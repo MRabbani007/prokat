@@ -1,115 +1,119 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:prokat/features/user/state/user_profile_provider.dart';
+import 'package:go_router/go_router.dart';
 
-void showEditUsernameSheet(
+Future<void> showEditUsernameSheet(
   BuildContext context,
   WidgetRef ref,
   String? currentUsername,
 ) {
-  final isLocked =
-      currentUsername != null && currentUsername.isNotEmpty;
-  final controller = TextEditingController(text: currentUsername ?? "");
+  final isLocked = currentUsername != null && currentUsername.isNotEmpty;
 
-  showModalBottomSheet(
+  final controller = TextEditingController(text: currentUsername ?? '');
+
+  final theme = Theme.of(context);
+  final colorScheme = theme.colorScheme;
+  final textTheme = theme.textTheme;
+
+  return showModalBottomSheet(
     context: context,
     isScrollControlled: true,
-    backgroundColor: const Color(0xFF1E1E1E),
+    backgroundColor: theme.scaffoldBackgroundColor,
     shape: const RoundedRectangleBorder(
       borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
     ),
-    builder: (_) {
-      return Padding(
-        padding: EdgeInsets.only(
-          left: 16,
-          right: 16,
-          top: 16,
-          bottom: MediaQuery.of(context).viewInsets.bottom + 16,
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            /// Title
-            const Text(
-              "Set Username",
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
+    builder: (context) {
+      return SafeArea(
+        top: false,
+        child: Padding(
+          padding: EdgeInsets.only(
+            left: 24,
+            right: 24,
+            top: 20,
+            bottom: MediaQuery.of(context).viewInsets.bottom + 16,
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              /// Title
+              Text('Set Username', style: textTheme.titleLarge),
 
-            const SizedBox(height: 8),
+              const SizedBox(height: 8),
 
-            /// Info (important UX)
-            Text(
-              isLocked
-                  ? "Username cannot be changed once set."
-                  : "Choose a username. This can only be set once.",
-              style: TextStyle(
-                color: Colors.white.withValues(alpha: 0.5),
-                fontSize: 13,
-              ),
-              textAlign: TextAlign.center,
-            ),
-
-            const SizedBox(height: 16),
-
-            /// Input
-            TextField(
-              controller: controller,
-              enabled: !isLocked,
-              style: const TextStyle(color: Colors.white),
-              decoration: InputDecoration(
-                hintText: "username",
-                hintStyle: TextStyle(
-                  color: Colors.white.withValues(alpha: 0.4),
-                ),
-                filled: true,
-                fillColor: Colors.white.withValues(alpha: 0.05),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
+              /// Info text
+              Text(
+                isLocked
+                    ? 'Username cannot be changed once set.'
+                    : 'Choose a username. This can only be set once.',
+                textAlign: TextAlign.center,
+                style: textTheme.bodySmall?.copyWith(
+                  color: colorScheme.onSurface.withOpacity(0.6),
                 ),
               ),
-            ),
 
-            const SizedBox(height: 16),
+              const SizedBox(height: 20),
 
-            /// Actions
-            Row(
-              children: [
-                Expanded(
-                  child: TextButton(
-                    onPressed: () => Navigator.pop(context),
-                    child: const Text("Close"),
+              /// Username input
+              TextField(
+                controller: controller,
+                enabled: !isLocked,
+                textInputAction: TextInputAction.done,
+                style: textTheme.bodyLarge,
+                decoration: InputDecoration(
+                  hintText: 'username',
+                  hintStyle: textTheme.bodyMedium?.copyWith(
+                    color: colorScheme.onSurface.withOpacity(0.4),
+                  ),
+                  filled: true,
+                  fillColor: theme.cardColor,
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 14,
+                  ),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(14),
+                    borderSide: BorderSide.none,
                   ),
                 ),
+              ),
 
-                if (!isLocked)
+              const SizedBox(height: 20),
+
+              /// Actions
+              Row(
+                children: [
                   Expanded(
-                    child: ElevatedButton(
-                      onPressed: () async {
-                        final username = controller.text.trim();
-
-                        if (username.isEmpty) return;
-
-                        /// optional validation
-                        if (username.length < 3) return;
-
-                        final res = await ref
-                            .read(userProfileProvider.notifier)
-                            .updateUserName(username);
-
-                        if (res == true) {
-                          Navigator.pop(context);
-                        }
-                      },
-                      child: const Text("Save"),
+                    child: TextButton(
+                      onPressed: () => context.pop(),
+                      child: const Text('Close'),
                     ),
                   ),
-              ],
-            ),
-          ],
+
+                  if (!isLocked) ...[
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: ElevatedButton(
+                        onPressed: () async {
+                          final username = controller.text.trim();
+                          if (username.length < 3) return;
+
+                          final success = await ref
+                              .read(userProfileProvider.notifier)
+                              .updateUserName(username);
+
+                          if (success == true && context.mounted) {
+                            context.pop();
+                          }
+                        },
+                        child: const Text('Save'),
+                      ),
+                    ),
+                  ],
+                ],
+              ),
+            ],
+          ),
         ),
       );
     },

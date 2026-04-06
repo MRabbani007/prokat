@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:prokat/features/bookings/state/booking_provider.dart';
 import 'package:prokat/features/categories/models/category.dart';
 import 'package:prokat/features/categories/providers/category_provider.dart';
 import 'package:prokat/features/equipment/providers/equipment_provider.dart';
@@ -8,6 +9,7 @@ import 'package:prokat/features/user/widgets/user_category_selector.dart';
 import 'package:prokat/features/user/widgets/user_dashboard_header.dart';
 import 'package:prokat/features/user/widgets/user_equipment_tile.dart';
 import 'package:prokat/features/user/widgets/user_location_tile.dart';
+import 'package:go_router/go_router.dart';
 
 class UserDashboardPage extends ConsumerStatefulWidget {
   const UserDashboardPage({super.key});
@@ -30,92 +32,68 @@ class _UserDashboardPageState extends ConsumerState<UserDashboardPage> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final categoriesState = ref.watch(categoriesProvider);
-    // final bg = theme.scaffoldBackgroundColor;
-    // final card = theme.cardColor;
-    // final accent = theme.colorScheme.primary;
+    final items = ref.watch(equipmentProvider).renterEquipment;
+    final bookingNotifier = ref.read(bookingProvider.notifier);
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
-      // Use a CustomScrollView for a smoother feel with a pinned header if needed
       body: SafeArea(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+        child: ListView(
+          padding: const EdgeInsets.only(bottom: 16),
           children: [
-            UserDashboardHeader(),
+            // Header
+            const UserDashboardHeader(),
 
-            Row(
-              children: [
-                Expanded(
-                  child: Container(
-                    padding: EdgeInsets.symmetric(horizontal: 16),
-                    child: UserLocationTile(),
-                  ),
-                ),
+            const SizedBox(height: 12),
 
-                if (categoriesState.showSelect == false &&
-                    categoriesState.selectedCategory != null) ...[
-                  const SizedBox(width: 10),
+            // Location + category row
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 12),
+              child: Row(
+                children: [
+                  Expanded(child: UserLocationTile()),
+
+                  const SizedBox(width: 12),
+
                   Expanded(
-                    child: categoriesState.showSelect == false
-                        ? SelectedServiceTile(
-                            service:
+                    child: categoriesState.selectedCategory != null
+                        ? SelectedCategoryTile(
+                            category:
                                 categoriesState.selectedCategory as Category,
                             clearSelected: () => ref
-                                .watch(categoriesProvider.notifier)
+                                .read(categoriesProvider.notifier)
                                 .clearCategory(),
                           )
-                        : SizedBox(),
+                        : const SizedBox(),
                   ),
                 ],
-              ],
+              ),
             ),
 
-            SizedBox(height: 8),
+            // Category selector
+            const UserCategorySelector(),
 
-            UserCategorySelector(),
+            const SizedBox(height: 12),
 
-            // const Padding(
-            //   padding: EdgeInsets.fromLTRB(16, 24, 16, 12),
-            //   child: Text(
-            //     "Nearby Equipment",
-            //     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            //   ),
-            // ),
-            Expanded(child: _buildEquipmentList(context, ref)),
+            // Equipment list (NO local scroll)
+            ...items.map(
+              (equipment) => Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 0),
+                child: UserEquipmentTile(
+                  equipment: equipment,
+                  onTap: () {
+                    // Select equipment
+                    bookingNotifier.selectEquipment(equipment);
+                    // Navigate to booking screen
+                    context.push('/equipment/${equipment.id}/book');
+                  },
+                  isRenter: true,
+                ),
+              ),
+            ),
           ],
         ),
       ),
-    );
-  }
-
-  Widget _buildEquipmentList(BuildContext context, WidgetRef ref) {
-    final items = ref.watch(equipmentProvider).renterEquipment;
-
-    return ListView.builder(
-      padding: const EdgeInsets.symmetric(horizontal: 0),
-      itemCount: items.length,
-      itemBuilder: (context, index) {
-        final equipment = items[index];
-        return Container(
-          margin: const EdgeInsets.only(bottom: 16),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(20),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.04),
-                blurRadius: 10,
-                offset: const Offset(0, 4),
-              ),
-            ],
-          ),
-          child: UserEquipmentTile(
-            equipment: equipment,
-            onTap: () {},
-            isRenter: true,
-          ),
-        );
-      },
     );
   }
 }

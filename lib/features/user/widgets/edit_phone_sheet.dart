@@ -3,62 +3,99 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:prokat/features/user/state/user_profile_provider.dart';
 import 'package:go_router/go_router.dart';
 
-void editPhoneSheet(BuildContext context, WidgetRef ref, String currentPhone) {
+Future<void> showEditPhoneSheet(
+  BuildContext context,
+  WidgetRef ref,
+  String currentPhone,
+) {
   final controller = TextEditingController(text: currentPhone);
 
-  showModalBottomSheet(
+  final theme = Theme.of(context);
+  final colorScheme = theme.colorScheme;
+  final textTheme = theme.textTheme;
+
+  return showModalBottomSheet(
     context: context,
-    backgroundColor: const Color(0xFF1E1E1E),
+    isScrollControlled: true,
+    backgroundColor: theme.scaffoldBackgroundColor,
     shape: const RoundedRectangleBorder(
       borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
     ),
-    builder: (_) {
-      return Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Text("Edit Phone", style: TextStyle(color: Colors.white)),
-            const SizedBox(height: 12),
+    builder: (context) {
+      return SafeArea(
+        top: false,
+        child: Padding(
+          padding: EdgeInsets.only(
+            left: 24,
+            right: 24,
+            top: 20,
+            bottom: MediaQuery.of(context).viewInsets.bottom + 16,
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              /// Title
+              Text('Edit Phone', style: textTheme.titleLarge),
 
-            TextField(
-              controller: controller,
-              keyboardType: TextInputType.phone,
-              style: const TextStyle(color: Colors.white),
-              decoration: const InputDecoration(
-                hintText: "+7 700...",
-                hintStyle: TextStyle(color: Colors.white54),
+              const SizedBox(height: 16),
+
+              /// Input
+              TextField(
+                controller: controller,
+                keyboardType: TextInputType.phone,
+                textInputAction: TextInputAction.done,
+                style: textTheme.bodyLarge,
+                decoration: InputDecoration(
+                  hintText: '+7 700...',
+                  hintStyle: textTheme.bodyMedium?.copyWith(
+                    color: colorScheme.onSurface.withOpacity(0.5),
+                  ),
+                  filled: true,
+                  fillColor: theme.cardColor,
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 14,
+                  ),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(14),
+                    borderSide: BorderSide.none,
+                  ),
+                ),
               ),
-            ),
 
-            const SizedBox(height: 16),
+              const SizedBox(height: 20),
 
-            Row(
-              children: [
-                Expanded(
-                  child: TextButton(
-                    onPressed: () => context.pop(),
-                    child: const Text("Cancel"),
+              /// Actions
+              Row(
+                children: [
+                  Expanded(
+                    child: TextButton(
+                      onPressed: () => context.pop(),
+                      child: const Text('Cancel'),
+                    ),
                   ),
-                ),
-                Expanded(
-                  child: ElevatedButton(
-                    onPressed: () async {
-                      await ref
-                          .read(userProfileProvider.notifier)
-                          .updateUserProfile(
-                            phoneCountryCode: "KZ",
-                            phoneNumber: controller.text.trim(),
-                          );
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: () async {
+                        await ref
+                            .read(userProfileProvider.notifier)
+                            .updateUserProfile(
+                              phoneCountryCode: 'KZ',
+                              phoneNumber: controller.text.trim(),
+                            );
 
-                      context.pop();
-                    },
-                    child: const Text("Save"),
+                        if (context.mounted) {
+                          context.pop();
+                        }
+                      },
+                      child: const Text('Save'),
+                    ),
                   ),
-                ),
-              ],
-            ),
-          ],
+                ],
+              ),
+            ],
+          ),
         ),
       );
     },

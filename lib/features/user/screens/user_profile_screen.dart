@@ -1,21 +1,27 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:prokat/core/widgets/page_header.dart';
+import 'package:prokat/features/auth/widgets/logout_button.dart';
 import 'package:prokat/features/locations/state/location_provider.dart';
 import 'package:prokat/features/user/state/user_profile_provider.dart';
+import 'package:prokat/features/user/widgets/become_owner_cta.dart';
 import 'package:prokat/features/user/widgets/build_info_tile.dart';
 import 'package:prokat/features/user/widgets/display_name.dart';
 import 'package:prokat/features/user/widgets/edit_phone_sheet.dart';
+import 'package:prokat/features/user/widgets/setting_link_tile.dart';
 import 'package:prokat/features/user/widgets/show_edit_username.dart';
+
+import 'package:go_router/go_router.dart';
 
 class UserProfileScreen extends ConsumerWidget {
   const UserProfileScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    const bgColor = Color(0xFF121417); // Matches Sidebar
-    const cardColor = Color(0xFF1E2125); // Slightly lighter for depth
-    const accentColor = Color(0xFF4E73DF); // Industrial Blue
+    final theme = Theme.of(context);
+
+    // const cardColor = Color(0xFF1E2125); // Slightly lighter for depth
+    // const accentColor = Color(0xFF4E73DF); // Industrial Blue
 
     final state = ref.watch(userProfileProvider);
     final userAddresses = ref.watch(locationProvider).renterLocations;
@@ -26,7 +32,7 @@ class UserProfileScreen extends ConsumerWidget {
     final username = state.userProfile?.username;
 
     return Scaffold(
-      backgroundColor: bgColor,
+      backgroundColor: theme.scaffoldBackgroundColor,
       body: SafeArea(
         child: SingleChildScrollView(
           child: Column(
@@ -46,7 +52,7 @@ class UserProfileScreen extends ConsumerWidget {
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
                         border: Border.all(
-                          color: accentColor.withValues(alpha: 0.5),
+                          color: theme.colorScheme.primary,
                           width: 2,
                         ),
                       ),
@@ -62,8 +68,8 @@ class UserProfileScreen extends ConsumerWidget {
                       right: 4,
                       child: Container(
                         padding: const EdgeInsets.all(8),
-                        decoration: const BoxDecoration(
-                          color: accentColor,
+                        decoration: BoxDecoration(
+                          color: theme.colorScheme.primary,
                           shape: BoxShape.circle,
                         ),
                         child: const Icon(
@@ -84,23 +90,21 @@ class UserProfileScreen extends ConsumerWidget {
               const SizedBox(height: 32),
 
               // 2. Info Section (Cards)
-              BuildInfoTile(
+              InfoTile(
                 icon: Icons.phone_android_rounded,
                 label: "Phone Number",
                 value: state.userProfile?.phoneNumber ?? "+7 234 ...",
-                cardColor: cardColor,
-                onTap: () => editPhoneSheet(
+                onTap: () => showEditPhoneSheet(
                   context,
                   ref,
                   state.userProfile?.phoneNumber ?? "",
                 ),
                 trailing: const Icon(Icons.edit, color: Colors.white54),
               ),
-              BuildInfoTile(
+              InfoTile(
                 icon: Icons.email_outlined,
                 label: "Email Address",
                 value: username ?? "Add username",
-                cardColor: cardColor,
                 onTap: () => showEditUsernameSheet(context, ref, username),
 
                 // onTap: username == null
@@ -110,14 +114,12 @@ class UserProfileScreen extends ConsumerWidget {
                     ? const Icon(Icons.add, color: Colors.white54)
                     : null,
               ),
-              BuildInfoTile(
+              InfoTile(
                 icon: Icons.location_on_outlined,
                 label: "Primary Address",
                 value: selectedAddress != null
                     ? selectedAddress.street
                     : "Select address",
-                cardColor: cardColor,
-
                 onTap: () {
                   Scaffold.of(context).openEndDrawer();
                   // OR
@@ -130,35 +132,44 @@ class UserProfileScreen extends ConsumerWidget {
                 ),
               ),
 
-              const SizedBox(height: 40),
+              const SizedBox(height: 20),
 
-              // Action Button
-              // Padding(
-              //   padding: const EdgeInsets.symmetric(horizontal: 24),
-              //   child: SizedBox(
-              //     width: double.infinity,
-              //     height: 56,
-              //     child: ElevatedButton(
-              //       onPressed: () {},
-              //       style: ElevatedButton.styleFrom(
-              //         backgroundColor: accentColor,
-              //         foregroundColor: Colors.white,
-              //         shape: RoundedRectangleBorder(
-              //           borderRadius: BorderRadius.circular(16),
-              //         ),
-              //         elevation: 8,
-              //         shadowColor: accentColor.withValues(alpha: 0.4),
-              //       ),
-              //       child: const Text(
-              //         "Edit Profile",
-              //         style: TextStyle(
-              //           fontWeight: FontWeight.bold,
-              //           fontSize: 16,
-              //         ),
-              //       ),
-              //     ),
-              //   ),
-              // ),
+              BecomeOwnerCTA(),
+
+              const SizedBox(height: 20),
+
+              /// Support / Growth
+              SettingsLinkTile(
+                icon: Icons.favorite_outline,
+                title: 'Support Us',
+                subtitle: 'Donate or help us grow',
+                onTap: () {
+                  context.push('/support-us');
+                },
+              ),
+
+              /// Legal
+              SettingsLinkTile(
+                icon: Icons.description_outlined,
+                title: 'Terms & Conditions',
+                onTap: () {
+                  context.push('/terms');
+                },
+              ),
+
+              /// Help & Support
+              SettingsLinkTile(
+                icon: Icons.help_outline,
+                title: 'Help & Support',
+                subtitle: 'Get help or contact support',
+                onTap: () {
+                  context.push('/help');
+                },
+              ),
+
+              LogoutButton(),
+
+              const SizedBox(height: 20),
             ],
           ),
         ),

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:prokat/features/layout/prokat_navigation_bar.dart';
+// import 'package:prokat/features/layout/prokat_navigation_bar.dart';
 import 'package:prokat/features/navigation/sidebar/sidebar_drawer.dart';
 
 class MainScaffold extends StatelessWidget {
@@ -16,7 +16,7 @@ class MainScaffold extends StatelessWidget {
     return Scaffold(
       key: _scaffoldKey,
       drawer: const SidebarDrawer(),
-      bottomNavigationBar: ProkatNavigationBar(navigationShell: navigationShell),
+      // bottomNavigationBar: ProkatNavigationBar(navigationShell: navigationShell),
       body: Stack(
         children: [
           // The actual page content

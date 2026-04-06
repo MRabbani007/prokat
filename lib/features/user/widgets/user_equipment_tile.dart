@@ -101,7 +101,7 @@ class UserEquipmentTile extends ConsumerWidget {
                           child: Text(
                             equipment.owner?.displayName ?? "Private Owner",
                             style: TextStyle(
-                              fontSize: 11,
+                              fontSize: 12,
                               fontWeight: FontWeight.w600,
                               color: Colors.grey[600],
                             ),
@@ -109,15 +109,43 @@ class UserEquipmentTile extends ConsumerWidget {
                           ),
                         ),
 
-                        if (isFavorite)
-                          const Padding(
-                            padding: EdgeInsets.only(right: 6),
-                            child: Icon(
-                              Icons.favorite,
-                              size: 16,
-                              color: Colors.redAccent,
+                        isFavorite == true
+                            ? const Padding(
+                                padding: EdgeInsets.only(right: 6),
+                                child: Icon(
+                                  Icons.favorite_border,
+                                  size: 16,
+                                  color: Colors.redAccent,
+                                ),
+                              )
+                            : const Padding(
+                                padding: EdgeInsets.only(right: 6),
+                                child: Icon(
+                                  Icons.favorite,
+                                  size: 16,
+                                  color: Colors.redAccent,
+                                ),
+                              ),
+
+                        /// RATING
+                        Row(
+                          children: [
+                            const Icon(
+                              Icons.star,
+                              size: 14,
+                              color: Colors.amber,
                             ),
-                          ),
+                            const SizedBox(width: 4),
+                            Text(
+                              "4.8 (24)",
+                              style: TextStyle(
+                                fontSize: 11,
+                                color: Colors.grey[700],
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ],
+                        ),
 
                         _StatusIndicator(status: equipment.status),
                       ],
@@ -129,7 +157,7 @@ class UserEquipmentTile extends ConsumerWidget {
                     Text(
                       equipment.name,
                       style: const TextStyle(
-                        fontSize: 15,
+                        fontSize: 16,
                         fontWeight: FontWeight.bold,
                       ),
                       maxLines: 1,
@@ -139,25 +167,7 @@ class UserEquipmentTile extends ConsumerWidget {
                     /// MODEL + CAPACITY
                     Text(
                       "${equipment.model} • ${equipment.capacity} ${equipment.capacityUnit}",
-                      style: TextStyle(fontSize: 12, color: Colors.grey[600]),
-                    ),
-
-                    const SizedBox(height: 6),
-
-                    /// RATING
-                    Row(
-                      children: [
-                        const Icon(Icons.star, size: 14, color: Colors.amber),
-                        const SizedBox(width: 4),
-                        Text(
-                          "4.8 (24)",
-                          style: TextStyle(
-                            fontSize: 11,
-                            color: Colors.grey[700],
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ],
+                      style: TextStyle(fontSize: 14, color: Colors.grey[600]),
                     ),
 
                     const SizedBox(height: 8),

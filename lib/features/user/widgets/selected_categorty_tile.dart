@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:prokat/features/categories/models/category.dart';
 
-class SelectedServiceTile extends StatelessWidget {
-  final Category service;
+class SelectedCategoryTile extends StatelessWidget {
+  final Category category;
   final VoidCallback clearSelected;
 
-  const SelectedServiceTile({super.key, required this.service, required this.clearSelected});
+  const SelectedCategoryTile({
+    super.key,
+    required this.category,
+    required this.clearSelected,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -22,13 +26,13 @@ class SelectedServiceTile extends StatelessWidget {
       child: Row(
         children: [
           // Icon (you can map based on service type)
-          Icon(_getServiceIcon(service), color: accent, size: 20),
+          Icon(_getServiceIcon(category), color: accent, size: 20),
 
           const SizedBox(width: 8),
 
           Expanded(
             child: Text(
-              service.name,
+              category.name,
               style: TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.w600,
@@ -40,7 +44,7 @@ class SelectedServiceTile extends StatelessWidget {
 
           // Optional: clear button
           GestureDetector(
-            onTap: ()=>clearSelected(),
+            onTap: () => clearSelected(),
             child: Icon(Icons.close, size: 16, color: Colors.grey[500]),
           ),
         ],

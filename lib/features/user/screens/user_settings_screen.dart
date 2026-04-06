@@ -43,10 +43,9 @@ class _UserSettingsScreenState extends ConsumerState<UserSettingsScreen> {
 
               // SECTION: PREFERENCES
               const _SettingsSectionHeader(title: "PREFERENCES"),
-              
+
               // Theme toggle
               // _ThemeSelectionTile(),
-
               _SettingsSwitchTile(
                 icon: Icons.notifications_none_rounded,
                 title: "Push Notifications",

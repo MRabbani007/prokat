@@ -40,7 +40,7 @@ class _EquipmentListScreenState extends ConsumerState<EquipmentListScreen> {
     final equipmentState = ref.watch(equipmentProvider);
     final bookingNotifier = ref.read(bookingProvider.notifier);
     final authSession = ref.watch(authProvider).session;
-    final isRenter = authSession !=null ? true : false;
+    final isRenter = authSession != null ? true : false;
 
     return Scaffold(
       backgroundColor: bgColor,

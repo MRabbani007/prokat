@@ -7,37 +7,36 @@ class LogoutButton extends ConsumerWidget {
   const LogoutButton({super.key});
 
   Future<void> _confirmLogout(BuildContext context, WidgetRef ref) async {
-    const errorColor = Color(0xFFE53935);
-    const ghostGray = Color(0x4DFFFFFF);
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final textTheme = theme.textTheme;
 
     final confirm = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        backgroundColor: const Color(
-          0xFF1A1D21,
-        ), // Slightly lighter than bgColor for depth
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        title: const Text(
-          "Logout",
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+        backgroundColor: theme.cardColor,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: Text(
+          'Logout',
+          style: textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w700),
         ),
-        content: const Text(
-          "Are you sure you want to logout?",
-          style: TextStyle(color: ghostGray),
+        content: Text(
+          'Are you sure you want to logout?',
+          style: textTheme.bodyMedium?.copyWith(
+            color: colorScheme.onSurface.withOpacity(0.7),
+          ),
         ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: const Text(
-              "CANCEL",
-              style: TextStyle(color: ghostGray, fontWeight: FontWeight.bold),
-            ),
+            onPressed: () => context.pop(false),
+            child: const Text('Cancel'),
           ),
           TextButton(
-            onPressed: () => Navigator.pop(context, true),
+            onPressed: () => context.pop(true),
+            style: TextButton.styleFrom(foregroundColor: colorScheme.error),
             child: const Text(
-              "LOGOUT",
-              style: TextStyle(color: errorColor, fontWeight: FontWeight.bold),
+              'Logout',
+              style: TextStyle(fontWeight: FontWeight.w600),
             ),
           ),
         ],
@@ -49,36 +48,56 @@ class LogoutButton extends ConsumerWidget {
     await ref.read(authProvider.notifier).logout();
 
     if (context.mounted) {
-      context.go('/login'); // Usually redirect to login after logout
+      context.go('/login');
     }
   }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
     final authState = ref.watch(authProvider);
-    const errorColor = Color(0xFFE53935);
 
-    return ListTile(
-      contentPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
-      leading: authState.isLoading
-          ? const SizedBox(
-              width: 20,
-              height: 20,
-              child: CircularProgressIndicator(
-                strokeWidth: 2,
-                valueColor: AlwaysStoppedAnimation<Color>(errorColor),
+    return InkWell(
+      onTap: authState.isLoading ? null : () => _confirmLogout(context, ref),
+      borderRadius: BorderRadius.circular(16),
+      child: Container(
+        margin: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: theme.cardColor,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: colorScheme.error.withOpacity(0.2)),
+        ),
+        child: Row(
+          children: [
+            /// Icon / Loader
+            authState.isLoading
+                ? SizedBox(
+                    width: 20,
+                    height: 20,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      color: colorScheme.error,
+                    ),
+                  )
+                : Icon(Icons.logout_rounded, color: colorScheme.error),
+
+            const SizedBox(width: 16),
+
+            /// Text
+            Expanded(
+              child: Text(
+                'Logout',
+                style: theme.textTheme.bodyLarge?.copyWith(
+                  color: colorScheme.error,
+                  fontWeight: FontWeight.w600,
+                ),
               ),
-            )
-          : const Icon(Icons.logout_rounded, color: errorColor),
-      title: const Text(
-        "Logout",
-        style: TextStyle(
-          color: errorColor,
-          fontWeight: FontWeight.bold,
-          letterSpacing: 0.5,
+            ),
+          ],
         ),
       ),
-      onTap: authState.isLoading ? null : () => _confirmLogout(context, ref),
     );
   }
 }
