@@ -10,6 +10,7 @@ class UserProfileModel {
   final String? darkMode;
   final String? selectedCategoryId;
   final String? selectedAddressId;
+  final DateTime? createdAt;
 
   UserProfileModel({
     this.username,
@@ -23,6 +24,7 @@ class UserProfileModel {
     this.darkMode,
     this.selectedCategoryId,
     this.selectedAddressId,
+    this.createdAt,
   });
 
   String get displayName {
@@ -46,6 +48,9 @@ class UserProfileModel {
         darkMode: json['darkMode']?.toString(),
         selectedCategoryId: json['selectedCategoryId']?.toString(),
         selectedAddressId: json['selectedAddressId']?.toString(),
+        createdAt: json['createdAt'] != null
+            ? DateTime.parse(json['createdAt'])
+            : null,
       );
     } catch (e, stack) {
       print("❌ User Profile parsing failed");
@@ -69,6 +74,7 @@ class UserProfileModel {
       'darkMode': darkMode,
       'selectedCategoryId': selectedCategoryId,
       'selectedAddressId': selectedAddressId,
+      'createdAt': createdAt,
     };
   }
 }

@@ -131,8 +131,7 @@ Industrial Dark theme, we’ll use the #121417 background
 POA: Price on Application (or sometimes Price on Asking)
 
 
-Register Owner
-
+---- Register Owner ----
 
 Individual or Company
 
@@ -162,3 +161,8 @@ Submit request ==> account will be created as draft pending admin review
 
 after review allow creating equipment
 
+
+
+---- ----
+
+Become and owner, register as an owner, publish / advertise your equipment and Services, find clients

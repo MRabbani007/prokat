@@ -80,7 +80,7 @@ class _DisplayNameState extends ConsumerState<DisplayName> {
               decoration: InputDecoration(
                 hintText: 'Enter name',
                 hintStyle: textTheme.bodyMedium?.copyWith(
-                  color: colorScheme.onSurface.withOpacity(0.5),
+                  color: colorScheme.onSurface.withValues(alpha: 0.5),
                 ),
                 filled: true,
                 fillColor: theme.cardColor,
@@ -100,14 +100,16 @@ class _DisplayNameState extends ConsumerState<DisplayName> {
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                TextButton(
-                  onPressed: cancelEditing,
-                  child: const Text('Cancel'),
-                ),
-                const SizedBox(width: 12),
                 ElevatedButton(
                   onPressed: isLoading ? null : submit,
                   child: const Text('Save'),
+                ),
+
+                const SizedBox(width: 12),
+
+                TextButton(
+                  onPressed: cancelEditing,
+                  child: const Text('Cancel'),
                 ),
               ],
             ),
@@ -116,26 +118,31 @@ class _DisplayNameState extends ConsumerState<DisplayName> {
       );
     }
 
-    /// 👇 Display mode
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 24),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Text(
-            name,
-            style: textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w700),
-          ),
-          const SizedBox(width: 8),
-          InkWell(
-            borderRadius: BorderRadius.circular(20),
+          GestureDetector(
             onTap: () => startEditing(name),
-            child: Padding(
-              padding: const EdgeInsets.all(4),
-              child: Icon(
-                Icons.edit,
-                size: 18,
-                color: colorScheme.onSurface.withOpacity(0.7),
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+              // decoration: BoxDecoration(
+              //   color: Theme.of(context).colorScheme.surface,
+              //   borderRadius: BorderRadius.circular(99),
+              //   boxShadow: [
+              //     BoxShadow(
+              //       color: Colors.black.withValues(alpha: 0.15),
+              //       blurRadius: 12,
+              //       offset: const Offset(0, 4),
+              //     ),
+              //   ],
+              // ),
+              child: Text(
+                name,
+                style: Theme.of(
+                  context,
+                ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w700),
               ),
             ),
           ),

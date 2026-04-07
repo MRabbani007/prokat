@@ -22,16 +22,25 @@ class InfoTile extends StatelessWidget {
     final colorScheme = theme.colorScheme;
     final textTheme = theme.textTheme;
 
-    return InkWell(
+    return GestureDetector(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(16),
       child: Container(
         margin: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
           color: theme.cardColor,
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: colorScheme.onSurface.withValues(alpha: 0.2)),
+          border: Border.all(
+            color: colorScheme.onSurface.withValues(alpha: 0.2),
+          ),
+          // Optional: always-visible shadow
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.08),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
+            ),
+          ],
         ),
         child: Row(
           children: [
@@ -71,7 +80,7 @@ class InfoTile extends StatelessWidget {
             ),
 
             /// Optional trailing widget
-            if (trailing != null) trailing!,
+            trailing ?? const SizedBox(),
           ],
         ),
       ),

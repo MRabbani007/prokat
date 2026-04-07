@@ -121,7 +121,7 @@ class _UserHeaderState extends ConsumerState<UserDashboardHeader> {
               UserLocationTile(),
 
               const SizedBox(width: 12),
-              
+
               // Language selector
               LanguagePillSelector(
                 value: selectedLanguage,

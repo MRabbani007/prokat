@@ -5,12 +5,10 @@ class RegisterOwnerPage extends ConsumerStatefulWidget {
   const RegisterOwnerPage({super.key});
 
   @override
-  ConsumerState<RegisterOwnerPage> createState() =>
-      _RegisterOwnerPageState();
+  ConsumerState<RegisterOwnerPage> createState() => _RegisterOwnerPageState();
 }
 
-class _RegisterOwnerPageState
-    extends ConsumerState<RegisterOwnerPage> {
+class _RegisterOwnerPageState extends ConsumerState<RegisterOwnerPage> {
   final fullNameController = TextEditingController();
   final iinController = TextEditingController();
   final displayNameController = TextEditingController();
@@ -34,10 +32,7 @@ class _RegisterOwnerPageState
             _sectionTitle(context, "Basic Information"),
 
             const SizedBox(height: 12),
-            _inputField(
-              controller: fullNameController,
-              hint: "Full Name",
-            ),
+            _inputField(controller: fullNameController, hint: "Full Name"),
 
             const SizedBox(height: 12),
             _inputField(
@@ -70,7 +65,7 @@ class _RegisterOwnerPageState
 
             const SizedBox(height: 12),
 
-            ...equipment.map((e) => _equipmentTile(e)).toList(),
+            ...equipment.map((e) => _equipmentTile(e)),
 
             const SizedBox(height: 12),
 
@@ -125,9 +120,7 @@ class _RegisterOwnerPageState
     return TextField(
       controller: controller,
       keyboardType: keyboardType,
-      decoration: InputDecoration(
-        hintText: hint,
-      ),
+      decoration: InputDecoration(hintText: hint),
     );
   }
 
@@ -137,8 +130,7 @@ class _RegisterOwnerPageState
       margin: const EdgeInsets.only(bottom: 8),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(12),
-        color: Theme.of(context).colorScheme.surface
-            .withValues(alpha: 0.3),
+        color: Theme.of(context).colorScheme.surface.withValues(alpha: 0.3),
       ),
       child: ListTile(
         title: Text(name),

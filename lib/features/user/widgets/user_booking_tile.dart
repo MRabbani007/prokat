@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:prokat/features/bookings/models/booking_model.dart';
 
 class UserBookingTile extends StatelessWidget {
@@ -10,6 +9,10 @@ class UserBookingTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final accent = theme.colorScheme.primary;
+
+    final displayUrl = booking.equipment.imageUrl?.isNotEmpty == true
+        ? booking.equipment.imageUrl!
+        : "https://insqvwqlfhbfcqqnvzxu.supabase.co/storage/v1/object/public/Media/kamaz1.jpg";
 
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -44,28 +47,30 @@ class UserBookingTile extends StatelessWidget {
               ),
             ],
           ),
+
           const SizedBox(height: 12),
+
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // Image Section
-              // SizedBox(
-              //   width: 100, // Fixed width
-              //   child: AspectRatio(
-              //     aspectRatio: 4 / 3,
-              //     child: ClipRRect(
-              //       borderRadius: BorderRadius.circular(8),
-              //       child: Image.network(
-              //         booking.equipment.imageUrl ?? "",
-              //         fit: BoxFit.cover,
-              //         errorBuilder: (c, e, s) => Container(
-              //           color: Colors.grey[200],
-              //           child: const Icon(Icons.image),
-              //         ),
-              //       ),
-              //     ),
-              //   ),
-              // ),
+              SizedBox(
+                width: 100, // Fixed width
+                child: AspectRatio(
+                  aspectRatio: 4 / 3,
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(8),
+                    child: Image.network(
+                      displayUrl,
+                      fit: BoxFit.cover,
+                      errorBuilder: (c, e, s) => Container(
+                        color: Colors.grey[200],
+                        child: const Icon(Icons.image),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
               const SizedBox(width: 12),
               // Info Section
               Expanded(

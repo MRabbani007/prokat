@@ -2,15 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:prokat/features/bookings/state/booking_provider.dart';
 import 'package:prokat/features/bookings/widgets/client_bookings_section.dart';
-import 'package:prokat/features/categories/models/category.dart';
-import 'package:prokat/features/categories/providers/category_provider.dart';
 import 'package:prokat/features/equipment/providers/equipment_provider.dart';
 import 'package:prokat/features/user/widgets/equipment_card.dart';
-import 'package:prokat/features/user/widgets/selected_categorty_tile.dart';
 import 'package:prokat/features/user/widgets/user_category_selector.dart';
 import 'package:prokat/features/user/widgets/user_dashboard_header.dart';
-import 'package:prokat/features/user/widgets/user_equipment_tile.dart';
-import 'package:prokat/features/user/widgets/user_location_tile.dart';
 import 'package:go_router/go_router.dart';
 
 class UserDashboardPage extends ConsumerStatefulWidget {
@@ -33,7 +28,6 @@ class _UserDashboardPageState extends ConsumerState<UserDashboardPage> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final categoriesState = ref.watch(categoriesProvider);
     final items = ref.watch(equipmentProvider).renterEquipment;
     final bookingNotifier = ref.read(bookingProvider.notifier);
 
@@ -47,30 +41,6 @@ class _UserDashboardPageState extends ConsumerState<UserDashboardPage> {
             const UserDashboardHeader(),
 
             const SizedBox(height: 12),
-
-            // Location + category row
-            // Padding(
-            //   padding: const EdgeInsets.symmetric(horizontal: 12),
-            //   child: Row(
-            //     children: [
-            //       Expanded(child: UserLocationTile()),
-
-            //       const SizedBox(width: 12),
-
-            //       Expanded(
-            //         child: categoriesState.selectedCategory != null
-            //             ? SelectedCategoryTile(
-            //                 category:
-            //                     categoriesState.selectedCategory as Category,
-            //                 clearSelected: () => ref
-            //                     .read(categoriesProvider.notifier)
-            //                     .clearCategory(),
-            //               )
-            //             : const SizedBox(),
-            //       ),
-            //     ],
-            //   ),
-            // ),
 
             // Category selector
             const UserCategorySelector(),

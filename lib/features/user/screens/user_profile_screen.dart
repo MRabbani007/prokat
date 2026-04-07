@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:prokat/core/widgets/page_header.dart';
+import 'package:intl/intl.dart';
 import 'package:prokat/features/auth/widgets/logout_button.dart';
-import 'package:prokat/features/locations/state/location_provider.dart';
 import 'package:prokat/features/user/state/user_profile_provider.dart';
 import 'package:prokat/features/user/widgets/become_owner_cta.dart';
 import 'package:prokat/features/user/widgets/build_info_tile.dart';
@@ -19,15 +18,11 @@ class UserProfileScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
 
-    // const cardColor = Color(0xFF1E2125); // Slightly lighter for depth
-    // const accentColor = Color(0xFF4E73DF); // Industrial Blue
-
     final state = ref.watch(userProfileProvider);
-    final userAddresses = ref.watch(locationProvider).renterLocations;
-    final selectedAddress = userAddresses
-        .where((address) => state.userProfile?.selectedAddressId == address.id)
-        .firstOrNull;
-
+    // final userAddresses = ref.watch(locationProvider).renterLocations;
+    // final selectedAddress = userAddresses
+    //     .where((address) => state.userProfile?.selectedAddressId == address.id)
+    //     .firstOrNull;
     final username = state.userProfile?.username;
 
     return Scaffold(
@@ -38,61 +33,103 @@ class UserProfileScreen extends ConsumerWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // Reusable Page Header (Customized for clearing FAB)
-              IconButton(
-                icon: const Icon(Icons.arrow_back),
-                color: const Color.fromARGB(255, 61, 63, 65),
-                onPressed: () {
-                  if (context.canPop()) {
-                    context.pop();
-                  }
-                },
+              Padding(
+                padding: const EdgeInsets.only(left: 12.0, top: 12),
+                child: IconButton(
+                  icon: const Icon(Icons.arrow_back),
+                  color: const Color.fromARGB(255, 61, 63, 65),
+                  onPressed: () {
+                    if (context.canPop()) {
+                      context.pop();
+                    }
+                  },
+                ),
               ),
 
-              const SizedBox(height: 20),
-
-              // 1. Profile Photo Section
-              Center(
-                child: Stack(
+              // const SizedBox(height: 20),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                child: Row(
                   children: [
-                    Container(
-                      padding: const EdgeInsets.all(4),
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        border: Border.all(
-                          color: theme.colorScheme.primary,
-                          width: 2,
-                        ),
-                      ),
-                      child: const CircleAvatar(
-                        radius: 60,
-                        backgroundImage: NetworkImage(
-                          'https://via.placeholder.com',
-                        ), // Replace with actual user photo
+                    Center(
+                      child: Stack(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(4),
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              border: Border.all(
+                                color: theme.colorScheme.primary,
+                                width: 2,
+                              ),
+                            ),
+                            child: const CircleAvatar(
+                              radius: 60,
+                              backgroundImage: NetworkImage(
+                                'https://via.placeholder.com',
+                              ), // Replace with actual user photo
+                            ),
+                          ),
+                          Positioned(
+                            bottom: 0,
+                            right: 4,
+                            child: Container(
+                              padding: const EdgeInsets.all(8),
+                              decoration: BoxDecoration(
+                                color: theme.colorScheme.primary,
+                                shape: BoxShape.circle,
+                              ),
+                              child: const Icon(
+                                Icons.edit_rounded,
+                                color: Colors.white,
+                                size: 18,
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
-                    Positioned(
-                      bottom: 0,
-                      right: 4,
-                      child: Container(
-                        padding: const EdgeInsets.all(8),
-                        decoration: BoxDecoration(
-                          color: theme.colorScheme.primary,
-                          shape: BoxShape.circle,
+
+                    Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        DisplayName(), const SizedBox(height: 4), // Rating
+
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            const Icon(
+                              Icons.star,
+                              size: 24,
+                              color: Colors.amber,
+                            ),
+                            const SizedBox(width: 8),
+                            Text(
+                              (state.userProfile?.rating ?? 0).toStringAsFixed(
+                                1,
+                              ),
+                              style: const TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ],
                         ),
-                        child: const Icon(
-                          Icons.edit_rounded,
-                          color: Colors.white,
-                          size: 18,
-                        ),
-                      ),
+
+                        state.userProfile?.createdAt != null
+                            ? Text(
+                                DateFormat(
+                                  state.userProfile?.createdAt
+                                      ?.toIso8601String(),
+                                ).toString(),
+                              )
+                            : SizedBox(),
+                      ],
                     ),
                   ],
                 ),
               ),
-
-              const SizedBox(height: 12),
-
-              DisplayName(),
 
               const SizedBox(height: 32),
 
@@ -120,23 +157,6 @@ class UserProfileScreen extends ConsumerWidget {
                 trailing: username == null
                     ? const Icon(Icons.add, color: Colors.white54)
                     : null,
-              ),
-              InfoTile(
-                icon: Icons.location_on_outlined,
-                label: "Primary Address",
-                value: selectedAddress != null
-                    ? selectedAddress.street
-                    : "Select address",
-                onTap: () {
-                  Scaffold.of(context).openEndDrawer();
-                  // OR
-                  // context.push(AppRoutes.selectAddress);
-                },
-
-                trailing: const Icon(
-                  Icons.chevron_right,
-                  color: Colors.white54,
-                ),
               ),
 
               const SizedBox(height: 20),

@@ -9,7 +9,7 @@ class AppTheme {
   static const Color darkCard = Color(0xFF1E2125);
 
   // Light mode subtle colors
-  static const Color lightBackground = Color.fromARGB(255, 238, 238, 238);
+  static const Color lightBackground = Color.fromARGB(255, 255, 255, 255);
   static const Color lightCard = Colors.white;
 
   // ---------- Text Colors ----------
