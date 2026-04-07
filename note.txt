@@ -129,3 +129,36 @@ Industrial Dark theme, we’ll use the #121417 background
 
 
 POA: Price on Application (or sometimes Price on Asking)
+
+
+Register Owner
+
+
+Individual or Company
+
+How many equipment
+1-5
+5-20
+20+
+
+How many employees
+1-5
+5-20
+20+
+
+- Services Provided
+    select multiple categories
+- Locations
+    cities
+
+Full name, IIN, payment details?
+
+Contact details
+phone number
+
+comment
+
+Submit request ==> account will be created as draft pending admin review
+
+after review allow creating equipment
+

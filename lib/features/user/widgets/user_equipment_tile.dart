@@ -62,35 +62,39 @@ class UserEquipmentTile extends ConsumerWidget {
       decoration: BoxDecoration(
         color: theme.cardColor,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: accent.withOpacity(0.15), width: 1.5),
+        border: Border.all(color: accent.withValues(alpha: 0.35), width: 1.5),
       ),
       child: InkWell(
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(16),
+          bottomLeft: Radius.circular(16),
+        ),
         onTap: onTap,
-        child: Padding(
-          padding: const EdgeInsets.all(10),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              /// IMAGE
-              ClipRRect(
-                borderRadius: BorderRadius.circular(12),
-                child: SizedBox(
-                  width: 100,
-                  height: 110,
-                  child: CachedNetworkImage(
-                    imageUrl: displayUrl,
-                    fit: BoxFit.cover,
-                    placeholder: (_, _) => _fallback(),
-                    errorWidget: (_, _, _) => _fallback(),
-                  ),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            /// IMAGE
+            ClipRRect(
+              borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(12),
+                bottomLeft: Radius.circular(12),
+              ),
+              child: SizedBox(
+                width: 100,
+                height: 110,
+                child: CachedNetworkImage(
+                  imageUrl: displayUrl,
+                  fit: BoxFit.cover,
+                  placeholder: (_, _) => _fallback(),
+                  errorWidget: (_, _, _) => _fallback(),
                 ),
               ),
+            ),
 
-              const SizedBox(width: 12),
-
-              /// CONTENT
-              Expanded(
+            /// CONTENT
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -108,7 +112,7 @@ class UserEquipmentTile extends ConsumerWidget {
                             overflow: TextOverflow.ellipsis,
                           ),
                         ),
-
+                
                         isFavorite == true
                             ? const Padding(
                                 padding: EdgeInsets.only(right: 6),
@@ -126,15 +130,11 @@ class UserEquipmentTile extends ConsumerWidget {
                                   color: Colors.redAccent,
                                 ),
                               ),
-
+                
                         /// RATING
                         Row(
                           children: [
-                            const Icon(
-                              Icons.star,
-                              size: 14,
-                              color: Colors.amber,
-                            ),
+                            const Icon(Icons.star, size: 14, color: Colors.amber),
                             const SizedBox(width: 4),
                             Text(
                               "4.8 (24)",
@@ -146,13 +146,13 @@ class UserEquipmentTile extends ConsumerWidget {
                             ),
                           ],
                         ),
-
+                
                         _StatusIndicator(status: equipment.status),
                       ],
                     ),
-
+                
                     const SizedBox(height: 4),
-
+                
                     /// NAME
                     Text(
                       equipment.name,
@@ -163,15 +163,15 @@ class UserEquipmentTile extends ConsumerWidget {
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
-
+                
                     /// MODEL + CAPACITY
                     Text(
                       "${equipment.model} • ${equipment.capacity} ${equipment.capacityUnit}",
                       style: TextStyle(fontSize: 14, color: Colors.grey[600]),
                     ),
-
+                
                     const SizedBox(height: 8),
-
+                
                     /// LOCATION + PRICE
                     Row(
                       children: [
@@ -183,7 +183,7 @@ class UserEquipmentTile extends ConsumerWidget {
                               const SizedBox(width: 4),
                               Expanded(
                                 child: Text(
-                                  "${location?.city ?? ''}",
+                                  location?.city ?? "",
                                   style: TextStyle(
                                     fontSize: 11,
                                     color: Colors.grey[600],
@@ -194,7 +194,7 @@ class UserEquipmentTile extends ConsumerWidget {
                             ],
                           ),
                         ),
-
+                
                         /// PRICE
                         Row(
                           children: [
@@ -223,8 +223,8 @@ class UserEquipmentTile extends ConsumerWidget {
                   ],
                 ),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
@@ -237,9 +237,6 @@ class _StatusIndicator extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final accent = theme.colorScheme.primary;
-
     Color color;
     switch (status.toUpperCase()) {
       case "AVAILABLE":
@@ -259,7 +256,7 @@ class _StatusIndicator extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(4),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.15),
+        color: color.withValues(alpha: 0.15),
         shape: BoxShape.circle,
       ),
       child: Container(

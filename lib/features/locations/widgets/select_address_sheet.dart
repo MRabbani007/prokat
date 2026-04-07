@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:prokat/features/locations/state/location_provider.dart';
-// import 'your_location_provider_path.dart';
 
 class SelectAddressSheet extends ConsumerWidget {
   final String? equipmentId;
@@ -11,18 +10,19 @@ class SelectAddressSheet extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final theme = Theme.of(context);
+
     final locationState = ref.watch(locationProvider);
     final addresses = locationState.renterLocations.take(3).toList();
-
-    const bgColor = Color(0xFF121417);
-    // const accentColor = Color(0xFF4E73DF);
 
     return Container(
       padding: const EdgeInsets.fromLTRB(24, 12, 24, 32),
       decoration: BoxDecoration(
-        color: bgColor,
+        color: theme.cardColor,
         borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
+        border: Border.all(
+          color: theme.colorScheme.outline.withValues(alpha: 0.05),
+        ),
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -35,19 +35,18 @@ class SelectAddressSheet extends ConsumerWidget {
               width: 36,
               height: 4,
               decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.1),
+                color: theme.colorScheme.onSurface.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(10),
               ),
             ),
           ),
 
-          const Text(
+          Text(
             "SELECT ADDRESS",
-            style: TextStyle(
-              color: Colors.white30,
-              fontSize: 11,
-              fontWeight: FontWeight.bold,
+            style: theme.textTheme.labelMedium?.copyWith(
               letterSpacing: 1.5,
+              fontWeight: FontWeight.bold,
+              color: theme.colorScheme.onSurface,
             ),
           ),
 
@@ -59,7 +58,9 @@ class SelectAddressSheet extends ConsumerWidget {
               padding: const EdgeInsets.symmetric(vertical: 20),
               child: Text(
                 "No recent addresses",
-                style: TextStyle(color: Colors.white.withValues(alpha: 0.2)),
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: theme.colorScheme.onSurface.withValues(alpha: 0.4),
+                ),
               ),
             )
           else
@@ -88,17 +89,20 @@ class SelectAddressSheet extends ConsumerWidget {
                 );
               },
               icon: const Icon(Icons.map_outlined, size: 20),
-              label: const Text(
+              label: Text(
                 "CHOOSE ON MAP",
-                style: TextStyle(fontWeight: FontWeight.bold, letterSpacing: 1),
+                style: theme.textTheme.labelLarge?.copyWith(
+                  fontWeight: FontWeight.bold,
+                  letterSpacing: 1,
+                ),
               ),
               style: OutlinedButton.styleFrom(
-                foregroundColor: Colors.white,
-                side: BorderSide(color: Colors.white.withValues(alpha: 0.1)),
+                foregroundColor: theme.colorScheme.primary,
+                side: BorderSide(color: theme.colorScheme.outline.withValues(alpha: 0.3)),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(16),
                 ),
-                backgroundColor: Colors.white.withValues(alpha: 0.03),
+                backgroundColor: theme.colorScheme.primary.withValues(alpha: 0.05),
               ),
             ),
           ),
@@ -116,26 +120,31 @@ class _AddressHistoryTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return Container(
       margin: const EdgeInsets.only(bottom: 8),
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.03),
+        color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.15),
         borderRadius: BorderRadius.circular(12),
       ),
       child: ListTile(
         onTap: onTap,
         leading: Icon(
           Icons.history,
-          color: Colors.white.withValues(alpha: 0.3),
+          color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.3),
           size: 20,
         ),
         title: Text(
           "${address.street}, ${address.city}",
-          style: const TextStyle(color: Colors.white, fontSize: 14),
+          style: theme.textTheme.bodyMedium?.copyWith(
+            fontSize: 14,
+            color: theme.colorScheme.onSurface,
+          ),
         ),
         trailing: Icon(
           Icons.chevron_right,
-          color: Colors.white.withValues(alpha: 0.1),
+          color: theme.colorScheme.onSurface.withValues(alpha: 0.3),
           size: 18,
         ),
       ),

@@ -16,7 +16,6 @@ class _AppStartupGateState extends ConsumerState<AppStartupGate> {
   void initState() {
     super.initState();
 
-    // ✅ Runs ONLY ONCE
     Future.microtask(() {
       ref.read(appStartupProvider.notifier).init();
     });

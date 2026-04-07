@@ -34,7 +34,7 @@ class UserLocationTile extends ConsumerWidget {
     final location = locationState.selectedAddress;
     final selectedCity = locationState.city;
 
-    String displayText = 'Select location';
+    String displayText = 'City';
 
     if (location != null) {
       if (location.city.isNotEmpty) {
@@ -53,38 +53,33 @@ class UserLocationTile extends ConsumerWidget {
           shape: const RoundedRectangleBorder(
             borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
           ),
-          builder: (context) {
-            return _CityPickerSheet();
-          },
+          builder: (context) => _CityPickerSheet(),
         );
       },
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-        decoration: BoxDecoration(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+        decoration: ShapeDecoration(
           color: accent.withValues(alpha: 0.1),
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: accent.withValues(alpha: 0.2), width: 2),
+          shape: StadiumBorder(
+            // Gives it the perfect pill shape
+            side: BorderSide(color: accent.withValues(alpha: 0.2), width: 1.5),
+          ),
         ),
         child: Row(
+          mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(Icons.location_on, color: accent, size: 22),
-            const SizedBox(width: 10),
-
-            Expanded(
-              child: Text(
-                displayText,
-                style: TextStyle(
-                  fontSize: 15,
-                  fontWeight: FontWeight.w500,
-                  color: displayText == 'Select location'
-                      ? Colors.grey
-                      : theme.textTheme.bodyLarge?.color,
-                ),
-                overflow: TextOverflow.ellipsis,
+            Icon(Icons.location_on, color: accent, size: 16),
+            const SizedBox(width: 6),
+            Text(
+              displayText,
+              style: TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.w600,
+                color: selectedCity == null ? Colors.grey[600] : accent,
               ),
             ),
-
-            Icon(Icons.arrow_forward_ios, size: 14, color: Colors.grey[500]),
+            const SizedBox(width: 4),
+            Icon(Icons.keyboard_arrow_down, size: 16, color: accent),
           ],
         ),
       ),

@@ -9,7 +9,7 @@ class AppTheme {
   static const Color darkCard = Color(0xFF1E2125);
 
   // Light mode subtle colors
-  static const Color lightBackground = Color(0xFFF5F5F5);
+  static const Color lightBackground = Color.fromARGB(255, 238, 238, 238);
   static const Color lightCard = Colors.white;
 
   // ---------- Text Colors ----------
@@ -59,21 +59,45 @@ class AppTheme {
         displayMedium: TextStyle(color: lightTextPrimary),
         displaySmall: TextStyle(color: lightTextPrimary),
 
-        headlineLarge: TextStyle(color: lightTextPrimary),
+        headlineLarge: TextStyle(
+          color: lightTextPrimary,
+          fontSize: 14,
+          fontWeight: FontWeight.w600,
+          letterSpacing: 1.5,
+        ),
         headlineMedium: TextStyle(color: lightTextPrimary),
         headlineSmall: TextStyle(color: lightTextPrimary),
 
-        titleLarge: TextStyle(color: lightTextPrimary),
-        titleMedium: TextStyle(color: lightTextPrimary),
+        titleLarge: TextStyle(
+          color: lightTextPrimary,
+          fontSize: 20,
+          fontWeight: FontWeight.bold,
+          letterSpacing: 0.5,
+        ),
+        titleMedium: TextStyle(
+          color: lightTextSecondary,
+          fontSize: 14,
+          fontWeight: FontWeight.normal,
+          letterSpacing: 0.5,
+        ),
         titleSmall: TextStyle(color: lightTextSecondary),
 
         bodyLarge: TextStyle(color: lightTextPrimary),
-        bodyMedium: TextStyle(color: lightTextSecondary),
+        bodyMedium: TextStyle(
+          color: lightTextSecondary,
+          fontSize: 15,
+          fontWeight: FontWeight.w600,
+        ),
         bodySmall: TextStyle(color: lightTextTertiary),
 
-        labelLarge: TextStyle(color: lightTextPrimary),
-        labelMedium: TextStyle(color: lightTextSecondary),
-        labelSmall: TextStyle(color: lightTextDisabled),
+        labelLarge: TextStyle(color: lightTextPrimary, fontSize: 16),
+        labelMedium: TextStyle(
+          color: lightTextSecondary,
+          fontSize: 14,
+          fontWeight: FontWeight.bold,
+          letterSpacing: 1.2,
+        ),
+        labelSmall: TextStyle(color: lightTextDisabled, fontSize: 10),
       ),
     );
   }
@@ -115,8 +139,18 @@ class AppTheme {
         headlineMedium: TextStyle(color: darkTextPrimary),
         headlineSmall: TextStyle(color: darkTextPrimary),
 
-        titleLarge: TextStyle(color: darkTextPrimary),
-        titleMedium: TextStyle(color: darkTextPrimary),
+        titleLarge: TextStyle(
+          color: darkTextPrimary,
+          fontSize: 20,
+          fontWeight: FontWeight.bold,
+          letterSpacing: 0.5,
+        ),
+        titleMedium: TextStyle(
+          color: darkTextPrimary,
+          fontSize: 20,
+          fontWeight: FontWeight.bold,
+          letterSpacing: 0.5,
+        ),
         titleSmall: TextStyle(color: darkTextSecondary),
 
         bodyLarge: TextStyle(color: darkTextPrimary),

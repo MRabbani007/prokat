@@ -31,7 +31,7 @@ class InfoTile extends StatelessWidget {
         decoration: BoxDecoration(
           color: theme.cardColor,
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: colorScheme.onSurface.withOpacity(0.05)),
+          border: Border.all(color: colorScheme.onSurface.withValues(alpha: 0.2)),
         ),
         child: Row(
           children: [
@@ -39,7 +39,7 @@ class InfoTile extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
-                color: colorScheme.onSurface.withOpacity(0.04),
+                color: colorScheme.onSurface.withValues(alpha: 0.15),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Icon(icon, size: 22, color: colorScheme.primary),
@@ -55,7 +55,7 @@ class InfoTile extends StatelessWidget {
                   Text(
                     label,
                     style: textTheme.bodySmall?.copyWith(
-                      color: colorScheme.onSurface.withOpacity(0.6),
+                      color: colorScheme.onSurface.withValues(alpha: 0.6),
                     ),
                   ),
                   const SizedBox(height: 4),

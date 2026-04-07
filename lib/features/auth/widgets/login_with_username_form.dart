@@ -47,7 +47,7 @@ class _LoginWithUsernameFormState extends ConsumerState<LoginWithUsernameForm> {
       final res = await ref.read(authProvider.notifier).login(credentials);
 
       if (res == true) {
-        if (mounted) context.push("/search/map");
+        if (mounted) context.push("/dashboard");
       } else {
         // Handle case where res is false but no exception was thrown
         widget.onError("Invalid username or password");

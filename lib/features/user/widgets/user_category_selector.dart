@@ -50,7 +50,7 @@ class UserCategorySelector extends ConsumerWidget {
       },
       child:
           categoriesState.showSelect == true ||
-              categoriesState.selectedCategory == null
+              categoriesState.selectedCategory == null || true
           ? SizedBox(
               key: const ValueKey('service_list'),
               height: 150, // your existing height

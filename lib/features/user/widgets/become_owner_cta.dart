@@ -9,14 +9,15 @@ class BecomeOwnerCTA extends StatelessWidget {
     final theme = Theme.of(context);
 
     return Padding(
-      padding: const EdgeInsets.fromLTRB(24, 16, 24, 8),
+      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
       child: SizedBox(
         width: double.infinity,
         child: ElevatedButton.icon(
           icon: const Icon(Icons.storefront),
           label: const Text('Become an Equipment Owner'),
           style: ElevatedButton.styleFrom(
-            padding: const EdgeInsets.symmetric(vertical: 14),
+            elevation: 4,
+            padding: const EdgeInsets.symmetric(vertical: 24),
             textStyle: theme.textTheme.bodyLarge?.copyWith(
               fontWeight: FontWeight.w600,
             ),

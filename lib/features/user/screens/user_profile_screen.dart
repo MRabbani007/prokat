@@ -10,7 +10,6 @@ import 'package:prokat/features/user/widgets/display_name.dart';
 import 'package:prokat/features/user/widgets/edit_phone_sheet.dart';
 import 'package:prokat/features/user/widgets/setting_link_tile.dart';
 import 'package:prokat/features/user/widgets/show_edit_username.dart';
-
 import 'package:go_router/go_router.dart';
 
 class UserProfileScreen extends ConsumerWidget {
@@ -39,7 +38,15 @@ class UserProfileScreen extends ConsumerWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // Reusable Page Header (Customized for clearing FAB)
-              const PageHeader(title: "My Profile"),
+              IconButton(
+                icon: const Icon(Icons.arrow_back),
+                color: const Color.fromARGB(255, 61, 63, 65),
+                onPressed: () {
+                  if (context.canPop()) {
+                    context.pop();
+                  }
+                },
+              ),
 
               const SizedBox(height: 20),
 

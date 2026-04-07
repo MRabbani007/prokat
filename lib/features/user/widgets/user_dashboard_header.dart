@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:prokat/features/user/state/user_profile_provider.dart';
 import 'package:prokat/features/user/widgets/language_pill_selector.dart';
+import 'package:prokat/features/user/widgets/user_location_tile.dart';
 
 class UserDashboardHeader extends ConsumerStatefulWidget {
   const UserDashboardHeader({super.key});
@@ -24,7 +25,6 @@ class _UserHeaderState extends ConsumerState<UserDashboardHeader> {
       child: Column(
         children: [
           Row(
-            mainAxisAlignment: MainAxisAlignment.center,
             children: [
               // Profile Image
               GestureDetector(
@@ -102,46 +102,26 @@ class _UserHeaderState extends ConsumerState<UserDashboardHeader> {
 
               // Name, Rating, and Location
               Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Name + rating
-                    Row(
-                      children: [
-                        GestureDetector(
-                          onTap: () {
-                            context.push('/profile');
-                          },
-                          child: Text(
-                            userProfileState.userProfile?.displayName ??
-                                'Hello',
-                            style: const TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-
-                    // Row(
-                    //   children: [
-                    //     const Icon(Icons.star, color: Colors.amber, size: 16),
-                    //     const SizedBox(width: 4),
-                    //     Text(
-                    //       (userProfileState.userProfile?.rating ?? 0)
-                    //           .toStringAsFixed(1),
-                    //       style: TextStyle(
-                    //         color: Colors.grey[700],
-                    //         fontSize: 14,
-                    //       ),
-                    //     ),
-                    //   ],
-                    // ),
-                  ],
+                child: Text(
+                  userProfileState.userProfile?.displayName ?? 'Hello,',
+                  style: const TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                  ),
+                  // This handles the wrapping/overflow
+                  maxLines:
+                      1, // Change to 2 if you want it to wrap to a second line
+                  overflow: TextOverflow
+                      .ellipsis, // Adds "..." if the name is too long
                 ),
               ),
 
+              const SizedBox(width: 12),
+
+              UserLocationTile(),
+
+              const SizedBox(width: 12),
+              
               // Language selector
               LanguagePillSelector(
                 value: selectedLanguage,

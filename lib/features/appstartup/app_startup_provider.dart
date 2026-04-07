@@ -85,23 +85,17 @@ class AppStartupController extends StateNotifier<AppStartupState> {
   }
 
   Future<void> init() async {
-    print("startup_init");
     if (_initialized || _isInitializing) return;
 
     _isInitializing = true;
 
     try {
-      print("startup_initializing");
       await ref.read(categoriesProvider.notifier).getCategories();
-      print("startup_categories");
 
       final auth = ref.read(authProvider.notifier);
 
       /// Restore session
       final session = await auth.restoreSession();
-
-      print("startup_session");
-      print(session?.toJson());
 
       if (session == null) {
         state = AppStartupState.guest;
@@ -120,7 +114,6 @@ class AppStartupController extends StateNotifier<AppStartupState> {
 
       _initialized = true;
     } catch (e) {
-      print(e.toString());
       state = AppStartupState.error;
     } finally {
       _isInitializing = false;

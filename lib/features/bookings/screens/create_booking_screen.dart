@@ -11,18 +11,17 @@ import 'package:prokat/features/locations/widgets/address_picker_card.dart';
 import 'package:prokat/features/locations/widgets/select_address_sheet.dart';
 import 'package:go_router/go_router.dart';
 
-class EquipmentBookingScreen extends ConsumerStatefulWidget {
+class CreateBookingScreen extends ConsumerStatefulWidget {
   final String equipmentId;
 
-  const EquipmentBookingScreen({super.key, required this.equipmentId});
+  const CreateBookingScreen({super.key, required this.equipmentId});
 
   @override
-  ConsumerState<EquipmentBookingScreen> createState() =>
-      _EquipmentBookingScreenState();
+  ConsumerState<CreateBookingScreen> createState() =>
+      _CreateBookingScreenState();
 }
 
-class _EquipmentBookingScreenState
-    extends ConsumerState<EquipmentBookingScreen> {
+class _CreateBookingScreenState extends ConsumerState<CreateBookingScreen> {
   @override
   void initState() {
     super.initState();
@@ -39,7 +38,9 @@ class _EquipmentBookingScreenState
 
   @override
   Widget build(BuildContext context) {
-    /// 🔥 AUTO SYNC address → booking
+    final theme = Theme.of(context);
+
+    /// AUTO SYNC address → booking
     ref.listen(locationProvider, (previous, next) {
       final address = next.selectedAddress;
 
@@ -78,15 +79,11 @@ class _EquipmentBookingScreenState
         ? equipment.imageUrl!
         : testImage;
 
-    // Inside your _BookingScreenState build method
-    final bgColor = const Color(0xFF121417);
-    final cardColor = const Color(0xFF1E2125);
-    final accentColor = const Color(0xFF4E73DF);
-
     return Scaffold(
-      backgroundColor: bgColor,
+      backgroundColor: theme.scaffoldBackgroundColor,
       body: SafeArea(
-        child: Column(
+        child: ListView(
+          padding: const EdgeInsets.only(bottom: 16),
           children: [
             const PageHeader(title: "Book Equipment"),
 
@@ -100,47 +97,33 @@ class _EquipmentBookingScreenState
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     /// 1. ASSET HEADER CARD
-                    Container(
-                      padding: const EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                        color: cardColor,
-                        borderRadius: BorderRadius.circular(24),
-                        border: Border.all(
-                          color: Colors.white.withValues(alpha: 0.05),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        EquipmentImageHeader(imageUrl: displayUrl),
+                        const SizedBox(height: 16),
+                        Text(
+                          "${equipment.name} ${equipment.model}".toUpperCase(),
+                          style: theme.textTheme.titleLarge,
                         ),
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          EquipmentImageHeader(imageUrl: displayUrl),
-                          const SizedBox(height: 16),
-                          Text(
-                            "${equipment.name} ${equipment.model}"
-                                .toUpperCase(),
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                              letterSpacing: 0.5,
-                            ),
-                          ),
-                          Text(
-                            "SPEC: ${equipment.capacity} ${equipment.capacityUnit}",
-                            style: TextStyle(
-                              color: Colors.white.withValues(alpha: 0.3),
-                              fontSize: 11,
-                              fontWeight: FontWeight.bold,
-                              letterSpacing: 1,
-                            ),
-                          ),
-                        ],
+                        Text(
+                          "SPEC: ${equipment.capacity} ${equipment.capacityUnit}",
+                          style: theme.textTheme.titleMedium,
+                        ),
+                      ],
+                    ),
+
+                    const SizedBox(height: 16),
+
+                    /// Pricing
+                    Padding(
+                      padding: const EdgeInsets.only(left: 4, bottom: 12),
+                      child: Text(
+                        "Pricing Plan",
+                        style: theme.textTheme.headlineLarge,
                       ),
                     ),
 
-                    const SizedBox(height: 24),
-
-                    /// 2. PRICING PLAN SELECTOR
-                    _buildSectionHeader("SELECT PRICING PLAN"),
                     Wrap(
                       spacing: 10,
                       runSpacing: 10,
@@ -162,21 +145,27 @@ class _EquipmentBookingScreenState
                               vertical: 12,
                             ),
                             decoration: BoxDecoration(
-                              color: isSelected ? accentColor : cardColor,
+                              color: isSelected
+                                  ? theme.colorScheme.primary
+                                  : theme.cardColor,
                               borderRadius: BorderRadius.circular(14),
                               border: Border.all(
                                 color: isSelected
-                                    ? accentColor
-                                    : Colors.white.withValues(alpha: 0.08),
+                                    ? theme.colorScheme.primary
+                                    : theme.colorScheme.outline.withValues(
+                                        alpha: 0.4,
+                                      ),
                               ),
                             ),
                             child: Text(
                               "${entry.price} ₸ / ${entry.priceRate}",
-                              style: TextStyle(
+                              style: theme.textTheme.labelLarge?.copyWith(
                                 color: isSelected
-                                    ? Colors.white
-                                    : Colors.white70,
-                                fontWeight: FontWeight.bold,
+                                    ? theme.colorScheme.onPrimary
+                                    : theme.colorScheme.onSurface.withValues(
+                                        alpha: 0.7,
+                                      ),
+                                fontWeight: FontWeight.w600,
                                 fontSize: 13,
                               ),
                             ),
@@ -187,13 +176,29 @@ class _EquipmentBookingScreenState
 
                     const SizedBox(height: 24),
 
-                    /// 3. LOGISTICS (Address & Schedule)
-                    _buildSectionHeader("Address & Schedule"),
+                    /// Address & Schedule
+                    Padding(
+                      padding: const EdgeInsets.only(left: 4, bottom: 12),
+                      child: Text(
+                        "Address & Schedule",
+                        style: theme.textTheme.headlineLarge,
+                      ),
+                    ),
+
                     AddressPickerCard(
                       selectedAddress: selectedAddress,
-                      onTap: () => _openAddressSheet(context, ref),
+                      onTap: () => showModalBottomSheet(
+                        context: context,
+                        backgroundColor:
+                            Colors.transparent, // For rounded corners
+                        isScrollControlled: true,
+                        builder: (context) =>
+                            const SelectAddressSheet(equipmentId: "your_id"),
+                      ),
                     ),
-                    const SizedBox(height: 12),
+
+                    const SizedBox(height: 16),
+
                     Row(
                       children: [
                         Expanded(
@@ -217,7 +222,9 @@ class _EquipmentBookingScreenState
                             },
                           ),
                         ),
-                        const SizedBox(width: 12),
+
+                        const SizedBox(width: 16),
+
                         Expanded(
                           child: IndustrialDateTimeBtn(
                             icon: Icons.access_time_rounded,
@@ -252,47 +259,58 @@ class _EquipmentBookingScreenState
                     const SizedBox(height: 24),
 
                     /// 4. ADDITIONAL NOTES
-                    _buildSectionHeader("Note to Operator"),
+                    Padding(
+                      padding: const EdgeInsets.only(left: 4, bottom: 12),
+                      child: Text(
+                        "Note to Operator",
+                        style: theme.textTheme.headlineLarge,
+                      ),
+                    ),
+
                     TextField(
                       maxLines: 3,
-                      style: const TextStyle(color: Colors.white, fontSize: 14),
+                      style: theme.textTheme.bodyMedium,
                       onChanged: (v) => bookingNotifier.setComment(v),
                       decoration: InputDecoration(
                         hintText: "Site access details, conditions...",
-                        hintStyle: TextStyle(
-                          color: Colors.white.withValues(alpha: 0.1),
-                        ),
+                        hintStyle: theme.textTheme.bodyMedium
+                            ?.copyWith(
+                              color: theme.colorScheme.onSurface.withValues(alpha: 0.4),
+                            ),
                         filled: true,
-                        fillColor: cardColor,
+                        fillColor: theme.cardColor,
+
                         enabledBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(16),
                           borderSide: BorderSide(
-                            color: Colors.white.withValues(alpha: 0.05),
+                            color: theme.colorScheme.outline.withValues(alpha: 0.5),
                           ),
                         ),
+
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(16),
-                          borderSide: const BorderSide(
-                            color: Color(0xFF4E73DF),
+                          borderSide: BorderSide(
+                            color: theme.colorScheme.primary,
+                            width: 1.5,
                           ),
+                        ),
+
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 14,
                         ),
                       ),
                     ),
-                    const SizedBox(height: 40),
+
+                    const SizedBox(height: 20),
                   ],
                 ),
               ),
             ),
 
             /// 5. STICKY ACTION FOOTER
-            Container(
-              padding: const EdgeInsets.fromLTRB(20, 16, 20, 12),
-              decoration: BoxDecoration(
-                color: bgColor,
-                border: Border(
-                  top: BorderSide(color: Colors.white.withValues(alpha: 0.05)),
-                ),
-              ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(20, 24, 20, 32),
               child: SizedBox(
                 width: double.infinity,
                 height: 58,
@@ -308,19 +326,18 @@ class _EquipmentBookingScreenState
                           }
                         },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: accentColor,
-                    foregroundColor: Colors.white,
-                    disabledBackgroundColor: Colors.white.withValues(
-                      alpha: 0.05,
-                    ),
+                    backgroundColor: theme.colorScheme.primary,
+                    foregroundColor: theme.colorScheme.onPrimary,
+                    disabledBackgroundColor: theme.colorScheme.onSurface.withValues(alpha: 0.12),
+                    disabledForegroundColor: theme.colorScheme.onSurface.withValues(alpha: 0.38),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(16),
                     ),
                     elevation: 0,
                   ),
-                  child: const Text(
-                    "Confirm",
-                    style: TextStyle(
+                  child: Text(
+                    "CONFIRM",
+                    style: theme.textTheme.labelLarge?.copyWith(
                       fontWeight: FontWeight.bold,
                       letterSpacing: 1.2,
                     ),
@@ -333,29 +350,4 @@ class _EquipmentBookingScreenState
       ),
     );
   }
-
-  // Helper widgets to keep build clean
-  Widget _buildSectionHeader(String title) {
-    return Padding(
-      padding: const EdgeInsets.only(left: 4, bottom: 12),
-      child: Text(
-        title,
-        style: TextStyle(
-          color: Colors.white.withValues(alpha: 0.3),
-          fontSize: 11,
-          fontWeight: FontWeight.bold,
-          letterSpacing: 1.5,
-        ),
-      ),
-    );
-  }
-}
-
-void _openAddressSheet(BuildContext context, WidgetRef ref) {
-  showModalBottomSheet(
-    context: context,
-    backgroundColor: Colors.transparent, // For rounded corners
-    isScrollControlled: true,
-    builder: (context) => const SelectAddressSheet(equipmentId: "your_id"),
-  );
 }

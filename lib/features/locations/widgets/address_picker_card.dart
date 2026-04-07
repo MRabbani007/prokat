@@ -12,15 +12,14 @@ class AddressPickerCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const cardColor = Color(0xFF1E2125); // Charcoal depth
-    const accentColor = Color(0xFF4E73DF); // Industrial Blue
+    final theme = Theme.of(context);
 
     return GestureDetector(
       onTap: onTap,
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: cardColor,
+          color: theme.cardColor,
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
             color: Colors.white.withValues(alpha: 0.05), // Subtle "rim" light
@@ -39,12 +38,12 @@ class AddressPickerCard extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
-                color: accentColor.withValues(alpha: 0.1),
+                color: theme.colorScheme.primary.withValues(alpha: 0.3),
                 borderRadius: BorderRadius.circular(12),
               ),
-              child: const Icon(
+              child: Icon(
                 Icons.location_on_rounded,
-                color: accentColor,
+                color: theme.colorScheme.primary,
                 size: 22,
               ),
             ),
@@ -57,41 +56,25 @@ class AddressPickerCard extends StatelessWidget {
                   ? Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          "DELIVERY TO",
-                          style: TextStyle(
-                            fontSize: 10,
-                            fontWeight: FontWeight.bold,
-                            letterSpacing: 1.2,
-                            color: Colors.white.withValues(alpha: 0.3),
-                          ),
-                        ),
+                        Text("DELIVER TO", style: theme.textTheme.labelMedium),
                         const SizedBox(height: 2),
                         Text(
                           "${selectedAddress.street}, ${selectedAddress.city}",
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 15,
-                            fontWeight: FontWeight.w600,
-                          ),
+                          style: theme.textTheme.bodyMedium,
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                         ),
                       ],
                     )
-                  : const Text(
+                  : Text(
                       "Add Delivery Address",
-                      style: TextStyle(
-                        color: Colors.white70,
-                        fontSize: 15,
-                        fontWeight: FontWeight.w500,
-                      ),
+                      style: theme.textTheme.bodyMedium,
                     ),
             ),
 
             Icon(
               Icons.chevron_right_rounded,
-              color: Colors.white.withValues(alpha: 0.2),
+              color: Colors.white.withValues(alpha: 0.4),
             ),
           ],
         ),

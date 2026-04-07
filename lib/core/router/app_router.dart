@@ -6,7 +6,7 @@ import 'package:prokat/features/appstartup/app_startup_provider.dart';
 import 'package:prokat/features/appstatic/screens/error_screen.dart';
 import 'package:prokat/features/auth/providers/auth_provider.dart';
 import 'package:prokat/features/auth/screens/register_screen.dart';
-import 'package:prokat/features/bookings/screens/equipment_booking_screen.dart';
+import 'package:prokat/features/bookings/screens/create_booking_screen.dart';
 import 'package:prokat/features/bookings/screens/renter_bookings_screen.dart';
 import 'package:prokat/features/categories/screens/categories_screen.dart';
 import 'package:prokat/features/equipment/screens/equipment_id_screen.dart';
@@ -34,6 +34,7 @@ import 'package:prokat/features/requests/screens/renter_requests_screen.dart';
 import 'package:prokat/features/user/screens/owner_dashboard_screen.dart';
 import 'package:prokat/features/user/screens/owner_profile_screen.dart';
 import 'package:prokat/features/user/screens/owner_settings_screen.dart';
+import 'package:prokat/features/user/screens/register_owner_screen.dart';
 import 'package:prokat/features/user/screens/user_dashboard_screen.dart';
 import 'package:prokat/features/user/screens/user_profile_screen.dart';
 import 'package:prokat/features/user/screens/user_settings_screen.dart';
@@ -167,7 +168,7 @@ GoRouter createRouter(WidgetRef ref) {
                     path: 'book',
                     builder: (context, state) {
                       final id = state.pathParameters['id']!;
-                      return EquipmentBookingScreen(equipmentId: id); //
+                      return CreateBookingScreen(equipmentId: id); //
                     },
                   ),
                 ],
@@ -228,6 +229,10 @@ GoRouter createRouter(WidgetRef ref) {
               GoRoute(
                 path: AppRoutes.settings,
                 builder: (_, _) => const UserSettingsScreen(),
+              ),
+              GoRoute(
+                path: "/become-owner",
+                builder: (_, _) => const RegisterOwnerPage(),
               ),
             ],
           ),
