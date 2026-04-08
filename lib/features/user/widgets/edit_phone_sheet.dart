@@ -48,7 +48,7 @@ Future<void> showEditPhoneSheet(
                 decoration: InputDecoration(
                   hintText: '+7 700...',
                   hintStyle: textTheme.bodyMedium?.copyWith(
-                    color: colorScheme.onSurface.withOpacity(0.5),
+                    color: colorScheme.onSurface.withValues(alpha: 0.5),
                   ),
                   filled: true,
                   fillColor: theme.cardColor,

@@ -57,9 +57,9 @@ GoRouter createRouter(WidgetRef ref) {
       final startupState = ref.read(appStartupProvider);
 
       if (startupState == AppStartupState.loading) {
-        return '/launch';
+        return AppRoutes.launch;
       } else if (startupState == AppStartupState.error) {
-        return '/error';
+        return AppRoutes.error;
       }
 
       final authState = ref.read(authProvider);
@@ -231,7 +231,7 @@ GoRouter createRouter(WidgetRef ref) {
                 builder: (_, _) => const UserSettingsScreen(),
               ),
               GoRoute(
-                path: "/become-owner",
+                path: AppRoutes.becomeOwner,
                 builder: (_, _) => const RegisterOwnerPage(),
               ),
             ],

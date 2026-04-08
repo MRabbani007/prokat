@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:prokat/features/auth/providers/auth_provider.dart';
 import 'package:prokat/features/equipment/models/equipment_model.dart';
 import 'package:prokat/features/favorites/state/favorites_provider.dart';
+
+// TODO: MOVE TO EQUIPMENT FEATURE AND RENAME
 
 class EquipmentCard extends ConsumerWidget {
   final Equipment equipment;
@@ -16,19 +19,15 @@ class EquipmentCard extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
+    final authSession = ref.watch(authProvider).session;
+    final isClient = authSession != null ? true : false;
 
     final notifier = ref.read(favoriteProvider.notifier);
     final bool isFavorite = notifier.isFavorite(equipment.id);
 
-    final displayUrl = equipment.imageUrl?.isNotEmpty == true
-        ? equipment.imageUrl!
-        : "https://insqvwqlfhbfcqqnvzxu.supabase.co/storage/v1/object/public/Media/kamaz1.jpg";
-
     final priceEntry = equipment.prices.isNotEmpty
         ? equipment.prices.first
         : null;
-
-    final location = equipment.location;
 
     final priceRate = priceEntry != null
         ? priceEntry.priceRate.toUpperCase() == "PER_TRIP"
@@ -45,9 +44,12 @@ class EquipmentCard extends ConsumerWidget {
       decoration: BoxDecoration(
         color: theme.cardColor,
         borderRadius: BorderRadius.circular(20),
+        border: Border.all(
+          color: theme.colorScheme.outline.withValues(alpha: 0.3),
+        ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.1),
+            color: Colors.black.withValues(alpha: 0.4),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -74,23 +76,24 @@ class EquipmentCard extends ConsumerWidget {
               Positioned(
                 top: 12,
                 left: 12,
-                child: _badge(
-                  text: equipment.status.toLowerCase() == "available"
-                      ? "ONLINE"
-                      : "OFFLINE",
-                  color: equipment.status.toLowerCase() == "available"
-                      ? Colors.green
-                      : Colors.grey,
-                ),
-              ),
+                child: Row(
+                  children: [
+                    _badge(
+                      text: equipment.status.toLowerCase() == "available"
+                          ? "ONLINE"
+                          : "OFFLINE",
+                      color: equipment.status.toLowerCase() == "available"
+                          ? Colors.green
+                          : Colors.grey,
+                    ),
 
-              /// DISTANCE BADGE
-              Positioned(
-                top: 12,
-                left: 100,
-                child: _badge(
-                  text: equipment.location?.city ?? "",
-                  color: Colors.black87,
+                    SizedBox(width: 12),
+
+                    _badge(
+                      text: equipment.location?.city ?? "",
+                      color: Colors.black87,
+                    ),
+                  ],
                 ),
               ),
 
@@ -98,28 +101,32 @@ class EquipmentCard extends ConsumerWidget {
               Positioned(
                 bottom: 12,
                 right: 12,
+                // Price container
                 child: Container(
                   padding: const EdgeInsets.symmetric(
                     horizontal: 14,
                     vertical: 8,
                   ),
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: theme.primaryColor,
                     borderRadius: BorderRadius.circular(30),
                   ),
                   child: Row(
                     children: [
+                      // Price Amount
                       Text(
                         priceEntry != null ? "${priceEntry.price} ₸" : "POA",
                         style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.bold,
+                          color: Colors.white,
                         ),
                       ),
                       const SizedBox(width: 2),
+                      // Price Rate (unit)
                       Text(
                         priceRate,
-                        style: TextStyle(fontSize: 10, color: Colors.grey[600]),
+                        style: TextStyle(fontSize: 10, color: Colors.white),
                       ),
                     ],
                   ),
@@ -140,7 +147,13 @@ class EquipmentCard extends ConsumerWidget {
                   children: [
                     /// FAVORITE BUTTON
                     GestureDetector(
-                      onTap: () {},
+                      onTap: isClient
+                          ? () async {
+                              ref
+                                  .read(favoriteProvider.notifier)
+                                  .toggleFavorite(equipment.id);
+                            }
+                          : null,
                       child: Padding(
                         padding: const EdgeInsets.only(right: 8),
                         child: Icon(
@@ -156,20 +169,12 @@ class EquipmentCard extends ConsumerWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
-                            equipment.owner?.displayName ?? "",
-                            style: theme.textTheme.labelMedium?.copyWith(
-                              fontSize: 18,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-
                           Row(
                             children: [
                               Text(
                                 equipment.name,
                                 style: theme.textTheme.titleLarge?.copyWith(
-                                  fontSize: 24,
+                                  fontSize: 20,
                                   fontWeight: FontWeight.bold,
                                 ),
                               ),
@@ -178,22 +183,30 @@ class EquipmentCard extends ConsumerWidget {
 
                               Text(
                                 equipment.model,
-                                style: theme.textTheme.titleLarge?.copyWith(
-                                  fontSize: 18,
+                                style: theme.textTheme.bodyLarge?.copyWith(
+                                  fontSize: 20,
                                   fontWeight: FontWeight.w600,
                                 ),
                               ),
                             ],
                           ),
 
-                          const SizedBox(height: 4),
+                          Text(
+                            equipment.owner?.displayName ?? "",
+                            style: theme.textTheme.labelMedium?.copyWith(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
 
+                          // Equipment specs
                           Row(
                             children: [
                               Text(
                                 equipment.capacity,
-                                style: theme.textTheme.bodyMedium?.copyWith(
-                                  color: Colors.grey,
+                                style: theme.textTheme.labelMedium?.copyWith(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w500,
                                 ),
                               ),
 
@@ -201,8 +214,9 @@ class EquipmentCard extends ConsumerWidget {
 
                               Text(
                                 equipment.capacityUnit,
-                                style: theme.textTheme.bodyMedium?.copyWith(
-                                  color: Colors.grey,
+                                style: theme.textTheme.labelMedium?.copyWith(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w500,
                                 ),
                               ),
                             ],
@@ -246,11 +260,14 @@ class EquipmentCard extends ConsumerWidget {
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(14),
                       ),
-                      backgroundColor: const Color.fromARGB(255, 255, 242, 200),
+                      backgroundColor: theme.primaryColor,
                     ),
                     child: const Text(
                       "RESERVE NOW",
-                      style: TextStyle(fontWeight: FontWeight.bold),
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
                     ),
                   ),
                 ),

@@ -13,40 +13,45 @@ class CategorySelectorTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // const cardColor = Color(0xFF1E2125);
-    const accentColor = Color(0xFF4E73DF);
+    final theme = Theme.of(context);
     final isSelected = selectedCategory != null;
 
-    return InkWell(
+    return GestureDetector(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(16),
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        // decoration: BoxDecoration(
-        //   color: cardColor,
-        //   borderRadius: BorderRadius.circular(16),
-        //   border: Border.all(
-        //     color: isSelected
-        //         ? accentColor.withValues(alpha: 0.3)
-        //         : Colors.white.withValues(alpha: 0.05),
-        //   ),
-        // ),
+        decoration: BoxDecoration(
+          color: theme.cardColor,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: isSelected
+                ? theme.colorScheme.primary.withValues(alpha: 0.5)
+                : theme.colorScheme.primary.withValues(alpha: 0.3),
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.4),
+              blurRadius: 6,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
         child: Row(
           children: [
-            // Icon Container (Small version of your original)
+            // Icon Container
             Container(
               padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
                 color: isSelected
-                    ? accentColor.withValues(alpha: 0.1)
-                    : Colors.white.withValues(alpha: 0.03),
+                    ?  theme.colorScheme.primary.withValues(alpha: 0.6)
+                    : theme.colorScheme.primary.withValues(alpha: 0.3),
                 shape: BoxShape.circle,
               ),
               child: Icon(
                 isSelected
                     ? _getCategoryIcon(selectedCategory!.name)
                     : Icons.category_outlined,
-                color: isSelected ? accentColor : Colors.white24,
+                color: isSelected ?  theme.colorScheme.primary : theme.colorScheme.secondary.withValues(alpha: 0.5),
                 size: 24,
               ),
             ),
@@ -57,24 +62,15 @@ class CategorySelectorTile extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    isSelected ? "CATEGORY" : "EQUIPMENT TYPE",
-                    style: TextStyle(
-                      color: Colors.white.withValues(alpha: 0.3),
-                      fontSize: 10,
-                      fontWeight: FontWeight.bold,
-                      letterSpacing: 1.1,
-                    ),
+                    "Service",
+                    style: theme.textTheme.labelLarge,
                   ),
                   const SizedBox(height: 2),
                   Text(
                     isSelected
                         ? selectedCategory!.name.toUpperCase()
-                        : "Select Category",
-                    style: TextStyle(
-                      color: isSelected ? Colors.white : Colors.white54,
-                      fontSize: 14,
-                      fontWeight: FontWeight.bold,
-                    ),
+                        : "Select Service",
+                    style: theme.textTheme.bodyLarge,
                   ),
                 ],
               ),
@@ -97,5 +93,4 @@ class CategorySelectorTile extends StatelessWidget {
     if (n.contains('excavator')) return Icons.precision_manufacturing_rounded;
     return Icons.construction_rounded;
   }
-  
 }

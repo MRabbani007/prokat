@@ -24,40 +24,42 @@ class IndustrialTextField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
-        color: const Color(0xFF1E2125),
+        color: theme.cardColor,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
+        border: Border.all(color: theme.colorScheme.outline.withValues(alpha: 0.5), width: 1),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.4),
+            blurRadius: 6,
+            offset: const Offset(0, 4),
+          ),
+        ],
       ),
       child: TextField(
         controller: controller,
         maxLines: maxLines,
         keyboardType: keyboardType,
-        style: const TextStyle(color: Colors.white),
-
-        /// 🔥 CONNECT HERE
+        style: theme.textTheme.labelMedium,
         onChanged: onChanged,
-
         decoration: InputDecoration(
           labelText: label,
-          labelStyle: TextStyle(
-            color: Colors.white.withValues(alpha: 0.4),
-            fontSize: 14,
-          ),
+          labelStyle: theme.textTheme.labelMedium,
           hintText: hint,
-          hintStyle: TextStyle(
-            color: Colors.white.withValues(alpha: 0.15),
-            fontSize: 14,
+          hintStyle: theme.textTheme.labelMedium?.copyWith(
+            color: theme.textTheme.labelMedium?.color,
           ),
-          prefixIcon: Icon(icon, color: const Color(0xFF4E73DF), size: 20),
+          prefixIcon: Icon(icon, color: theme.colorScheme.primary, size: 24),
           border: InputBorder.none,
           contentPadding: const EdgeInsets.symmetric(
             horizontal: 16,
             vertical: 16,
           ),
-          floatingLabelStyle: const TextStyle(color: Color(0xFF4E73DF)),
+          floatingLabelStyle: TextStyle(color: theme.colorScheme.primary),
         ),
       ),
     );

@@ -77,7 +77,10 @@ class UserProfileService {
     try {
       final res = await _dio.patch(
         ApiRoutes.userCategory,
-        data: {if (selectedCategoryId != null) "selectedCategoryId": selectedCategoryId},
+        data: {
+          if (selectedCategoryId != null)
+            "selectedCategoryId": selectedCategoryId,
+        },
       );
 
       if (res.statusCode == 200 || res.statusCode == 201) {
@@ -107,12 +110,19 @@ class UserProfileService {
     }
   }
 
-  Future<UserProfileModel?> cancelRequest(String id) async {
+  Future<UserProfileModel?> selectCityRegion(
+    String? city,
+    String? region,
+  ) async {
     try {
       final res = await _dio.patch(
-        '/requests/$id',
-        data: {"status": "CANCELLED"},
+        ApiRoutes.userCityRegion,
+        data: {
+          if (city != null) "city": city,
+          if (region != null) "region": region,
+        },
       );
+
       if (res.statusCode == 200 || res.statusCode == 201) {
         return UserProfileModel.fromJson(res.data['data']);
       }

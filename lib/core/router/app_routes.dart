@@ -27,6 +27,8 @@ class AppRoutes {
   static const String profile = '/profile';
   static const String settings = '/settings';
 
+  static const String becomeOwner = '/become-owner';
+
   // Owner Screens
   // prefixed with /owner
   static const String ownerDashboard = '/owner/dashboard';

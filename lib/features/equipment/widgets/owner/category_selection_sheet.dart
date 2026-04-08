@@ -5,21 +5,19 @@ import 'package:prokat/features/equipment/providers/equipment_provider.dart';
 import 'package:prokat/features/requests/providers/request_provider.dart';
 
 class CategorySelectionSheet extends ConsumerWidget {
-  final service;
+  final String service;
 
   const CategorySelectionSheet({super.key, required this.service});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // 1. Read your categories list
+    final theme = Theme.of(context);
     final categories = ref.watch(categoriesProvider).categories;
-    const backgroundColor = Color(0xFF1E2125);
-    const accentColor = Color(0xFF4E73DF);
 
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 24),
-      decoration: const BoxDecoration(
-        color: backgroundColor,
+      decoration: BoxDecoration(
+        color: theme.scaffoldBackgroundColor,
         borderRadius: BorderRadius.vertical(top: Radius.circular(32)),
       ),
       child: Column(
@@ -30,28 +28,24 @@ class CategorySelectionSheet extends ConsumerWidget {
             width: 40,
             height: 4,
             decoration: BoxDecoration(
-              color: Colors.white12,
+              color: Colors.grey,
               borderRadius: BorderRadius.circular(2),
             ),
           ),
-          const SizedBox(height: 24),
-          const Text(
-            "SELECT CATEGORY",
-            style: TextStyle(
-              color: Colors.white54,
-              fontSize: 12,
-              fontWeight: FontWeight.bold,
-              letterSpacing: 2,
-            ),
-          ),
           const SizedBox(height: 16),
-          // 2. List the categories
+
+          Text("Select Service", style: theme.textTheme.titleLarge),
+
+          const SizedBox(height: 16),
+
+          // List the categories
           Flexible(
             child: ListView.builder(
               shrinkWrap: true,
               itemCount: categories.length,
               itemBuilder: (context, index) {
                 final category = categories[index];
+
                 return ListTile(
                   contentPadding: const EdgeInsets.symmetric(
                     horizontal: 24,
@@ -60,36 +54,33 @@ class CategorySelectionSheet extends ConsumerWidget {
                   leading: Container(
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                      color: accentColor.withValues(alpha: 0.1),
+                      color: theme.colorScheme.primary.withValues(alpha: 0.3),
                       shape: BoxShape.circle,
                     ),
                     child: Icon(
                       Icons.construction_rounded,
-                      color: accentColor,
+                      color: theme.colorScheme.primary.withValues(alpha: 0.5),
                       size: 20,
                     ),
                   ),
                   title: Text(
                     category.name,
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.w600,
-                    ),
+                    style: theme.textTheme.bodyLarge,
                   ),
                   onTap: () {
                     if (service == "request") {
-                      // 3. Update the Request Notifier
+                      // Update the Request Notifier
                       ref
                           .read(requestProvider.notifier)
                           .selectCategory(category);
                     } else if (service == "equipment") {
-                      // 3. Update the Equipment Notifier
+                      // Update the Equipment Notifier
                       ref
                           .read(equipmentProvider.notifier)
                           .selectCategory(category);
                     }
 
-                    // 4. Close the sheet and return the category to the form
+                    // Close the sheet and return the category to the form
                     Navigator.pop(context, category);
                   },
                 );

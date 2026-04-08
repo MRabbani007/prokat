@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:prokat/features/user/state/user_profile_provider.dart';
 import 'package:prokat/features/user/widgets/language_pill_selector.dart';
-import 'package:prokat/features/user/widgets/user_location_tile.dart';
 
 class UserDashboardHeader extends ConsumerStatefulWidget {
   const UserDashboardHeader({super.key});
@@ -17,8 +16,9 @@ class _UserHeaderState extends ConsumerState<UserDashboardHeader> {
   @override
   Widget build(BuildContext context) {
     final userProfileState = ref.watch(userProfileProvider);
+    final profileImageUrl = userProfileState.userProfile?.profileImageUrl ?? "";
+
     final theme = Theme.of(context);
-    final accent = theme.colorScheme.primary;
 
     return Container(
       padding: const EdgeInsets.fromLTRB(12, 16, 12, 10),
@@ -39,21 +39,39 @@ class _UserHeaderState extends ConsumerState<UserDashboardHeader> {
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
                         border: Border.all(
-                          color: accent.withValues(alpha: 0.2),
-                          width: 3,
+                          color: theme.colorScheme.outline.withValues(
+                            alpha: 0.4,
+                          ),
+                          width: 1,
                         ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withValues(alpha: 0.3),
+                            blurRadius: 10,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
                       ),
                       child: CircleAvatar(
                         radius: 28,
-                        backgroundColor: accent.withValues(alpha: 0.1),
-                        child: Icon(Icons.person, color: accent),
+                        backgroundColor: Theme.of(context).colorScheme.surface,
+                        child: ClipOval(
+                          child: Image.network(
+                            profileImageUrl,
+                            width: 100,
+                            height: 100,
+                            fit: BoxFit.cover,
+                            errorBuilder: (_, _, _) =>
+                                const Icon(Icons.person, size: 40),
+                          ),
+                        ),
                       ),
                     ),
 
                     // Rating badge
                     Positioned(
-                      bottom: -2,
-                      right: -2,
+                      bottom: -6,
+                      right: -10,
                       child: Container(
                         padding: const EdgeInsets.symmetric(
                           horizontal: 6,
@@ -64,13 +82,16 @@ class _UserHeaderState extends ConsumerState<UserDashboardHeader> {
                           borderRadius: BorderRadius.circular(12),
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.black.withValues(alpha: 0.15),
-                              blurRadius: 4,
-                              offset: const Offset(0, 2),
+                              color: Colors.black.withValues(alpha: 0.3),
+                              blurRadius: 10,
+                              offset: const Offset(0, 4),
                             ),
                           ],
                           border: Border.all(
-                            color: Colors.amber.withValues(alpha: 0.6),
+                            color: theme.colorScheme.outline.withValues(
+                              alpha: 0.4,
+                            ),
+                            width: 1
                           ),
                         ),
                         child: Row(
@@ -78,8 +99,8 @@ class _UserHeaderState extends ConsumerState<UserDashboardHeader> {
                           children: [
                             const Icon(
                               Icons.star,
-                              size: 12,
-                              color: Colors.amber,
+                              size: 14,
+                              color: Color.fromARGB(255, 255, 191, 0),
                             ),
                             const SizedBox(width: 2),
                             Text(
@@ -115,10 +136,6 @@ class _UserHeaderState extends ConsumerState<UserDashboardHeader> {
                       .ellipsis, // Adds "..." if the name is too long
                 ),
               ),
-
-              const SizedBox(width: 12),
-
-              UserLocationTile(),
 
               const SizedBox(width: 12),
 

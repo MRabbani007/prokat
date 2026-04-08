@@ -4,6 +4,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:prokat/features/equipment/models/equipment_model.dart';
 import 'package:prokat/features/favorites/state/favorites_provider.dart';
 
+// TODO: DELETE
+
 class UserEquipmentTile extends ConsumerWidget {
   final Equipment equipment;
   final VoidCallback onTap;

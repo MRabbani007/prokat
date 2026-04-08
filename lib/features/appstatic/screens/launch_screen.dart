@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:prokat/core/router/app_routes.dart';
 
@@ -18,6 +19,17 @@ class _LaunchScreenState extends State<LaunchScreen>
   @override
   void initState() {
     super.initState();
+
+    SystemChrome.setSystemUIOverlayStyle(
+      const SystemUiOverlayStyle(
+        statusBarColor: Colors.transparent,
+        systemNavigationBarColor: Colors.transparent,
+        statusBarIconBrightness:
+            Brightness.dark, // Use light if using a dark theme
+      ),
+    );
+
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
 
     _controller = AnimationController(
       vsync: this,
@@ -55,116 +67,116 @@ class _LaunchScreenState extends State<LaunchScreen>
     final textTheme = theme.textTheme;
 
     return Scaffold(
+      // Ensure the scaffold extends behind system cutouts
+      extendBody: true,
+      extendBodyBehindAppBar: true,
       backgroundColor: theme.scaffoldBackgroundColor,
-      body: SizedBox.expand(
-        child: Stack(
-          alignment: Alignment.center,
-          children: [
-            /// 1. Subtle background radial glow
-            Positioned(
-              top: -120,
-              child: Container(
-                width: 420,
-                height: 420,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  gradient: RadialGradient(
-                    colors: [
-                      colorScheme.primary.withOpacity(0.08),
-                      Colors.transparent,
-                    ],
-                  ),
-                ),
-              ),
+      body: Stack(
+        alignment: Alignment.center,
+        children: [
+          /// 1. Background Glows (Layered for depth)
+          // Primary top-right glow
+          Positioned(
+            top: -150,
+            right: -100,
+            child: _BackgroundGlow(
+              color: colorScheme.primary.withValues(alpha: 0.15),
+              size: 500,
             ),
+          ),
+          // Subtle bottom-left glow for balance
+          Positioned(
+            bottom: -100,
+            left: -100,
+            child: _BackgroundGlow(
+              color: colorScheme.primary.withValues(alpha: 0.05),
+              size: 400,
+            ),
+          ),
 
-            /// 2. Branding
-            FadeTransition(
+          /// 2. Branding (Centered)
+          Center(
+            child: FadeTransition(
               opacity: _fadeAnimation,
               child: ScaleTransition(
                 scale: _scaleAnimation,
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    /// Icon container
                     Container(
-                      padding: const EdgeInsets.all(24),
+                      padding: const EdgeInsets.all(28),
                       decoration: BoxDecoration(
-                        color: colorScheme.onSurface.withOpacity(0.03),
-                        borderRadius: BorderRadius.circular(32),
+                        color: colorScheme.primary.withValues(alpha: 0.12),
+                        borderRadius: BorderRadius.circular(36),
                         border: Border.all(
-                          color: colorScheme.onSurface.withOpacity(0.08),
+                          color: colorScheme.primary.withValues(alpha: 0.25),
+                          width: 1.5,
                         ),
                         boxShadow: [
                           BoxShadow(
-                            color: colorScheme.primary.withOpacity(0.15),
+                            color: colorScheme.primary.withValues(alpha: 0.15),
                             blurRadius: 40,
-                            spreadRadius: 2,
+                            offset: const Offset(0, 10),
                           ),
                         ],
                       ),
                       child: Icon(
                         Icons.precision_manufacturing_rounded,
-                        size: 64,
+                        size: 72, // Slightly larger for "heavy" impact
                         color: colorScheme.primary,
                       ),
                     ),
-
-                    const SizedBox(height: 40),
-
-                    /// App name
+                    const SizedBox(height: 48),
                     Text(
                       'PROKAT',
                       style: textTheme.displayLarge?.copyWith(
-                        fontWeight: FontWeight.bold,
-                        letterSpacing: 6,
+                        fontWeight: FontWeight.w900, // Black weight
+                        letterSpacing: 8,
                         fontFamily: 'Oswald',
+                        color: colorScheme.onSurface,
                       ),
                     ),
-
                     const SizedBox(height: 12),
-
-                    /// Tagline
                     Text(
                       'HEAVY EQUIPMENT RENTALS',
-                      style: textTheme.bodyMedium?.copyWith(
+                      style: textTheme.bodySmall?.copyWith(
                         fontWeight: FontWeight.w800,
-                        letterSpacing: 2.5,
-                        color: colorScheme.onSurface.withOpacity(0.8),
+                        letterSpacing: 4,
+                        color: colorScheme.onSurface.withOpacity(0.5),
                       ),
                     ),
                   ],
                 ),
               ),
             ),
+          ),
 
-            /// 3. Loader
-            Positioned(
-              bottom: 80,
-              child: Column(
-                children: [
-                  SizedBox(
-                    width: 40,
-                    height: 40,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2,
-                      color: colorScheme.primary.withOpacity(0.5),
-                      backgroundColor: colorScheme.onSurface.withOpacity(0.05),
-                    ),
+          /// 3. Loader
+          Positioned(
+            bottom: 80,
+            child: Column(
+              children: [
+                SizedBox(
+                  width: 40,
+                  height: 40,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    color: colorScheme.primary.withValues(alpha: 0.5),
+                    backgroundColor: colorScheme.onSurface.withValues(alpha: 0.05),
                   ),
-                  const SizedBox(height: 24),
-                  Text(
-                    'LOADING',
-                    style: textTheme.labelLarge?.copyWith(
-                      letterSpacing: 2,
-                      fontWeight: FontWeight.bold,
-                    ),
+                ),
+                const SizedBox(height: 24),
+                Text(
+                  'LOADING',
+                  style: textTheme.labelLarge?.copyWith(
+                    letterSpacing: 2,
+                    fontWeight: FontWeight.bold,
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
@@ -177,5 +189,27 @@ class _OutProposedCurve extends Curve {
   @override
   double transformInternal(double t) {
     return 1.0 - (1.0 - t) * (1.0 - t) * (1.0 - t);
+  }
+}
+
+class _BackgroundGlow extends StatelessWidget {
+  final Color color;
+  final double size;
+
+  const _BackgroundGlow({required this.color, required this.size});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: size,
+      height: size,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        gradient: RadialGradient(
+          colors: [color, Colors.transparent],
+          stops: const [0.2, 1.0],
+        ),
+      ),
+    );
   }
 }

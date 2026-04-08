@@ -18,9 +18,6 @@ class _RegisterOwnerPageState extends ConsumerState<RegisterOwnerPage> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final colors = theme.colorScheme;
-
     return Scaffold(
       appBar: AppBar(title: const Text("Register as Owner")),
       body: SingleChildScrollView(

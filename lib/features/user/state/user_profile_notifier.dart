@@ -120,11 +120,31 @@ class UserProfileNotifier extends StateNotifier<UserProfileState> {
     }
   }
 
-    Future<bool> selectAddress(String addressId) async {
+  Future<bool> selectAddress(String addressId) async {
     try {
       state = state.copyWith(isLoading: true);
 
       final updated = await service.selectAddress(addressId);
+
+      if (updated != null) {
+        await getUserProfile();
+
+        return true;
+      }
+
+      state = state.copyWith(isLoading: false);
+      return false;
+    } catch (e) {
+      state = state.copyWith(isLoading: false, error: e.toString());
+      return false;
+    }
+  }
+
+  Future<bool> selectselectCityRegion(String city, String region) async {
+    try {
+      state = state.copyWith(isLoading: true);
+
+      final updated = await service.selectCityRegion(city, region);
 
       if (updated != null) {
         await getUserProfile();

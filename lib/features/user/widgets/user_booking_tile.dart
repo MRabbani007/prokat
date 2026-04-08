@@ -20,10 +20,10 @@ class UserBookingTile extends StatelessWidget {
       decoration: BoxDecoration(
         color: theme.cardColor,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.15)),
+        border: Border.all(color: theme.colorScheme.outline.withValues(alpha: 0.5)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.08),
+            color: Colors.black.withValues(alpha: 0.3),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -55,7 +55,7 @@ class UserBookingTile extends StatelessWidget {
             children: [
               // Image Section
               SizedBox(
-                width: 100, // Fixed width
+                width: 130, // Fixed width
                 child: AspectRatio(
                   aspectRatio: 4 / 3,
                   child: ClipRRect(
@@ -81,7 +81,8 @@ class UserBookingTile extends StatelessWidget {
                   children: [
                     Text(
                       booking.equipment.name,
-                      style: theme.textTheme.bodyMedium?.copyWith(
+                      style: theme.textTheme.bodyLarge?.copyWith(
+                        fontSize: 18,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
@@ -102,13 +103,17 @@ class UserBookingTile extends StatelessWidget {
           Row(
             children: [
               Expanded(
-                child: _expandedAction(Icons.phone, Colors.green, () {}),
+                child: _actionButton(Icons.phone, Colors.green, () {}),
               ),
+
               const SizedBox(width: 8),
-              Expanded(child: _expandedAction(Icons.visibility, accent, () {})),
+
+              Expanded(child: _actionButton(Icons.visibility, accent, () {})),
+
               const SizedBox(width: 8),
+
               Expanded(
-                child: _expandedAction(Icons.close, Colors.redAccent, () {}),
+                child: _actionButton(Icons.close, Colors.redAccent, () {}),
               ),
             ],
           ),
@@ -117,21 +122,20 @@ class UserBookingTile extends StatelessWidget {
     );
   }
 
-  Widget _expandedAction(IconData icon, Color color, VoidCallback onTap) {
+  Widget _actionButton(IconData icon, Color color, VoidCallback onTap) {
     return Material(
-      // Added Material to fix RenderPhysicalModel issues
       color: Colors.transparent,
       child: InkWell(
         onTap: onTap,
         borderRadius: BorderRadius.circular(10),
         child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 10),
+          padding: const EdgeInsets.symmetric(vertical: 8),
           decoration: BoxDecoration(
-            color: color.withValues(alpha: 0.05),
+            color: color.withValues(alpha: 0.15),
             borderRadius: BorderRadius.circular(10),
-            border: Border.all(color: color.withValues(alpha: 0.15)),
+            border: Border.all(color: color.withValues(alpha: 0.2)),
           ),
-          child: Icon(icon, size: 20, color: color),
+          child: Icon(icon, size: 24, color: color),
         ),
       ),
     );
@@ -141,12 +145,12 @@ class UserBookingTile extends StatelessWidget {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Icon(icon, size: 14, color: Colors.grey),
+        Icon(icon, size: 20, color: Colors.grey),
         const SizedBox(width: 4),
         Flexible(
           child: Text(
             text,
-            style: const TextStyle(fontSize: 12, color: Colors.grey),
+            style: const TextStyle(fontSize: 16, color: Colors.grey),
           ),
         ),
       ],
@@ -166,13 +170,13 @@ class _StatusBadge extends StatelessWidget {
         baseColor = Colors.orange;
         break;
       case 'CONFIRMED':
-        baseColor = Colors.greenAccent;
+        baseColor = Colors.green;
         break;
       case 'COMPLETED':
         baseColor = Color(0xFF4E73DF);
         break;
       case 'CANCELLED':
-        baseColor = Colors.redAccent;
+        baseColor = Colors.red;
         break;
       default:
         baseColor = Colors.grey;
@@ -181,15 +185,15 @@ class _StatusBadge extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       decoration: BoxDecoration(
-        color: baseColor.withValues(alpha: 0.1),
+        color: baseColor.withValues(alpha: 0.2),
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: baseColor.withValues(alpha: 0.3), width: 1),
+        border: Border.all(color: baseColor.withValues(alpha: 0.6), width: 1),
       ),
       child: Text(
         status.toUpperCase(),
         style: TextStyle(
           color: baseColor,
-          fontSize: 10,
+          fontSize: 12,
           fontWeight: FontWeight.bold,
           letterSpacing: 1,
         ),

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 class AppTheme {
   // A professional, deep and vibrant orange accent color
-  static const Color accentOrange = Color(0xFFF57C00);
+  static const Color accentOrange = Color.fromARGB(255, 0, 72, 155);
 
   // Dark mode colors extracted from the current app
   static const Color darkBackground = Color(0xFF121417);
@@ -82,19 +82,27 @@ class AppTheme {
         ),
         titleSmall: TextStyle(color: lightTextSecondary),
 
-        bodyLarge: TextStyle(color: lightTextPrimary),
-        bodyMedium: TextStyle(
-          color: lightTextSecondary,
-          fontSize: 15,
+        bodyLarge: TextStyle(
+          color: lightTextPrimary,
+          fontSize: 20,
           fontWeight: FontWeight.w600,
         ),
-        bodySmall: TextStyle(color: lightTextTertiary),
+        bodyMedium: TextStyle(
+          color: lightTextPrimary,
+          fontSize: 16,
+          fontWeight: FontWeight.w500,
+        ),
+        bodySmall: TextStyle(color: lightTextTertiary, fontSize: 14),
 
-        labelLarge: TextStyle(color: lightTextPrimary, fontSize: 16),
+        labelLarge: TextStyle(
+          color: lightTextSecondary,
+          fontSize: 16,
+          fontWeight: FontWeight.w600,
+        ),
         labelMedium: TextStyle(
           color: lightTextSecondary,
           fontSize: 14,
-          fontWeight: FontWeight.bold,
+          fontWeight: FontWeight.w600,
           letterSpacing: 1.2,
         ),
         labelSmall: TextStyle(color: lightTextDisabled, fontSize: 10),

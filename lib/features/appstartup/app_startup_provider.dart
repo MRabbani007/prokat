@@ -48,7 +48,7 @@ class AppStartupController extends StateNotifier<AppStartupState> {
       return AppStartupState.guest;
     }
 
-    /// Category restore
+    /// Load Selected Service
     final selectedCategory = profile.selectedCategoryId;
     final categories = ref.read(categoriesProvider).categories;
 
@@ -58,6 +58,12 @@ class AppStartupController extends StateNotifier<AppStartupState> {
 
     if (foundCategory != null) {
       ref.read(categoriesProvider.notifier).selectCategory(foundCategory);
+    }
+
+    // Load Selected City / Region
+    final selectedCity = profile.city;
+    if (selectedCity != null) {
+      ref.read(locationProvider.notifier).selectCity(selectedCity);
     }
 
     /// Shared data

@@ -1,30 +1,45 @@
 class UserProfileModel {
   final String? username;
-  final String? phoneNumber;
-  final int? rating;
-  final bool? isPhoneVerified;
+  final String? role;
+
   final String? firstName;
   final String? lastName;
+
+  final String? phoneNumber;
+  final bool? isPhoneVerified;
+
+  final int? rating;
   final String? profileImageUrl;
-  final String? role;
-  final String? darkMode;
+  final DateTime? createdAt;
+
   final String? selectedCategoryId;
   final String? selectedAddressId;
-  final DateTime? createdAt;
+  final String? city;
+  final String? region;
+
+  // Settings
+  final String? darkMode;
 
   UserProfileModel({
     this.username,
+    this.role,
+
     this.firstName,
     this.lastName,
+
     this.phoneNumber,
-    this.rating,
     this.isPhoneVerified,
-    this.role,
+
+    this.rating,
     this.profileImageUrl,
-    this.darkMode,
+    this.createdAt,
+
     this.selectedCategoryId,
     this.selectedAddressId,
-    this.createdAt,
+    this.city,
+    this.region,
+
+    this.darkMode,
   });
 
   String get displayName {
@@ -38,19 +53,26 @@ class UserProfileModel {
     try {
       return UserProfileModel(
         username: json['username']?.toString(),
+        role: json['role']?.toString(),
+
         firstName: json['firstName']?.toString(),
         lastName: json['lastName']?.toString(),
+
         phoneNumber: json['phoneNumber']?.toString(),
-        rating: int.tryParse(json['rating'] ?? '') ?? 0,
         isPhoneVerified: json['isPhoneVerified'],
-        role: json['role']?.toString(),
+
+        rating: int.tryParse(json['rating'] ?? '') ?? 0,
         profileImageUrl: json['profileImageUrl']?.toString(),
-        darkMode: json['darkMode']?.toString(),
-        selectedCategoryId: json['selectedCategoryId']?.toString(),
-        selectedAddressId: json['selectedAddressId']?.toString(),
         createdAt: json['createdAt'] != null
             ? DateTime.parse(json['createdAt'])
             : null,
+
+        selectedCategoryId: json['selectedCategoryId']?.toString(),
+        selectedAddressId: json['selectedAddressId']?.toString(),
+        city: json['city']?.toString(),
+        region: json['region']?.toString(),
+
+        darkMode: json['darkMode']?.toString(),
       );
     } catch (e, stack) {
       print("❌ User Profile parsing failed");
@@ -64,17 +86,24 @@ class UserProfileModel {
   Map<String, dynamic> toJson() {
     return {
       'username': username,
+      'role': role,
+
       'firstName': firstName,
       'lastName': lastName,
+
       'phoneNumber': phoneNumber,
-      'rating': rating,
       'isPhoneVerified': isPhoneVerified,
-      'role': role,
+
+      'rating': rating,
       'profileImageUrl': profileImageUrl,
-      'darkMode': darkMode,
+      'createdAt': createdAt,
+
       'selectedCategoryId': selectedCategoryId,
       'selectedAddressId': selectedAddressId,
-      'createdAt': createdAt,
+      'city': city,
+      'region': region,
+
+      'darkMode': darkMode,
     };
   }
 }

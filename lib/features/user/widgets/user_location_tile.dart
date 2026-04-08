@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:prokat/features/locations/state/location_provider.dart';
+import 'package:prokat/features/user/state/user_profile_provider.dart';
 
 const kazakhstanCities = [
   'Almaty',
@@ -31,18 +32,20 @@ class UserLocationTile extends ConsumerWidget {
     final accent = theme.colorScheme.primary;
 
     // Determine display text
-    final location = locationState.selectedAddress;
+    // final location = locationState.selectedAddress;
     final selectedCity = locationState.city;
 
     String displayText = 'City';
 
-    if (location != null) {
-      if (location.city.isNotEmpty) {
-        displayText = location.city;
-      } else if (location.street.isNotEmpty) {
-        displayText = location.street;
-      }
-    } else if (selectedCity != null) {
+    // if (location != null) {
+    //   if (location.city.isNotEmpty) {
+    //     displayText = location.city;
+    //   } else if (location.street.isNotEmpty) {
+    //     displayText = location.street;
+    //   }
+    // }  
+    
+    if (selectedCity != null && selectedCity != "") {
       displayText = selectedCity;
     }
 
@@ -57,29 +60,37 @@ class UserLocationTile extends ConsumerWidget {
         );
       },
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-        decoration: ShapeDecoration(
-          color: accent.withValues(alpha: 0.1),
-          shape: StadiumBorder(
-            // Gives it the perfect pill shape
-            side: BorderSide(color: accent.withValues(alpha: 0.2), width: 1.5),
+        margin: EdgeInsets.symmetric(horizontal: 24),
+        padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
+        decoration: BoxDecoration(
+          color: theme.cardColor,
+          border: Border.all(
+            color: theme.colorScheme.outline.withValues(alpha: 0.3),
           ),
+          borderRadius: BorderRadius.circular(20),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.3),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
+            ),
+          ],
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(Icons.location_on, color: accent, size: 16),
+            Icon(Icons.location_on, color: accent, size: 20),
             const SizedBox(width: 6),
             Text(
               displayText,
               style: TextStyle(
-                fontSize: 13,
+                fontSize: 16,
                 fontWeight: FontWeight.w600,
                 color: selectedCity == null ? Colors.grey[600] : accent,
               ),
             ),
             const SizedBox(width: 4),
-            Icon(Icons.keyboard_arrow_down, size: 16, color: accent),
+            Icon(Icons.keyboard_arrow_down, size: 20, color: accent),
           ],
         ),
       ),
@@ -115,8 +126,11 @@ class _CityPickerSheet extends ConsumerWidget {
                     leading: const Icon(Icons.location_city),
                     title: Text(city),
                     onTap: () {
-                      // Update provider
                       ref.read(locationProvider.notifier).selectCity(city);
+
+                      ref
+                          .read(userProfileProvider.notifier)
+                          .selectselectCityRegion(city, "No Region");
 
                       Navigator.pop(context);
                     },

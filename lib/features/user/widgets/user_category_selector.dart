@@ -15,15 +15,6 @@ class UserCategorySelector extends ConsumerWidget {
 
     final theme = Theme.of(context);
 
-    final Map<String, IconData> categoryIcons = {
-      'septic trucks': Icons.plumbing_rounded,
-      'manipulators': Icons.precision_manufacturing_rounded,
-      'cranes': Icons.architecture_rounded,
-      'excavators': Icons.construction_rounded,
-      'forklifts': Icons.forklift,
-      'tow trucks': Icons.car_repair_rounded,
-    };
-
     Future<void> onCategorySelected(
       BuildContext context,
       Category category,
@@ -31,10 +22,6 @@ class UserCategorySelector extends ConsumerWidget {
       ref.read(categoriesProvider.notifier).selectCategory(category);
 
       await userProfileState.selectCategory(category.id);
-
-      // if (res == true && context.mounted) {
-      //   context.go('/search/map', extra: {'category': category.id});
-      // }
     }
 
     return AnimatedSwitcher(
@@ -48,110 +35,128 @@ class UserCategorySelector extends ConsumerWidget {
           child: FadeTransition(opacity: animation, child: child),
         );
       },
-      child:
-          categoriesState.showSelect == true ||
-              categoriesState.selectedCategory == null || true
-          ? SizedBox(
-              key: const ValueKey('service_list'),
-              height: 150, // your existing height
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  SizedBox(height: 8),
+      child: SizedBox(
+        key: const ValueKey('service_list'),
+        height: 260,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            SizedBox(height: 8),
 
-                  const Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 16, vertical: 0),
-                    child: Text(
-                      "Service",
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
+            const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 16, vertical: 0),
+              child: Text(
+                "Service",
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              ),
+            ),
+
+            SizedBox(
+              height: 220,
+              child: ListView.builder(
+                scrollDirection: Axis.horizontal,
+                padding: const EdgeInsets.symmetric(horizontal: 12),
+                itemCount: categoriesState.categories.length,
+                itemBuilder: (context, index) {
+                  final cat = categoriesState.categories[index];
+                  final isSelected =
+                      categoriesState.selectedCategory?.id == cat.id;
+
+                  return GestureDetector(
+                    onTap: () => onCategorySelected(context, cat),
+                    child: AnimatedContainer(
+                      duration: const Duration(milliseconds: 200),
+                      width: 160,
+                      margin: const EdgeInsets.symmetric(
+                        horizontal: 6,
+                        vertical: 4,
                       ),
-                    ),
-                  ),
-
-                  SizedBox(
-                    height: 110, // Increased height to fit larger icons
-                    child: ListView.builder(
-                      scrollDirection: Axis.horizontal,
-                      padding: const EdgeInsets.symmetric(horizontal: 12),
-                      itemCount: categoriesState.categories.length,
-                      itemBuilder: (context, index) {
-                        final cat = categoriesState.categories[index];
-                        final isSelected =
-                            categoriesState.selectedCategory?.id == cat.id;
-                        final icon =
-                            categoryIcons[cat.name.toLowerCase()] ??
-                            Icons.local_shipping_rounded;
-
-                        return GestureDetector(
-                          onTap: () => onCategorySelected(context, cat),
-                          child: AnimatedContainer(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: theme.cardColor,
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(
+                          color: isSelected
+                              ? accent.withValues(
+                                  alpha: 0.5,
+                                )
+                              : theme.colorScheme.outline.withValues(
+                                  alpha: 0.3,
+                                ),
+                          width: 1.5,
+                        ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withValues(alpha: 0.3),
+                            blurRadius: 10,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
+                      ),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          /// IMAGE (RECTANGLE)
+                          AnimatedContainer(
                             duration: const Duration(milliseconds: 200),
-                            width: 90,
-                            margin: const EdgeInsets.symmetric(
-                              horizontal: 6,
-                              vertical: 4,
-                            ),
-                            padding: const EdgeInsets.symmetric(
-                              vertical: 10,
-                              horizontal: 6,
-                            ),
+                            height: 160,
+                            width: double.infinity,
                             decoration: BoxDecoration(
-                              color: isSelected
-                                  ? accent.withOpacity(0.12)
-                                  : theme
-                                        .cardColor, // or scaffoldBackgroundColor
-                              borderRadius: BorderRadius.circular(18),
-                              border: Border.all(
-                                color: isSelected
-                                    ? accent.withOpacity(0.4)
-                                    : accent.withOpacity(0.15),
-                                width: 1.5,
-                              ),
+                              borderRadius: BorderRadius.circular(12),
+                              color: theme.colorScheme.surface,
                             ),
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                // Icon container
-                                AnimatedContainer(
-                                  duration: const Duration(milliseconds: 200),
-                                  padding: const EdgeInsets.all(10),
-                                  decoration: BoxDecoration(
-                                    color: isSelected
-                                        ? accent.withOpacity(0.2)
-                                        : accent.withOpacity(0.1),
-                                    shape: BoxShape.circle,
-                                  ),
-                                  child: Icon(icon, size: 28, color: accent),
-                                ),
+                            clipBehavior: Clip.antiAlias,
+                            child:
+                                (cat.imageUrl != null &&
+                                    cat.imageUrl!.isNotEmpty)
+                                ? Image.network(
+                                    cat.imageUrl!,
+                                    fit: BoxFit.fitWidth,
+                                    errorBuilder: (_, _, _) =>
+                                        _fallbackImage(theme),
+                                  )
+                                : _fallbackImage(theme),
+                          ),
 
-                                const SizedBox(height: 8),
+                          const SizedBox(height: 4),
 
-                                Text(
-                                  cat.name,
-                                  textAlign: TextAlign.center,
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w600,
-                                    color: isSelected
-                                        ? accent
-                                        : theme.textTheme.bodyMedium?.color,
-                                  ),
-                                ),
-                              ],
+                          /// TEXT BELOW IMAGE
+                          Text(
+                            cat.name,
+                            textAlign: TextAlign.center,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                              color: isSelected
+                                  ? accent
+                                  : theme.textTheme.bodyMedium?.color
+                                        ?.withValues(alpha: 0.9),
                             ),
                           ),
-                        );
-                      },
+                        ],
+                      ),
                     ),
-                  ),
-                ],
+                  );
+                },
               ),
-            )
-          : const SizedBox(key: ValueKey('empty')),
+            ),
+          ],
+        ),
+      ),
     );
   }
+}
+
+Widget _fallbackImage(ThemeData theme) {
+  return Container(
+    color: theme.colorScheme.surface,
+    alignment: Alignment.center,
+    child: Icon(
+      Icons.image_not_supported_outlined,
+      size: 28,
+      color: theme.colorScheme.onSurface.withValues(alpha: 0.4),
+    ),
+  );
 }
