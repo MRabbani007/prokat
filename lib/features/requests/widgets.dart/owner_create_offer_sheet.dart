@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:prokat/core/widgets/edit_sheet.dart';
-import 'package:prokat/core/widgets/industrial_input_container.dart';
-import 'package:prokat/features/categories/providers/category_provider.dart';
+import 'package:prokat/core/utils/format.dart';
 import 'package:prokat/features/equipment/providers/equipment_provider.dart';
 import 'package:prokat/features/offers/providers/offers_provider.dart';
 import 'package:prokat/features/requests/models/request_model.dart';
@@ -15,233 +13,299 @@ void openResponseSheet(BuildContext context, RequestModel request) {
     builder: (context) {
       return Consumer(
         builder: (context, ref, _) {
+          final theme = Theme.of(context);
+
           final offersState = ref.watch(offersProvider);
           final offersNotifier = ref.read(offersProvider.notifier);
           final equipmentState = ref.watch(equipmentProvider);
-          final selectedCategory = ref
-              .watch(categoriesProvider)
-              .selectedCategory;
+
           final equipmentOptions = equipmentState.ownerEquipment
-              .where((e) => e.category?.id == selectedCategory?.id)
+              .where((e) => e.category?.id.toString() == offersState.selectedRequest?.categoryId)
               .toList();
 
-          return EditSheet(
-            title: "Send Offer",
-            buttonText: "Send",
-            onSubmit: () async {
-              final res = await offersNotifier.createOffer();
-
-              if (res == true) {
-                Navigator.pop(context);
-              }
-            },
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                /// CATEGORY
-                // InfoBar(
-                //   label: "TARGET CATEGORY",
-                //   value: offersState.selectedRequest?.category?.name ?? "",
-                // ),
-
-                // const SizedBox(height: 16),
-
-                /// ✅ EQUIPMENT DROPDOWN (REAL DATA)
-                IndustrialInputContainer(
-                  label: "Select Equipment",
-                  child: DropdownButtonHideUnderline(
-                    child: DropdownButton(
-                      isExpanded: true,
-                      value: offersState.selectedEquipment,
-                      dropdownColor: const Color(0xFF1E2125),
-                      items: equipmentOptions.map((e) {
-                        return DropdownMenuItem(
-                          value: e,
-                          child: Text(
-                            e.name,
-                            style: const TextStyle(color: Colors.white),
-                          ),
-                        );
-                      }).toList(),
-                      onChanged: (value) {
-                        if (value != null) {
-                          offersNotifier.selectEquipment(value);
-                        }
-                      },
-                    ),
-                  ),
-                ),
-
-                const SizedBox(height: 16),
-
-                // Price
-                Row(
-                  children: [
-                    Expanded(
-                      child: IndustrialInputContainer(
-                        label: "PRICE",
-                        child: TextField(
-                          keyboardType: TextInputType.number,
-                          style: const TextStyle(color: Colors.white),
-                          onChanged: (value) {
-                            offersNotifier.setPrice(int.tryParse(value) ?? 0);
-                          },
-                          decoration: const InputDecoration(
-                            hintText: "0",
-                            hintStyle: TextStyle(color: Colors.white38),
-                            border: InputBorder.none,
-                          ),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: IndustrialInputContainer(
-                        label: "RATE TYPE",
-                        child: DropdownButtonHideUnderline(
-                          child: DropdownButton<String>(
-                            isExpanded: true,
-                            value: offersState.priceRate,
-                            hint: const Text(
-                              "Per day",
-                              style: TextStyle(color: Colors.white38),
-                            ),
-                            dropdownColor: const Color(0xFF1E2125),
-                            items: ["Per hour", "Per day", "Fixed"]
-                                .map(
-                                  (e) => DropdownMenuItem(
-                                    value: e,
-                                    child: Text(
-                                      e,
-                                      style: const TextStyle(
-                                        color: Colors.white,
-                                      ),
-                                    ),
-                                  ),
-                                )
-                                .toList(),
-                            onChanged: (value) {
-                              offersNotifier.setPriceRate(value ?? "");
-                            },
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-
-                const SizedBox(height: 16),
-
-                /// ✅ DATE / DURATION (from selected request)
-                Row(
-                  children: [
-                    /// ✅ DATE
-                    Expanded(
-                      child: IndustrialInputContainer(
-                        label: "START DATE",
-                        child: GestureDetector(
-                          behavior: HitTestBehavior
-                              .opaque, // 🔥 makes whole area clickable
-                          onTap: () async {
-                            final date = await showDatePicker(
-                              context: context,
-                              initialDate:
-                                  offersState.selectedDate ?? DateTime.now(),
-                              firstDate: DateTime.now(),
-                              lastDate: DateTime.now().add(
-                                const Duration(days: 365),
-                              ),
-                            );
-
-                            if (date != null) {
-                              offersNotifier.setDate(date);
-                            }
-                          },
-                          child: Text(
-                            offersState.selectedDate != null
-                                ? offersState.selectedDate!
-                                      .toString()
-                                      .split(" ")
-                                      .first
-                                : "Select date",
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-
-                    const SizedBox(width: 12),
-
-                    /// ✅ TIME
-                    Expanded(
-                      child: IndustrialInputContainer(
-                        label: "START TIME",
-                        child: InkWell(
-                          onTap: () async {
-                            final time = await showTimePicker(
-                              context: context,
-                              initialTime: TimeOfDay.now(),
-                            );
-
-                            if (time != null) {
-                              final now = DateTime.now();
-
-                              offersNotifier.setTime(
-                                DateTime(
-                                  now.year,
-                                  now.month,
-                                  now.day,
-                                  time.hour,
-                                  time.minute,
-                                ),
-                              );
-                            }
-                          },
-                          child: Text(
-                            offersState.selectedTime != null
-                                ? TimeOfDay.fromDateTime(
-                                    offersState.selectedTime!,
-                                  ).format(context)
-                                : "Select time",
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-
-                const SizedBox(height: 16),
-
-                const SizedBox(height: 16),
-
-                /// ✅ COMMENT INPUT (CONNECTED)
-                IndustrialInputContainer(
-                  label: "Comment",
-                  child: TextField(
-                    maxLines: 2,
-                    style: const TextStyle(color: Colors.white),
-                    onChanged: (value) {
-                      offersNotifier.setComment(value);
-                    },
-                    decoration: const InputDecoration(
-                      hintText: "Comments or terms...",
-                      hintStyle: TextStyle(color: Colors.white38),
-                      border: InputBorder.none,
-                    ),
-                  ),
+          return Container(
+            margin: const EdgeInsets.only(top: 60),
+            padding: EdgeInsets.only(
+              left: 20,
+              right: 20,
+              top: 20,
+              bottom: MediaQuery.of(context).viewInsets.bottom + 20,
+            ),
+            decoration: BoxDecoration(
+              color: theme.scaffoldBackgroundColor,
+              borderRadius: const BorderRadius.vertical(
+                top: Radius.circular(24),
+              ),
+              boxShadow: const [
+                BoxShadow(
+                  color: Colors.black,
+                  blurRadius: 20,
+                  offset: Offset(0, -6),
                 ),
               ],
+            ),
+
+            child: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  /// 🔹 HEADER
+                  Text(
+                    "Send Offer",
+                    style: theme.textTheme.titleLarge?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+
+                  const SizedBox(height: 20),
+
+                  /// 🔹 EQUIPMENT
+                  Text("Equipment", style: theme.textTheme.labelMedium),
+                  const SizedBox(height: 6),
+
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 12),
+                    decoration: BoxDecoration(
+                      color: theme.cardColor,
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: theme.dividerColor),
+                    ),
+                    child: DropdownButtonHideUnderline(
+                      child: DropdownButton(
+                        isExpanded: true,
+                        value: offersState.selectedEquipment,
+                        hint: const Text("Select equipment"),
+                        items: equipmentOptions.map((e) {
+                          return DropdownMenuItem(
+                            value: e,
+                            child: Text(e.name),
+                          );
+                        }).toList(),
+                        onChanged: (value) {
+                          if (value != null) {
+                            offersNotifier.selectEquipment(value);
+                          }
+                        },
+                      ),
+                    ),
+                  ),
+
+                  const SizedBox(height: 20),
+
+                  /// 🔹 PRICE + RATE
+                  Row(
+                    children: [
+                      Expanded(
+                        child: _inputBox(
+                          theme,
+                          label: "Price (₸)",
+                          child: TextField(
+                            keyboardType: TextInputType.number,
+                            onChanged: (value) {
+                              offersNotifier.setPrice(int.tryParse(value) ?? 0);
+                            },
+                            decoration: const InputDecoration(
+                              hintText: "120 000",
+                              border: InputBorder.none,
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: _dropdownBox(
+                          theme,
+                          label: "Rate",
+                          value: offersState.priceRate,
+                          hint: "Per day",
+                          items: ["Per hour", "Per day", "Fixed"],
+                          onChanged: (value) {
+                            offersNotifier.setPriceRate(value ?? "");
+                          },
+                        ),
+                      ),
+                    ],
+                  ),
+
+                  const SizedBox(height: 20),
+
+                  /// 🔹 DATE + TIME
+                  Row(
+                    children: [
+                      Expanded(
+                        child: _inputBox(
+                          theme,
+                          label: "Start Date",
+                          child: InkWell(
+                            onTap: () async {
+                              final date = await showDatePicker(
+                                context: context,
+                                initialDate:
+                                    offersState.selectedDate ?? DateTime.now(),
+                                firstDate: DateTime.now(),
+                                lastDate: DateTime.now().add(
+                                  const Duration(days: 365),
+                                ),
+                              );
+
+                              if (date != null) {
+                                offersNotifier.setDate(date);
+                              }
+                            },
+                            child: Text(
+                              offersState.selectedDate != null
+                                  ? formatDate(offersState.selectedDate!)
+                                  : "Select date",
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: _inputBox(
+                          theme,
+                          label: "Start Time",
+                          child: InkWell(
+                            onTap: () async {
+                              final time = await showTimePicker(
+                                context: context,
+                                initialTime: TimeOfDay.now(),
+                              );
+
+                              if (time != null) {
+                                final now = DateTime.now();
+                                offersNotifier.setTime(
+                                  DateTime(
+                                    now.year,
+                                    now.month,
+                                    now.day,
+                                    time.hour,
+                                    time.minute,
+                                  ),
+                                );
+                              }
+                            },
+                            child: Text(
+                              offersState.selectedTime != null
+                                  ? formatTime(
+                                      context,
+                                      offersState.selectedTime!,
+                                    )
+                                  : "Select time",
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+
+                  const SizedBox(height: 20),
+
+                  /// 🔹 COMMENT
+                  _inputBox(
+                    theme,
+                    label: "Comment",
+                    child: TextField(
+                      maxLines: 3,
+                      onChanged: (value) {
+                        offersNotifier.setComment(value);
+                      },
+                      decoration: const InputDecoration(
+                        hintText: "Optional notes or terms...",
+                        border: InputBorder.none,
+                      ),
+                    ),
+                  ),
+
+                  const SizedBox(height: 24),
+
+                  /// 🔥 SUBMIT BUTTON
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        backgroundColor: theme.colorScheme.primary,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(14),
+                        ),
+                      ),
+                      onPressed: () async {
+                        final res = await offersNotifier.createOffer();
+                        if (res == true && context.mounted) {
+                          Navigator.pop(context);
+                        }
+                      },
+                      child:  Text(
+                        "Send Offer",
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: theme.colorScheme.onPrimary,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
           );
         },
       );
     },
+  );
+}
+
+Widget _inputBox(
+  ThemeData theme, {
+  required String label,
+  required Widget child,
+}) {
+  return Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      Text(label, style: theme.textTheme.labelMedium),
+      const SizedBox(height: 6),
+      Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+        decoration: BoxDecoration(
+          color: theme.cardColor,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: theme.dividerColor),
+        ),
+        child: child,
+      ),
+    ],
+  );
+}
+
+Widget _dropdownBox(
+  ThemeData theme, {
+  required String label,
+  required String? value,
+  required String hint,
+  required List<String> items,
+  required Function(String?) onChanged,
+}) {
+  return _inputBox(
+    theme,
+    label: label,
+    child: DropdownButtonHideUnderline(
+      child: DropdownButton<String>(
+        isExpanded: true,
+        value: value,
+        hint: Text(hint),
+        items: items
+            .map((e) => DropdownMenuItem(value: e, child: Text(e)))
+            .toList(),
+        onChanged: onChanged,
+      ),
+    ),
   );
 }

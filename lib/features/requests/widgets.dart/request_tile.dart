@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:prokat/features/requests/models/request_model.dart';
-import 'package:prokat/features/requests/providers/request_provider.dart';
+import 'package:prokat/features/requests/state/request_provider.dart';
 import 'package:prokat/features/requests/widgets.dart/request_status_badge.dart';
 
 class RequestTile extends ConsumerStatefulWidget {

@@ -77,8 +77,9 @@ class RequestModel {
       );
     } catch (e) {
       print("Request Parse Failed");
+      print(e.toString());
       print(json);
-      rethrow; // important
+      rethrow; 
     }
   }
 

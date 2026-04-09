@@ -13,6 +13,7 @@ class UserDashboardHeader extends ConsumerStatefulWidget {
 
 class _UserHeaderState extends ConsumerState<UserDashboardHeader> {
   String selectedLanguage = 'EN';
+
   @override
   Widget build(BuildContext context) {
     final userProfileState = ref.watch(userProfileProvider);
@@ -104,7 +105,7 @@ class _UserHeaderState extends ConsumerState<UserDashboardHeader> {
                             ),
                             const SizedBox(width: 2),
                             Text(
-                              (userProfileState.userProfile?.rating ?? 0)
+                              (userProfileState.userProfile?.ratingStars ?? 0)
                                   .toStringAsFixed(1),
                               style: const TextStyle(
                                 fontSize: 12,

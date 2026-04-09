@@ -8,6 +8,7 @@ class AppRoutes {
   static const String login = '/login';
   static const String register = '/register';
   static const String forgotPassword = '/forgot-password';
+  static const String unAuthorized = '/unauthorized';
 
   // Guest Screens
   static const String main = '/main'; // Landing page with limited information
@@ -47,6 +48,7 @@ class AppRoutes {
   static const String ownerRequests = '/owner/requests';
 
   static const String ownerBookings = '/owner/bookings';
+  static const String ownerBookingsHistory = '/owner/bookings/history';
 
   static const String ownerProfile = '/owner/profile';
   static const String ownerSettings = '/owner/settings';

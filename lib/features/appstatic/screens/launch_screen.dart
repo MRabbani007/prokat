@@ -48,7 +48,7 @@ class _LaunchScreenState extends State<LaunchScreen>
     _controller.forward();
 
     Future.delayed(const Duration(seconds: 3), () {
-      if (mounted) {
+      if (context.mounted) {
         context.go(AppRoutes.dashboard);
       }
     });
@@ -142,7 +142,7 @@ class _LaunchScreenState extends State<LaunchScreen>
                       style: textTheme.bodySmall?.copyWith(
                         fontWeight: FontWeight.w800,
                         letterSpacing: 4,
-                        color: colorScheme.onSurface.withOpacity(0.5),
+                        color: colorScheme.onSurface.withValues(alpha: 0.5),
                       ),
                     ),
                   ],

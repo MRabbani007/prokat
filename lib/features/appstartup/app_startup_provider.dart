@@ -4,7 +4,7 @@ import 'package:prokat/features/bookings/state/booking_provider.dart';
 import 'package:prokat/features/categories/providers/category_provider.dart';
 import 'package:prokat/features/equipment/providers/equipment_provider.dart';
 import 'package:prokat/features/locations/state/location_provider.dart';
-import 'package:prokat/features/requests/providers/request_provider.dart';
+import 'package:prokat/features/requests/state/request_provider.dart';
 import 'package:prokat/features/user/state/user_profile_provider.dart';
 
 enum AppStartupState { loading, guest, renter, owner, error }
@@ -23,18 +23,20 @@ class AppStartupController extends StateNotifier<AppStartupState> {
     Future.microtask(() async {
       final authState = ref.read(authProvider);
 
+      // await init();
+
       /// ✅ If already logged in → run init
       if (authState.session != null) {
         await init();
       } else {
-        /// ✅ Otherwise don't run init at all
+      //   print("app startup session null session");
+      //   /// ✅ Otherwise don't run init at all
         state = AppStartupState.guest;
       }
     });
   }
 
   Future<void> reloadApp() async {
-    // state = AppStartupState.loading;
     state = await loadAppData();
   }
 

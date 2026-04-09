@@ -1,7 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:prokat/features/categories/models/category.dart';
 import 'package:prokat/features/locations/models/location_model.dart';
-import 'package:prokat/features/requests/services/request_service.dart';
+import 'package:prokat/features/requests/state/request_service.dart';
 import 'package:prokat/features/requests/state/request_state.dart';
 
 class RequestNotifier extends StateNotifier<RequestState> {
@@ -20,8 +20,6 @@ class RequestNotifier extends StateNotifier<RequestState> {
 
   void selectCategory(Category category) {
     state = state.copyWith(categoryId: category.id, selectedCategory: category);
-
-    print(state.toString());
   }
 
   void setDate(DateTime date) {
@@ -157,7 +155,25 @@ class RequestNotifier extends StateNotifier<RequestState> {
       }
 
       state = state.copyWith(isLoading: false);
-      
+
+      return res;
+    } catch (e) {
+      state = state.copyWith(isLoading: false, error: e.toString());
+      return false;
+    }
+  }
+
+  Future<bool> rejectRequest(String id) async {
+    try {
+      state = state.copyWith(isLoading: true);
+      final res = await service.rejectRequest(id);
+
+      if (res == true) {
+        await getOwnerRequests();
+      }
+
+      state = state.copyWith(isLoading: false);
+
       return res;
     } catch (e) {
       state = state.copyWith(isLoading: false, error: e.toString());

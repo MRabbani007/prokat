@@ -6,7 +6,7 @@ class UserProfileNotifier extends StateNotifier<UserProfileState> {
   final UserProfileService service;
 
   UserProfileNotifier(this.service) : super(UserProfileState()) {
-    getUserProfile();
+    // getUserProfile();
   }
 
   void setFirstName(String firstName) {
@@ -30,6 +30,8 @@ class UserProfileNotifier extends StateNotifier<UserProfileState> {
       if (data == null) {
         return false;
       }
+
+      print(data.toJson());
 
       state = state.copyWith(isLoading: false, userProfile: data);
 

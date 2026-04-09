@@ -4,7 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:prokat/core/widgets/page_header.dart';
 import 'package:prokat/features/auth/providers/auth_provider.dart';
 import 'package:prokat/features/offers/providers/offers_provider.dart';
-import 'package:prokat/features/requests/providers/request_provider.dart';
+import 'package:prokat/features/requests/state/request_provider.dart';
 import 'package:prokat/features/requests/widgets.dart/request_with_offers.dart';
 
 class RenterRequestsScreen extends ConsumerStatefulWidget {

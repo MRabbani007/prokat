@@ -156,7 +156,7 @@ class UserProfileScreen extends ConsumerWidget {
                             ),
                             const SizedBox(width: 6),
                             Text(
-                              (state.userProfile?.rating ?? 0).toStringAsFixed(
+                              (state.userProfile?.ratingStars ?? 0).toStringAsFixed(
                                 1,
                               ),
                               style: Theme.of(context).textTheme.bodyLarge

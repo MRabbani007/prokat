@@ -12,14 +12,20 @@ class PriceEntry {
   });
 
   factory PriceEntry.fromJson(Map<String, dynamic> json) {
-    return PriceEntry(
-      id: json["id"],
-      price: json["price"],
-      priceRate: json["priceRate"],
-      serviceTime: json["serviceTime"] ?? 0,
-    );
+    try {
+      return PriceEntry(
+        id: json["id"],
+        price: (json['price'] as num?)?.toInt() ?? 0,
+        priceRate: json["priceRate"],
+        serviceTime: (json['serviceTime'] as num?)?.toInt() ?? 0,
+      );
+    } catch (e) {
+      print("***** PRICE ENTRY PARSE FAILED");
+      print(e);
+      rethrow;
+    }
   }
-  
+
   Map<String, dynamic> toJson() {
     return {
       "id": id,

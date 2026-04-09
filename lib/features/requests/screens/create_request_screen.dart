@@ -10,7 +10,7 @@ import 'package:prokat/features/equipment/widgets/owner/category_selector_tile.d
 import 'package:prokat/features/locations/state/location_provider.dart';
 import 'package:prokat/features/locations/widgets/address_picker_card.dart';
 import 'package:prokat/features/locations/widgets/select_address_sheet.dart';
-import 'package:prokat/features/requests/providers/request_provider.dart';
+import 'package:prokat/features/requests/state/request_provider.dart';
 import 'package:go_router/go_router.dart';
 import 'package:prokat/features/user/state/user_profile_provider.dart';
 

@@ -15,11 +15,8 @@ class Equipment {
   final bool isVisible;
   final User? owner;
   final String? imageUrl;
-
   final List<PriceEntry> prices;
-
   final EquipmentLocation? location;
-
   final String? categoryId;
   final Category? category;
 
@@ -37,7 +34,7 @@ class Equipment {
     this.owner,
     this.categoryId,
     this.category,
-     this.location,
+    this.location,
     required this.prices,
   });
 
@@ -99,9 +96,13 @@ class Equipment {
 
         owner: json["owner"] != null ? User.fromJson(json["owner"]) : null,
 
-        location: json['location'] !=null ? EquipmentLocation.fromJson(json['location']) : null,
+        location: json['location'] != null
+            ? EquipmentLocation.fromJson(json['location'])
+            : null,
 
-        categoryId: json["categoryId"] ?? '',
+        categoryId: json["categoryId"] != null
+            ? json["categoryId"].toString()
+            : null,
         category: json["category"] != null
             ? Category.fromJson(json["category"])
             : null,

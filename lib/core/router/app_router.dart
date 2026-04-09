@@ -72,9 +72,10 @@ GoRouter createRouter(WidgetRef ref) {
       final requiresAuth = <String>[
         AppRoutes.profile,
         AppRoutes.settings,
-        // AppRoutes.favorites,
-        // AppRoutes.myRentals,
-      ].any((path) => location.startsWith(path));
+        AppRoutes.dashboard,
+        AppRoutes.favorites,
+        // AppRoutes.myRequests,
+      ].any((path) => location.contains(path));
 
       /// 🔒 BOOKING (nested route)
       final isBookingRoute = location.contains('/book');
@@ -89,13 +90,17 @@ GoRouter createRouter(WidgetRef ref) {
 
       /// 🏗 OWNER ROLE GUARD
       if (isOwnerRoute && role != 'OWNER') {
-        return AppRoutes.main;
+        return AppRoutes.login;
       }
 
       /// 🚫 BLOCK AUTH SCREENS WHEN LOGGED IN
       if (isLoggedIn &&
           (location == AppRoutes.login || location == AppRoutes.register)) {
-        return AppRoutes.main;
+        if (role == 'OWNER') {
+          return AppRoutes.ownerDashboard;
+        } else {
+          return AppRoutes.dashboard;
+        }
       }
 
       return null;

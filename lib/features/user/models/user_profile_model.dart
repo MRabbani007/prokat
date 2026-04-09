@@ -1,3 +1,5 @@
+import 'package:prokat/core/utils/parse.dart';
+
 class UserProfileModel {
   final String? username;
   final String? role;
@@ -8,7 +10,8 @@ class UserProfileModel {
   final String? phoneNumber;
   final bool? isPhoneVerified;
 
-  final int? rating;
+  final int? ratingStars;
+  final int? ratingCount;
   final String? profileImageUrl;
   final DateTime? createdAt;
 
@@ -30,7 +33,8 @@ class UserProfileModel {
     this.phoneNumber,
     this.isPhoneVerified,
 
-    this.rating,
+    this.ratingStars,
+    this.ratingCount,
     this.profileImageUrl,
     this.createdAt,
 
@@ -61,14 +65,15 @@ class UserProfileModel {
         phoneNumber: json['phoneNumber']?.toString(),
         isPhoneVerified: json['isPhoneVerified'],
 
-        rating: int.tryParse(json['rating'] ?? '') ?? 0,
+        ratingStars: parseNullableInt(json['ratingStars']),
+        ratingCount: parseNullableInt(json['ratingCount']),
+
         profileImageUrl: json['profileImageUrl']?.toString(),
-        createdAt: json['createdAt'] != null
-            ? DateTime.parse(json['createdAt'])
-            : null,
+        createdAt: parseNullableDate(json['createdAt']),
 
         selectedCategoryId: json['selectedCategoryId']?.toString(),
         selectedAddressId: json['selectedAddressId']?.toString(),
+
         city: json['city']?.toString(),
         region: json['region']?.toString(),
 
@@ -94,7 +99,8 @@ class UserProfileModel {
       'phoneNumber': phoneNumber,
       'isPhoneVerified': isPhoneVerified,
 
-      'rating': rating,
+      'ratingStars': ratingStars,
+      'ratingCount': ratingCount,
       'profileImageUrl': profileImageUrl,
       'createdAt': createdAt,
 

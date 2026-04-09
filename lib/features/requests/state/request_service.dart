@@ -24,7 +24,7 @@ class RequestService {
   Future<List<RequestModel>> getOwnerRequests() async {
     try {
       final res = await _dio.get('/requests/owner');
-
+      
       return (res.data['data'] as List)
           .map((e) => RequestModel.fromJson(e))
           .toList();
@@ -101,6 +101,22 @@ class RequestService {
       final res = await _dio.patch(
         '/requests/$id/status',
         data: {"id": id, "status": "CANCELLED"},
+      );
+      if (res.statusCode == 200 || res.statusCode == 201) {
+        return true;
+      }
+
+      return false;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  Future<bool> rejectRequest(String id) async {
+    try {
+      final res = await _dio.patch(
+        '/requests/$id/reject',
+        data: {"id": id, "status": "REJECTED"},
       );
       if (res.statusCode == 200 || res.statusCode == 201) {
         return true;

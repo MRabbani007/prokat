@@ -89,10 +89,9 @@ class OffersNotifier extends StateNotifier<OffersState> {
       );
 
       if (created != null) {
-        state = state.copyWith(
-          isLoading: false,
-          renterOffers: [...state.renterOffers, created],
-        );
+        state = state.copyWith(isLoading: false);
+
+        await getOwnerOffers();
 
         return true;
       }

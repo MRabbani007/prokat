@@ -1,11 +1,37 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_slidable/flutter_slidable.dart';
-import 'package:prokat/features/bookings/widgets/category_icon.dart';
+import 'package:prokat/core/utils/format.dart';
 import 'package:prokat/features/offers/models/offer_model.dart';
 import 'package:prokat/features/offers/providers/offers_provider.dart';
 import 'package:prokat/features/requests/models/request_model.dart';
+import 'package:prokat/features/requests/state/request_provider.dart';
 import 'package:prokat/features/requests/widgets.dart/owner_create_offer_sheet.dart';
+
+String getOwnerRequestStateLabel(
+  RequestModel request,
+  List<OfferModel> offers,
+) {
+  final requestStatus = request.status.toLowerCase();
+
+  if (offers.isEmpty) {
+    if (requestStatus == "created") return "New Request";
+    if (requestStatus == "viewed") return "Viewed";
+    return "Request";
+  }
+
+  final offer = offers.first;
+  final offerStatus = offer.status.toLowerCase();
+
+  if (offerStatus == "accepted") return "Accepted";
+  if (offerStatus == "rejected") return "Rejected";
+
+  return "Offer Sent";
+}
+
+bool hasOffer(List<OfferModel> offers) => offers.isNotEmpty;
+
+bool isAccepted(List<OfferModel> offers) =>
+    offers.isNotEmpty && offers.first.status.toLowerCase() == "accepted";
 
 enum OwnerRequestUIState {
   newRequest, // request CREATED, no offer
@@ -67,7 +93,7 @@ OwnerRequestUIConfig getOwnerRequestUIConfig(OwnerRequestUIState state) {
 
 class OwnerRequestTile extends ConsumerWidget {
   final RequestModel request;
-  final List<OfferModel>? offers;
+  final List<OfferModel> offers;
 
   const OwnerRequestTile({
     super.key,
@@ -77,158 +103,220 @@ class OwnerRequestTile extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final uiState = getOwnerRequestState(request, offers ?? []);
-    final uiConfig = getOwnerRequestUIConfig(uiState);
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
+    final stateLabel = getOwnerRequestStateLabel(request, offers);
+    final hasOffer = offers.isNotEmpty;
+    final isAccepted =
+        hasOffer && offers.first.status.toLowerCase() == "accepted";
 
     return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(28),
-        child: Slidable(
-          endActionPane: ActionPane(
-            motion: const DrawerMotion(),
-            extentRatio: 0.25,
-            children: [
-              SlidableAction(
-                onPressed: (_) {}, // HIDE Logic
-                backgroundColor: Colors.white.withValues(alpha: 0.05),
-                foregroundColor: Colors.white38,
-                icon: Icons.visibility_off_outlined,
-                label: 'HIDE',
-              ),
-            ],
+      margin: const EdgeInsets.only(bottom: 16, left: 4, right: 4),
+      decoration: BoxDecoration(
+        color: theme.cardColor,
+        borderRadius: BorderRadius.circular(24),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.5),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
           ),
-          child: InkWell(
-            onTap: () {
-              if (uiState == OwnerRequestUIState.offerSent) {
-                // maybe open offer details instead
-                return;
-              }
+        ],
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(24),
+        child: InkWell(
+          onTap: () {
+            ref.read(offersProvider.notifier).selectRequest(request);
+            openResponseSheet(context, request);
+          },
+          child: Padding(
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                /// --- HEADER ---
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _buildEnhancedImage(request.category?.imageUrl),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          _StatusBadge(
+                            label: stateLabel,
+                            color: colorScheme.primary,
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            "${request.category?.name ?? "Request"} • ${request.capacity}${request.category?.capacityUnit ?? ""}",
+                            style: theme.textTheme.titleMedium?.copyWith(
+                              fontWeight: FontWeight.bold,
+                              letterSpacing: -0.5,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Row(
+                            children: [
+                              Icon(
+                                Icons.location_on_outlined,
+                                size: 14,
+                                color: colorScheme.outline,
+                              ),
+                              const SizedBox(width: 4),
+                              Expanded(
+                                child: Text(
+                                  request.location.street,
+                                  style: theme.textTheme.bodySmall?.copyWith(
+                                    color: colorScheme.outline,
+                                  ),
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                    Text(
+                      formatRequestTime(request.createdAt.toString()),
+                      style: theme.textTheme.labelSmall?.copyWith(
+                        color: colorScheme.outline,
+                      ),
+                    ),
+                  ],
+                ),
 
-              if (uiState == OwnerRequestUIState.accepted) {
-                // open booking / tracking
-                return;
-              }
+                const Padding(
+                  padding: EdgeInsets.symmetric(vertical: 16),
+                  child: Divider(height: 1, thickness: 0.5),
+                ),
 
-              ref.read(offersProvider.notifier).selectRequest(request);
-              openResponseSheet(context, request);
-            },
-            child: Container(
-              padding: const EdgeInsets.all(20),
-              decoration: BoxDecoration(
-                color: const Color(0xFF1E2125),
-                border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
-                borderRadius: BorderRadius.circular(28),
-              ),
-              child: Row(
-                children: [
-                  CategoryIcon(category: request.category?.name ?? ""),
-
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: Column(
+                /// --- FOOTER (Price & Actions) ---
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        // if (uiState == OwnerRequestUIState.offerSent)
-                        //   Container(
-                        //     margin: const EdgeInsets.only(bottom: 6),
-                        //     padding: const EdgeInsets.symmetric(
-                        //       horizontal: 8,
-                        //       vertical: 4,
-                        //     ),
-                        //     decoration: BoxDecoration(
-                        //       color: uiConfig.color.withValues(alpha: 0.15),
-                        //       borderRadius: BorderRadius.circular(12),
-                        //     ),
-                        //     child: Text(
-                        //       uiConfig.label,
-                        //       style: TextStyle(
-                        //         color: uiConfig.color,
-                        //         fontSize: 10,
-                        //         fontWeight: FontWeight.bold,
-                        //       ),
-                        //     ),
-                        //   ),
-                        Container(
-                          margin: const EdgeInsets.only(bottom: 6),
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 8,
-                            vertical: 4,
-                          ),
-                          decoration: BoxDecoration(
-                            color: uiConfig.color.withValues(alpha: 0.15),
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: Text(
-                            uiConfig.label,
-                            style: TextStyle(
-                              color: uiConfig.color,
-                              fontSize: 10,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
+                        Text("Offered Rate", style: theme.textTheme.labelSmall),
                         Text(
-                          "OPEN REQUEST • ${request.requiredOn}",
-                          style: const TextStyle(
-                            color: Color(0xFFD97706),
-                            fontSize: 9,
+                          formatKZT(request.offeredRate),
+                          style: theme.textTheme.titleLarge?.copyWith(
+                            color: colorScheme.primary,
                             fontWeight: FontWeight.bold,
-                            letterSpacing: 1.2,
-                          ),
-                        ),
-                        Row(
-                          spacing: 10,
-                          children: [
-                            Text(
-                              request.category?.name ?? "Septic Truck",
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 18,
-                                fontWeight: FontWeight.normal,
-                              ),
-                            ),
-                            Text(
-                              request.capacity,
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 18,
-                                fontWeight: FontWeight.normal,
-                              ),
-                            ),
-                            Text(
-                              request.category?.capacityUnit ?? "",
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 18,
-                                fontWeight: FontWeight.normal,
-                              ),
-                            ),
-                          ],
-                        ),
-                        Text(
-                          request.offeredRate.toString(),
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        Text(
-                          request.location.street,
-                          style: const TextStyle(
-                            color: Colors.white38,
-                            fontSize: 12,
                           ),
                         ),
                       ],
                     ),
-                  ),
-                  const Icon(Icons.bolt, color: Color(0xFFD97706), size: 20),
-                ],
-              ),
+                    Row(
+                      children: [
+                        if (!hasOffer) ...[
+                          IconButton.filledTonal(
+                            onPressed: () => ref
+                                .read(requestProvider.notifier)
+                                .rejectRequest(request.id),
+                            icon: const Icon(Icons.close),
+                            style: IconButton.styleFrom(
+                              backgroundColor: colorScheme.errorContainer,
+                              foregroundColor: colorScheme.error,
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                        ],
+                        ElevatedButton(
+                          onPressed: () {
+                            ref
+                                .read(offersProvider.notifier)
+                                .selectRequest(request);
+                            openResponseSheet(context, request);
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: isAccepted
+                                ? Colors.green
+                                : colorScheme.primary,
+                            foregroundColor: isAccepted
+                                ? Colors.white
+                                : colorScheme.onPrimary,
+                            elevation: 0,
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 24,
+                              vertical: 12,
+                            ),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(14),
+                            ),
+                          ),
+                          child: Text(
+                            isAccepted
+                                ? "View Booking"
+                                : (hasOffer ? "View Offer" : "Send Offer"),
+                            style: const TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ],
             ),
           ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildEnhancedImage(String? url) {
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(color: Colors.black.withValues(alpha: 0.3), blurRadius: 8),
+        ],
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(16),
+        child: SizedBox(
+          width: 110,
+          height: 64,
+          child: Image.network(
+            url ?? "",
+            fit: BoxFit.cover,
+            errorBuilder: (_, _, _) => Container(
+              color: Colors.grey[200],
+              child: const Icon(Icons.category_outlined, color: Colors.grey),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _StatusBadge extends StatelessWidget {
+  final String label;
+  final Color color;
+
+  const _StatusBadge({required this.label, required this.color});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.15),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Text(
+        label.toUpperCase(),
+        style: TextStyle(
+          fontSize: 10,
+          fontWeight: FontWeight.w800,
+          color: color,
+          letterSpacing: 0.5,
         ),
       ),
     );

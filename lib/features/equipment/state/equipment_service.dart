@@ -20,7 +20,6 @@ class EquipmentService {
         return <Equipment>[];
       }
 
-
       final parsed = data
           .whereType<Map<String, dynamic>>() // safety check
           .map((json) => Equipment.fromJson(json))

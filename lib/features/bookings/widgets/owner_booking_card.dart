@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:prokat/features/bookings/models/booking_model.dart';
+import 'package:prokat/features/bookings/widgets/booking_status_badge.dart';
 
 class OwnerBookingCard extends StatelessWidget {
   final BookingModel booking;
@@ -9,78 +10,85 @@ class OwnerBookingCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const cardColor = Color(0xFF1E2125);
-    const accentBlue = Color(0xFF4E73DF);
-    // const amberWarning = Color(0xFFD97706);
-    const ghostGray = Color(0x4DFFFFFF);
+    final theme = Theme.of(context);
+    final colors = theme.colorScheme;
 
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 8),
       decoration: BoxDecoration(
-        color: cardColor,
-        borderRadius: BorderRadius.circular(28), // Large Item Radius
+        color: colors.surface,
+        borderRadius: BorderRadius.circular(28),
         border: Border.all(
-          color: Colors.white.withValues(alpha: 0.08),
-        ), // Rim Light
+          color: theme.colorScheme.outlineVariant.withValues(alpha: 0.8),
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.5),
+            blurRadius: 8,
+            offset: const Offset(0, 4),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // 1. HEADER: Renter & Status
+          /// HEADER
           Padding(
             padding: const EdgeInsets.fromLTRB(20, 20, 16, 12),
             child: Row(
               children: [
-                // Renter Avatar / Identifier
                 Container(
                   width: 40,
                   height: 40,
                   decoration: BoxDecoration(
-                    color: Colors.black.withValues(alpha: 0.3),
+                    color: colors.surfaceVariant,
                     borderRadius: BorderRadius.circular(12),
                     border: Border.all(
-                      color: Colors.white.withValues(alpha: 0.05),
+                      color: colors.outline.withValues(alpha: 0.1),
                     ),
                   ),
-                  child: const Icon(
+                  child: Icon(
                     Icons.person_pin_rounded,
-                    color: accentBlue,
+                    color: colors.primary,
                     size: 22,
                   ),
                 ),
                 const SizedBox(width: 12),
+
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
+                      Text(
                         "REQUESTING ENTITY",
-                        style: TextStyle(
-                          color: ghostGray,
-                          fontSize: 9,
-                          fontWeight: FontWeight.bold,
+                        style: theme.textTheme.labelSmall?.copyWith(
+                          color: colors.onSurface.withValues(alpha: 0.6),
                           letterSpacing: 1.2,
+                          fontWeight: FontWeight.bold,
                         ),
                       ),
                       Text(
                         booking.renter?.firstName ?? "USER",
-                        style: const TextStyle(
-                          color: Colors.white,
+                        style: theme.textTheme.titleMedium?.copyWith(
                           fontWeight: FontWeight.bold,
-                          fontSize: 16,
                         ),
                       ),
                     ],
                   ),
                 ),
-                _IndustrialStatusBadge(status: booking.status),
+
+                BookingStatusBadge(status: booking.status),
               ],
             ),
           ),
 
-          const Divider(height: 1, thickness: 1, color: Colors.white10),
+          Divider(
+            height: 1,
+            thickness: 1,
+            color: colors.outline.withValues(alpha: 0.1),
+          ),
 
-          // 2. BODY: Asset & Logistics
+          /// BODY
           Padding(
             padding: const EdgeInsets.all(20),
             child: Column(
@@ -88,16 +96,13 @@ class OwnerBookingCard extends StatelessWidget {
               children: [
                 Text(
                   "ASSET: ${booking.equipment.name.toUpperCase()}",
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.w900,
-                    fontSize: 14,
+                  style: theme.textTheme.titleSmall?.copyWith(
+                    fontWeight: FontWeight.w800,
                     letterSpacing: 0.5,
                   ),
                 ),
                 const SizedBox(height: 16),
 
-                // Technical Meta Grid
                 _TechMetaRow(
                   Icons.calendar_today_rounded,
                   "SCHEDULED",
@@ -108,25 +113,26 @@ class OwnerBookingCard extends StatelessWidget {
                       : "PENDING",
                 ),
                 const SizedBox(height: 12),
+
                 _TechMetaRow(
                   Icons.location_on_rounded,
                   "DEPLOYMENT",
-                  booking.location.street, // ?? "ATYRAU REGION",
+                  booking.location.street,
                 ),
               ],
             ),
           ),
 
-          // 3. FOOTER: Financials & Action
+          /// FOOTER
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
             decoration: BoxDecoration(
-              color: Colors.black.withValues(alpha: 0.2), // Recessed Panel
+              color: colors.surfaceVariant.withValues(alpha: 0.4),
               borderRadius: const BorderRadius.vertical(
                 bottom: Radius.circular(28),
               ),
               border: Border(
-                top: BorderSide(color: Colors.white.withValues(alpha: 0.05)),
+                top: BorderSide(color: colors.outline.withValues(alpha: 0.1)),
               ),
             ),
             child: Row(
@@ -135,29 +141,24 @@ class OwnerBookingCard extends StatelessWidget {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
+                    Text(
                       "TRANSACTION VALUE",
-                      style: TextStyle(
-                        color: ghostGray,
-                        fontSize: 9,
+                      style: theme.textTheme.labelSmall?.copyWith(
+                        color: colors.onSurface.withValues(alpha: 0.6),
                         fontWeight: FontWeight.bold,
                       ),
                     ),
                     Text(
                       "${booking.price} ₸",
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 18,
+                      style: theme.textTheme.titleLarge?.copyWith(
                         fontWeight: FontWeight.bold,
-                        fontFamily: 'monospace',
                       ),
                     ),
                   ],
                 ),
-                // Swipe Indicator or Small Action Icon
                 Icon(
                   Icons.swipe_vertical_rounded,
-                  color: Colors.white.withValues(alpha: 0.1),
+                  color: colors.onSurface.withValues(alpha: 0.2),
                   size: 20,
                 ),
               ],
@@ -178,74 +179,34 @@ class _TechMetaRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colors = theme.colorScheme;
+
     return Row(
       children: [
-        Icon(icon, size: 16, color: const Color(0xFF4E73DF)),
+        Icon(icon, size: 16, color: colors.primary),
         const SizedBox(width: 12),
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
               label,
-              style: const TextStyle(
-                color: Color(0x4DFFFFFF),
-                fontSize: 8,
-                fontWeight: FontWeight.bold,
+              style: theme.textTheme.labelSmall?.copyWith(
+                color: colors.onSurface.withValues(alpha: 0.6),
                 letterSpacing: 1,
+                fontWeight: FontWeight.bold,
               ),
             ),
             Text(
               value,
-              style: const TextStyle(
-                color: Colors.white70,
-                fontSize: 13,
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: colors.onSurface.withValues(alpha: 0.8),
                 fontWeight: FontWeight.w500,
               ),
             ),
           ],
         ),
       ],
-    );
-  }
-}
-
-class _IndustrialStatusBadge extends StatelessWidget {
-  final String status;
-  const _IndustrialStatusBadge({required this.status});
-
-  @override
-  Widget build(BuildContext context) {
-    Color color;
-    switch (status.toUpperCase()) {
-      case 'CREATED':
-        color = const Color(0xFFD97706);
-        break; // Amber
-      case 'CONFIRMED':
-        color = const Color(0xFF4E73DF);
-        break; // Blue
-      case 'COMPLETED':
-        color = Colors.white70;
-        break;
-      default:
-        color = Colors.white24;
-    }
-
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: color.withValues(alpha: 0.3)),
-      ),
-      child: Text(
-        status.toUpperCase(),
-        style: TextStyle(
-          color: color,
-          fontSize: 9,
-          fontWeight: FontWeight.bold,
-          letterSpacing: 1,
-        ),
-      ),
     );
   }
 }

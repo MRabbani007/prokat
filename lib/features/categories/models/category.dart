@@ -1,5 +1,3 @@
-// features/categories/models/category.dart
-
 class Category {
   final String id;
   final String name;
@@ -22,16 +20,17 @@ class Category {
   factory Category.fromJson(Map<String, dynamic> json) {
     try {
       return Category(
-        id: json["id"],
-        name: json["name"],
-        capacityUnit: json["capacityUnit"],
-        sortIndex: json["sortIndex"] ?? 0,
+        id: json["id"] ?? "",
+        name: json["name"] ?? "",
+        capacityUnit: json["capacityUnit"] ?? "",
+        sortIndex: (json['sortIndex'] as num?)?.toInt() ?? 0,
         // isUserVisible: json["isUserVisible"] ?? false,
         // isOwnerVisible: json["isOwnerVisible"] ?? false,
-        imageUrl: json["imageUrl"],
+        imageUrl: json["imageUrl"] ?? "",
       );
     } catch (e) {
-      print("Category Parse Falied");
+      print("***** CATEGORY PARSE FAILED");
+      print(e);
       print(json);
       rethrow; // important
     }
