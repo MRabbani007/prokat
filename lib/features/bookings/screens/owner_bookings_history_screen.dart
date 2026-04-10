@@ -9,48 +9,82 @@ class OwnerBookingHistoryScreen extends ConsumerStatefulWidget {
   const OwnerBookingHistoryScreen({super.key});
 
   @override
-  ConsumerState<OwnerBookingHistoryScreen> createState() => _OwnerBookingHistoryScreenState();
+  ConsumerState<OwnerBookingHistoryScreen> createState() =>
+      _OwnerBookingHistoryScreenState();
 }
 
-class _OwnerBookingHistoryScreenState extends ConsumerState<OwnerBookingHistoryScreen> {
-  final bgColor = const Color(0xFF121417);
-  final ghostGray = const Color(0x4DFFFFFF);
-
+class _OwnerBookingHistoryScreenState
+    extends ConsumerState<OwnerBookingHistoryScreen> {
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     final state = ref.watch(bookingProvider);
-    
-    // Filter for non-active states
+
     final history = state.bookings
-        .where((b) => b.status == "COMPLETED" || b.status == "CANCELLED" || b.status == "REJECTED")
+        .where(
+          (b) =>
+              b.status == "COMPLETED" ||
+              b.status == "CANCELLED" ||
+              b.status == "REJECTED",
+        )
         .toList();
 
     return Scaffold(
-      backgroundColor: bgColor,
+      backgroundColor: theme.colorScheme.surface,
       body: SafeArea(
         child: Column(
           children: [
-            // 1. Technical Header
-            _HistoryHeader(onBack: () => context.pop()),
+            PageHeader(
+              title: "Order History",
+              trailing: Container(
+                // Adjust margin for external "breathing room" or use Padding
+                margin: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  shape: BoxShape
+                      .circle, // Keeps the shadow circular like the button
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.4),
+                      blurRadius: 10,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                ),
+                child: IconButton.filledTonal(
+                  // Adds internal padding between the icon and the button edge
+                  padding: const EdgeInsets.all(12),
+                  icon: Icon(
+                    Icons.archive_outlined,
+                    size: 24,
+                    color: theme.colorScheme.onSurface.withValues(alpha: 0.2),
+                  ),
+                  onPressed: () {
+                    context.push("/owner/bookings/archived");
+                  },
+                ),
+              ),
+            ),
 
-            // 2. Search / Filter Bar (Mockup for technical feel)
             _SearchFilterBar(),
 
             Expanded(
-              child: history.isEmpty 
-                ? _EmptySystemState() // Reusing the standby state we built
-                : ListView.builder(
-                    padding: const EdgeInsets.fromLTRB(20, 10, 20, 40),
-                    itemCount: history.length,
-                    itemBuilder: (context, index) {
-                      final booking = history[index];
-                      // Use the same card but wrapped in an "Archived" styling
-                      return Opacity(
-                        opacity: 0.8, // Slightly dimmed to show it's past data
-                        child: OwnerBookingCard(booking: booking),
-                      );
-                    },
-                  ),
+              child: history.isEmpty
+                  ? const _EmptySystemState()
+                  : ListView.builder(
+                      padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
+                      itemCount: history.length,
+                      itemBuilder: (context, index) {
+                        final booking = history[index];
+
+                        return Padding(
+                          padding: const EdgeInsets.only(bottom: 12),
+                          child: Opacity(
+                            opacity: 0.75,
+                            child: OwnerBookingCard(booking: booking),
+                          ),
+                        );
+                      },
+                    ),
             ),
           ],
         ),
@@ -59,50 +93,42 @@ class _OwnerBookingHistoryScreenState extends ConsumerState<OwnerBookingHistoryS
   }
 }
 
-class _HistoryHeader extends StatelessWidget {
-  final VoidCallback onBack;
-  const _HistoryHeader({required this.onBack});
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: [
-        IconButton(
-          onPressed: onBack,
-          icon: const Icon(Icons.arrow_back_ios_new_rounded, color: Colors.white, size: 20),
-        ),
-        const Expanded(child: PageHeader(title: "Booking History")),
-        Padding(
-          padding: const EdgeInsets.only(right: 20),
-          child: Icon(Icons.archive_outlined, color: Colors.white.withValues(alpha: 0.1), size: 24),
-        ),
-      ],
-    );
-  }
-}
-
 class _SearchFilterBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
       decoration: BoxDecoration(
-        color: const Color(0xFF1E2125),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
+        color: theme.colorScheme.surfaceContainerHighest,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(
+          color: theme.colorScheme.outline.withValues(alpha: 0.2),
+        ),
       ),
       child: Row(
         children: [
-          const Icon(Icons.search_rounded, color: Color(0x4DFFFFFF), size: 18),
-          const SizedBox(width: 12),
-          const Expanded(
+          Icon(
+            Icons.search_rounded,
+            size: 18,
+            color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
+          ),
+          const SizedBox(width: 10),
+          Expanded(
             child: Text(
-              "SEARCH ARCHIVED LOGS...",
-              style: TextStyle(color: Color(0x4DFFFFFF), fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 1.2),
+              "Search history...",
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
+              ),
             ),
           ),
-          Icon(Icons.tune_rounded, color: Colors.white.withValues(alpha: 0.4), size: 18),
+          Icon(
+            Icons.tune_rounded,
+            size: 18,
+            color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+          ),
         ],
       ),
     );
@@ -114,39 +140,39 @@ class _EmptySystemState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const ghostGray = Color(0x4DFFFFFF); // White @ 30%
+    final theme = Theme.of(context);
 
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: 60, horizontal: 40),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          // "Dimmed" System Icon
-          Icon(
-            Icons.sensors_off_rounded,
-            size: 48,
-            color: Colors.white.withValues(alpha: 0.05),
-          ),
-          const SizedBox(height: 24),
-
-          // Terminal-style text
-          const Text(
-            "SYSTEM STANDBY",
-            style: TextStyle(
-              color: ghostGray,
-              fontWeight: FontWeight.bold,
-              fontSize: 12,
-              letterSpacing: 2.0,
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 32),
+      child: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.history_toggle_off_rounded,
+              size: 48,
+              color: theme.colorScheme.onSurface.withValues(alpha: 0.2),
             ),
-          ),
-          const SizedBox(height: 8),
+            const SizedBox(height: 20),
+            Text(
+              "No order history",
+              style: theme.textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.w600,
+                color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
+              ),
+            ),
 
-          const Text(
-            "No active deployments or pending requests located in the fleet database.",
-            textAlign: TextAlign.center,
-            style: TextStyle(color: Colors.white24, fontSize: 13, height: 1.5),
-          ),
-        ],
+            const SizedBox(height: 8),
+
+            Text(
+              "Completed orders will appear here.",
+              textAlign: TextAlign.center,
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

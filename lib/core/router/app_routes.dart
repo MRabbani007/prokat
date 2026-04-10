@@ -52,4 +52,12 @@ class AppRoutes {
 
   static const String ownerProfile = '/owner/profile';
   static const String ownerSettings = '/owner/settings';
+
+  static const String ownerChatList =
+      '/owner/chat'; // Show chat list, receive bookingId or requestId and navigate to chat?id=
+  // static const String ownerChatId = '/owner/chat/:id';
+  // static const String ownerChatIdInfo = '/owner/chat/:id/info';
+
+  static const String chatDetail = ':id';
+  static const String chatInfo = 'info';
 }

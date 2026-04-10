@@ -35,32 +35,6 @@ class UserProfileScreen extends ConsumerWidget {
             children: [
               const PageHeader(),
 
-              // Padding(
-              //   padding: const EdgeInsets.only(left: 12.0, top: 12),
-              //   child: Container(
-              //     decoration: BoxDecoration(
-              //       color: theme.cardColor,
-              //       borderRadius: BorderRadius.circular(30),
-              //       boxShadow: [
-              //         BoxShadow(
-              //           color: Colors.black.withValues(alpha: 0.7),
-              //           blurRadius: 10,
-              //           offset: const Offset(0, 4),
-              //         ),
-              //       ],
-              //     ),
-              //     child: IconButton(
-              //       icon: const Icon(Icons.arrow_back),
-              //       color: const Color.fromARGB(255, 61, 63, 65),
-              //       onPressed: () {
-              //         if (context.canPop()) {
-              //           context.pop();
-              //         }
-              //       },
-              //     ),
-              //   ),
-              // ),
-
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 24.0),
                 child: Row(
@@ -98,7 +72,7 @@ class UserProfileScreen extends ConsumerWidget {
                               ),
                               color: theme
                                   .colorScheme
-                                  .surface, // important for clean edge
+                                  .surface, 
                             ),
                             child: CircleAvatar(
                               radius: 50,
@@ -144,8 +118,9 @@ class UserProfileScreen extends ConsumerWidget {
                       children: [
                         DisplayName(),
 
-                        const SizedBox(height: 4), // Rating
-
+                        const SizedBox(height: 4), 
+                        
+                        // Rating
                         Row(
                           mainAxisAlignment: MainAxisAlignment.start,
                           children: [

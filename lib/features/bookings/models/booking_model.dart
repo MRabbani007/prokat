@@ -1,10 +1,12 @@
 import 'package:prokat/features/auth/models/user_model.dart';
+import 'package:prokat/features/bookings/models/work_status.dart';
 import 'package:prokat/features/equipment/models/equipment_model.dart';
 import 'package:prokat/features/locations/models/location_model.dart';
 
 class BookingModel {
   final String id;
   final String status;
+  final WorkStatus workStatus;
 
   final DateTime? bookedOn;
   final DateTime? bookedAt;
@@ -26,6 +28,7 @@ class BookingModel {
   BookingModel({
     required this.id,
     required this.status,
+    this.workStatus = WorkStatus.onMyWay,
     this.bookedOn,
     this.bookedAt,
     required this.price,

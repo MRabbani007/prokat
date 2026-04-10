@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/material.dart';
+import 'package:prokat/core/router/app_routes.dart';
 import 'package:prokat/features/user/state/user_profile_provider.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:go_router/go_router.dart';
@@ -34,7 +35,7 @@ class _OwnerDashboardHeaderState extends ConsumerState<OwnerDashboardHeader> {
           // Profile Image
           GestureDetector(
             onTap: () {
-              context.push('/profile'); // GoRouter route
+              context.push(AppRoutes.ownerProfile);
             },
             child: Stack(
               clipBehavior: Clip.none,
@@ -126,7 +127,9 @@ class _OwnerDashboardHeaderState extends ConsumerState<OwnerDashboardHeader> {
               // Adds internal padding between the icon and the button edge
               padding: const EdgeInsets.all(12),
               icon: const Icon(LucideIcons.messageSquare, size: 20),
-              onPressed: () {},
+              onPressed: () {
+                context.push(AppRoutes.ownerChatList);
+              },
             ),
           ),
         ],

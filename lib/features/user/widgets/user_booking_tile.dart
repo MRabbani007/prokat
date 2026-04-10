@@ -10,9 +10,7 @@ class UserBookingTile extends StatelessWidget {
     final theme = Theme.of(context);
     final accent = theme.colorScheme.primary;
 
-    final displayUrl = booking.equipment.imageUrl?.isNotEmpty == true
-        ? booking.equipment.imageUrl!
-        : "https://insqvwqlfhbfcqqnvzxu.supabase.co/storage/v1/object/public/Media/kamaz1.jpg";
+    final displayUrl = booking.equipment.imageUrl ?? "";
 
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),

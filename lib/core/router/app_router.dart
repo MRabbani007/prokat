@@ -9,6 +9,9 @@ import 'package:prokat/features/auth/screens/register_screen.dart';
 import 'package:prokat/features/bookings/screens/create_booking_screen.dart';
 import 'package:prokat/features/bookings/screens/renter_bookings_screen.dart';
 import 'package:prokat/features/categories/screens/categories_screen.dart';
+import 'package:prokat/features/chat/screens/owner_chat_info_screen.dart';
+import 'package:prokat/features/chat/screens/owner_chat_list_screen.dart';
+import 'package:prokat/features/chat/screens/owner_chat_screen.dart';
 import 'package:prokat/features/equipment/screens/equipment_id_screen.dart';
 import 'package:prokat/features/equipment/screens/equipment_list_screen.dart';
 import 'package:prokat/features/layout/main_scaffold.dart';
@@ -242,7 +245,9 @@ GoRouter createRouter(WidgetRef ref) {
             ],
           ),
 
-          /// 🏗 OWNER
+          ///
+          /// ******* OWNER *******
+          ///
           StatefulShellBranch(
             routes: [
               GoRoute(
@@ -315,6 +320,9 @@ GoRouter createRouter(WidgetRef ref) {
                   ),
                 ],
               ),
+              //
+              // Owner Bookings
+              //
               GoRoute(
                 path: AppRoutes.ownerRequests,
                 builder: (_, _) => const OwnerRequestsScreen(),
@@ -329,6 +337,31 @@ GoRouter createRouter(WidgetRef ref) {
               GoRoute(
                 path: AppRoutes.ownerSettings,
                 builder: (_, _) => const OwnerSettingsScreen(),
+              ),
+              //
+              // Owner Chat
+              //
+              GoRoute(
+                path: AppRoutes.ownerChatList, // Full path: /owner/chat/list
+                builder: (context, state) => const OwnerChatListScreen(),
+                routes: [
+                  GoRoute(
+                    path:
+                        AppRoutes.chatDetail, // Full path: /owner/chat/list/:id
+                    builder: (context, state) {
+                      final id = state.pathParameters['id']!;
+                      return OwnerChatScreen(); //chatId: id
+                    },
+                    routes: [
+                      GoRoute(
+                        path: AppRoutes
+                            .chatInfo, // Full path: /owner/chat/list/:id/info
+                        builder: (context, state) =>
+                            const OwnerChatInfoScreen(),
+                      ),
+                    ],
+                  ),
+                ],
               ),
             ],
           ),

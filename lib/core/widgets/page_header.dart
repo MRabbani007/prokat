@@ -2,17 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lucide_icons/lucide_icons.dart'; // Add lucide_icons to pubspec.yaml
 
-
 class PageHeader extends StatelessWidget {
   final String? title;
   final bool showBack;
   final VoidCallback? onBack;
+  final Widget? trailing;
 
   const PageHeader({
     super.key,
     this.title,
     this.showBack = true,
     this.onBack,
+    this.trailing,
   });
 
   @override
@@ -23,19 +24,42 @@ class PageHeader extends StatelessWidget {
       bottom: false,
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        child: Stack( // Using Stack keeps the title perfectly centered
+        child: Stack(
+          // Using Stack keeps the title perfectly centered
           alignment: Alignment.centerLeft,
           children: [
             if (showBack)
-              _BackIconButton(
-                onPressed: onBack ?? () => context.canPop() ? context.pop() : null,
+              Container(
+                decoration: BoxDecoration(
+                  color: Theme.of(context).cardColor,
+                  shape: BoxShape.circle,
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.4),
+                      blurRadius: 12,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                ),
+                child: IconButton(
+                  icon: const Icon(LucideIcons.chevronLeft, size: 25),
+                  onPressed:
+                      onBack ?? () => context.canPop() ? context.pop() : null,
+                  constraints: const BoxConstraints(
+                    minWidth: 40,
+                    minHeight: 40,
+                  ),
+                  padding: EdgeInsets.zero,
+                ),
               ),
-            
+
             if (title != null)
               Align(
                 alignment: Alignment.center,
                 child: Padding(
-                  padding: EdgeInsets.symmetric(horizontal: showBack ? 48.0 : 0),
+                  padding: EdgeInsets.symmetric(
+                    horizontal: showBack ? 48.0 : 0,
+                  ),
                   child: Text(
                     title!,
                     maxLines: 1,
@@ -47,39 +71,15 @@ class PageHeader extends StatelessWidget {
                   ),
                 ),
               ),
+
+            /// Optional trailing widget
+            Align(
+              alignment: Alignment.centerRight,
+              child: trailing ?? const SizedBox(),
+            ),
           ],
         ),
       ),
     );
   }
 }
-
-class _BackIconButton extends StatelessWidget {
-  final VoidCallback onPressed;
-
-  const _BackIconButton({required this.onPressed});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Theme.of(context).cardColor,
-        shape: BoxShape.circle,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.4),
-            blurRadius: 12,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: IconButton(
-        icon: const Icon(LucideIcons.chevronLeft, size: 25),
-        onPressed: onPressed,
-        constraints: const BoxConstraints(minWidth: 40, minHeight: 40),
-        padding: EdgeInsets.zero,
-      ),
-    );
-  }
-}
-

@@ -9,6 +9,7 @@ import 'package:prokat/features/requests/state/request_provider.dart';
 import 'package:prokat/features/requests/widgets.dart/owner_booking_skeleton.dart';
 import 'package:prokat/features/user/widgets/owner_dashboard_header.dart';
 import 'package:lucide_icons/lucide_icons.dart';
+import 'package:prokat/features/user/widgets/rent_an_equipment_tile.dart';
 
 class OwnerDashboardScreen extends ConsumerStatefulWidget {
   const OwnerDashboardScreen({super.key});
@@ -56,6 +57,7 @@ class _OwnerDashboardScreenState extends ConsumerState<OwnerDashboardScreen> {
         slivers: [
           // 1. Header with Profile, Rating, and Chat
           SliverAppBar(
+            automaticallyImplyLeading: false,
             expandedHeight: 160,
             floating: false,
             pinned: true,
@@ -96,7 +98,10 @@ class _OwnerDashboardScreenState extends ConsumerState<OwnerDashboardScreen> {
                       {context.push(AppRoutes.ownerEquiment)},
                   },
                 ),
-                const SizedBox(height: 24),
+
+                const SizedBox(height: 16),
+
+                RentAnEquipmentTile(),
               ]),
             ),
           ),
@@ -156,9 +161,9 @@ class _OwnerDashboardScreenState extends ConsumerState<OwnerDashboardScreen> {
             ),
           ),
 
-          /// 🔹 BOOKINGS SECTION
+          /// BOOKINGS SECTION
           if (state.isLoading)
-            const OwnerBookingSkeleton()
+            SliverToBoxAdapter(child: const OwnerBookingSkeleton())
           else if (upcomingJobs.isEmpty)
             SliverFillRemaining(
               hasScrollBody: false,
