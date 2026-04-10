@@ -7,39 +7,34 @@ class DeleteEquipmentSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const warningAmber = Color(0xFFD97706);
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
+    final danger = colorScheme.error;
+    final ghostGray = colorScheme.onSurface.withValues(alpha: 0.7);
 
     return Container(
       margin: const EdgeInsets.only(top: 12, bottom: 40),
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        color: const Color(0xFF1E2125), // Industrial Charcoal
-        borderRadius: BorderRadius.circular(28), // Large Item Radius
-        border: Border.all(
-          // Warning Amber Rim Light
-          color: warningAmber.withValues(alpha: 0.15),
-          width: 1,
-        ),
+        color: colorScheme.surfaceContainerHighest,
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: danger.withValues(alpha: 0.2)),
       ),
       child: Column(
         children: [
-          // Technical Warning Label
+          /// HEADER
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Icon(
-                Icons.warning_amber_rounded,
-                color: warningAmber,
-                size: 16,
-              ),
+              Icon(Icons.warning_amber_rounded, color: danger, size: 18),
               const SizedBox(width: 8),
               Text(
                 "DANGER ZONE",
-                style: TextStyle(
-                  color: warningAmber.withValues(alpha: 0.8),
+                style: theme.textTheme.labelLarge?.copyWith(
+                  color: danger.withValues(alpha: 0.85),
                   fontWeight: FontWeight.bold,
-                  fontSize: 16,
-                  letterSpacing: 2.0,
+                  letterSpacing: 1.8,
                 ),
               ),
             ],
@@ -47,19 +42,19 @@ class DeleteEquipmentSection extends StatelessWidget {
 
           const SizedBox(height: 12),
 
-          const Text(
-            "Deleting this asset will permanently remove all telemetry and pricing data from the fleet database.",
+          /// DESCRIPTION
+          Text(
+            "Deleting this equipment will permanently remove it from your inventory, including all pricing and history.",
             textAlign: TextAlign.center,
-            style: TextStyle(
-              color: Color.fromARGB(255, 170, 170, 170),
-              fontSize: 14,
-              height: 1.8,
+            style: theme.textTheme.bodyMedium?.copyWith(
+              color: ghostGray,
+              height: 1.6,
             ),
           ),
 
           const SizedBox(height: 24),
 
-          // Heavy-duty Destructive Button
+          /// DELETE BUTTON
           SizedBox(
             width: double.infinity,
             height: 54,
@@ -70,22 +65,15 @@ class DeleteEquipmentSection extends StatelessWidget {
                 "Delete Equipment",
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
-                  fontSize: 16,
-                  letterSpacing: 1.2,
+                  letterSpacing: 1.1,
                 ),
               ),
               style: OutlinedButton.styleFrom(
-                foregroundColor: const Color(
-                  0xFFEF4444,
-                ), // Muted Destructive Red
-                side: BorderSide(
-                  color: const Color(0xFFEF4444).withValues(alpha: 0.3),
-                ),
-                backgroundColor: const Color(
-                  0xFFEF4444,
-                ).withValues(alpha: 0.05),
+                foregroundColor: danger,
+                side: BorderSide(color: danger.withValues(alpha: 0.4)),
+                backgroundColor: danger.withValues(alpha: 0.06),
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16), // Small Item Radius
+                  borderRadius: BorderRadius.circular(16),
                 ),
               ),
             ),

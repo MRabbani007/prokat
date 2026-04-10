@@ -48,6 +48,7 @@ class _EditEquipmentDetailsFormState extends State<EditEquipmentDetailsForm> {
     _rentConditionController = TextEditingController(
       text: widget.equipment.rentCondition,
     );
+
     _selectedCategory = widget.category;
   }
 
@@ -56,12 +57,18 @@ class _EditEquipmentDetailsFormState extends State<EditEquipmentDetailsForm> {
   }
 
   Future<void> _handleSave() async {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
     final name = _nameController.text.trim();
     final capacity = int.tryParse(_capacityController.text.trim());
 
     if (name.isEmpty || capacity == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("SYSTEM ERROR: INVALID INPUT DATA")),
+        SnackBar(
+          content: const Text("Invalid input data"),
+          backgroundColor: colorScheme.error,
+        ),
       );
       return;
     }
@@ -86,45 +93,53 @@ class _EditEquipmentDetailsFormState extends State<EditEquipmentDetailsForm> {
           _isDirty = false;
           _isSaving = false;
         });
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(const SnackBar(content: Text("Equipment Updated")));
-      } else if (mounted) {
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: const Text("Equipment Updated"),
+            backgroundColor: colorScheme.primary,
+          ),
+        );
+      } else {
         setState(() {
           _isDirty = true;
           _isSaving = false;
         });
       }
-    } catch (e) {
+    } catch (_) {
       setState(() => _isSaving = false);
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text("Update Failed!")));
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: const Text("Update Failed"),
+          backgroundColor: colorScheme.error,
+        ),
+      );
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    const cardColor = Color(0xFF1E2125);
-    const ghostGray = Color(0x4DFFFFFF); // White @ 30%
-    const accentBlue = Color(0xFF4E73DF);
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
+    final cardColor = colorScheme.surfaceContainerHighest;
+    final ghostGray = colorScheme.onSurface.withValues(alpha: 0.6);
+    final accent = colorScheme.primary;
 
     void onCategoryTap() async {
-      // Open the sheet and wait for the result
       final Category? picked = await showModalBottomSheet<Category>(
         context: context,
         isScrollControlled: true,
-        backgroundColor:
-            Colors.transparent, // Important for our custom border radius
+        backgroundColor: Colors.transparent,
         builder: (context) =>
             const CategorySelectionSheet(service: "equipment"),
       );
 
-      // If the user actually picked something, update local form state
       if (picked != null) {
         setState(() {
           _selectedCategory = picked;
-          _isDirty = true; // Marks form as edited so Save button enables
+          _isDirty = true;
         });
       }
     }
@@ -132,52 +147,54 @@ class _EditEquipmentDetailsFormState extends State<EditEquipmentDetailsForm> {
     return Container(
       decoration: BoxDecoration(
         color: cardColor,
-        borderRadius: BorderRadius.circular(28),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(
+          color: colorScheme.onSurface.withValues(alpha: 0.08),
+        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Dynamic Header
+          /// HEADER
           Padding(
             padding: const EdgeInsets.fromLTRB(20, 12, 12, 4),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text(
+                Text(
                   "INFORMATION",
-                  style: TextStyle(
-                    color: Color.fromARGB(255, 150, 150, 150),
-                    fontSize: 16,
+                  style: theme.textTheme.labelMedium?.copyWith(
+                    color: ghostGray,
                     fontWeight: FontWeight.bold,
                     letterSpacing: 1.5,
                   ),
                 ),
+
                 _isDirty
                     ? TextButton.icon(
                         onPressed: _isSaving ? null : _handleSave,
                         icon: _isSaving
-                            ? const SizedBox(
+                            ? SizedBox(
                                 width: 14,
                                 height: 14,
                                 child: CircularProgressIndicator(
                                   strokeWidth: 2,
-                                  color: Colors.white,
+                                  color: colorScheme.onPrimary,
                                 ),
                               )
                             : const Icon(Icons.save_rounded, size: 16),
                         label: const Text("Save"),
                         style: TextButton.styleFrom(
-                          foregroundColor: Colors.white,
-                          backgroundColor: accentBlue,
+                          foregroundColor: colorScheme.onPrimary,
+                          backgroundColor: accent,
                           padding: const EdgeInsets.symmetric(horizontal: 16),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),
                           ),
                         ),
                       )
-                    : const Padding(
-                        padding: EdgeInsets.all(12),
+                    : Padding(
+                        padding: const EdgeInsets.all(12),
                         child: Icon(
                           Icons.lock_outline_rounded,
                           color: ghostGray,
@@ -193,31 +210,30 @@ class _EditEquipmentDetailsFormState extends State<EditEquipmentDetailsForm> {
             onTap: onCategoryTap,
           ),
 
-          // Form Fields
-          _IndustrialInputField(
-            label: "NAME",
+          _ThemedInputField(
+            label: "Name",
             controller: _nameController,
             onChanged: _onChanged,
           ),
-          _IndustrialInputField(
-            label: "MODEL",
+          _ThemedInputField(
+            label: "Model",
             controller: _modelController,
             onChanged: _onChanged,
           ),
-          _IndustrialInputField(
-            label: "CAPACITY",
+          _ThemedInputField(
+            label: "Capacity",
             controller: _capacityController,
             onChanged: _onChanged,
             isNumeric: true,
             suffixText: _selectedCategory?.capacityUnit,
           ),
-          _IndustrialInputField(
-            label: "RENT CONDITION",
+          _ThemedInputField(
+            label: "Rent Condition",
             controller: _rentConditionController,
             onChanged: _onChanged,
           ),
-          _IndustrialInputField(
-            label: "COMMENTS",
+          _ThemedInputField(
+            label: "Comments",
             controller: _commentController,
             onChanged: _onChanged,
             isLast: true,
@@ -230,15 +246,15 @@ class _EditEquipmentDetailsFormState extends State<EditEquipmentDetailsForm> {
   }
 }
 
-class _IndustrialInputField extends StatelessWidget {
+class _ThemedInputField extends StatelessWidget {
   final String label;
   final TextEditingController controller;
   final VoidCallback onChanged;
   final bool isNumeric;
   final bool isLast;
-  final String? suffixText; // New property for the unit (e.g., 'm³' or 'Tons')
+  final String? suffixText;
 
-  const _IndustrialInputField({
+  const _ThemedInputField({
     required this.label,
     required this.controller,
     required this.onChanged,
@@ -249,18 +265,22 @@ class _IndustrialInputField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const accentColor = Color(0xFF4E73DF);
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
+    final ghostGray = colorScheme.onSurface.withValues(alpha: 0.6);
+    final accent = colorScheme.primary;
 
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 20),
-      padding: const EdgeInsets.symmetric(
-        vertical: 12,
-      ), // Increased padding for touch target
+      padding: const EdgeInsets.symmetric(vertical: 12),
       decoration: BoxDecoration(
         border: isLast
             ? null
             : Border(
-                bottom: BorderSide(color: Colors.white.withValues(alpha: 0.05)),
+                bottom: BorderSide(
+                  color: colorScheme.onSurface.withValues(alpha: 0.05),
+                ),
               ),
       ),
       child: Column(
@@ -268,14 +288,14 @@ class _IndustrialInputField extends StatelessWidget {
         children: [
           Text(
             label.toUpperCase(),
-            style: const TextStyle(
-              color: Color.fromARGB(255, 190, 190, 190),
-              fontSize: 14,
+            style: theme.textTheme.labelSmall?.copyWith(
+              color: ghostGray,
               fontWeight: FontWeight.bold,
               letterSpacing: 1.2,
             ),
           ),
           const SizedBox(height: 4),
+
           Row(
             children: [
               Expanded(
@@ -285,23 +305,22 @@ class _IndustrialInputField extends StatelessWidget {
                   keyboardType: isNumeric
                       ? const TextInputType.numberWithOptions(decimal: true)
                       : TextInputType.text,
-                  cursorColor: accentColor,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 16,
+                  cursorColor: accent,
+                  style: theme.textTheme.bodyMedium?.copyWith(
                     fontWeight: FontWeight.w600,
+                    color: colorScheme.onSurface,
                   ),
                   decoration: InputDecoration(
                     isDense: true,
                     contentPadding: const EdgeInsets.symmetric(vertical: 8),
                     border: InputBorder.none,
-                    // Hint text style for empty states
                     hintStyle: TextStyle(
-                      color: Colors.white.withValues(alpha: 0.2),
+                      color: ghostGray.withValues(alpha: 0.4),
                     ),
                   ),
                 ),
               ),
+
               if (suffixText != null)
                 Container(
                   margin: const EdgeInsets.only(left: 8),
@@ -310,14 +329,13 @@ class _IndustrialInputField extends StatelessWidget {
                     vertical: 4,
                   ),
                   decoration: BoxDecoration(
-                    color: accentColor.withValues(alpha: 0.1),
+                    color: accent.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(6),
                   ),
                   child: Text(
                     suffixText!,
-                    style: const TextStyle(
-                      color: accentColor,
-                      fontSize: 12,
+                    style: theme.textTheme.labelSmall?.copyWith(
+                      color: accent,
                       fontWeight: FontWeight.bold,
                     ),
                   ),

@@ -12,35 +12,37 @@ class LocationSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const cardColor = Color(0xFF1E2125);
-    const ghostGray = Color(0x4DFFFFFF); // White @ 30%
-    const accentBlue = Color(0xFF4E73DF);
-    const warningAmber = Color(0xFFD97706);
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
+    final cardColor = colorScheme.surfaceContainerHighest;
+    final ghostGray = colorScheme.onSurface.withValues(alpha: 0.6);
+    final accent = colorScheme.primary;
+    final warning = colorScheme.tertiary;
 
     final bool hasLocation = location != null && location!.isNotEmpty;
 
     return Container(
       decoration: BoxDecoration(
         color: cardColor,
-        borderRadius: BorderRadius.circular(28), // Large Item Radius
+        borderRadius: BorderRadius.circular(24),
         border: Border.all(
-          color: Colors.white.withValues(alpha: 0.08),
-        ), // Rim Light
+          color: colorScheme.onSurface.withValues(alpha: 0.08),
+        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Header
+          /// HEADER
           Padding(
             padding: const EdgeInsets.fromLTRB(20, 12, 12, 4),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text(
+                Text(
                   "LOCATION",
-                  style: TextStyle(
-                    color: Color.fromARGB(255, 190, 190, 190),
-                    fontSize: 16,
+                  style: theme.textTheme.labelMedium?.copyWith(
+                    color: ghostGray,
                     fontWeight: FontWeight.bold,
                     letterSpacing: 1.5,
                   ),
@@ -51,7 +53,7 @@ class LocationSection extends StatelessWidget {
                     hasLocation
                         ? Icons.layers_outlined
                         : Icons.add_location_alt_rounded,
-                    color: accentBlue,
+                    color: accent,
                     size: 22,
                   ),
                 ),
@@ -59,17 +61,17 @@ class LocationSection extends StatelessWidget {
             ),
           ),
 
-          // Location Content
+          /// CONTENT
           Padding(
             padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
             child: Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: Colors.black.withValues(
-                  alpha: 0.2,
-                ), // Recessed "Terminal" look
-                borderRadius: BorderRadius.circular(16), // Small Item Radius
-                border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
+                color: colorScheme.surfaceContainerHigh,
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(
+                  color: colorScheme.onSurface.withValues(alpha: 0.05),
+                ),
               ),
               child: Row(
                 children: [
@@ -77,34 +79,34 @@ class LocationSection extends StatelessWidget {
                     hasLocation
                         ? Icons.fmd_good_rounded
                         : Icons.location_disabled_rounded,
-                    color: hasLocation ? accentBlue : warningAmber,
+                    color: hasLocation ? accent : warning,
                     size: 20,
                   ),
                   const SizedBox(width: 16),
+
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
                           hasLocation
-                              ? "CURRENT COORDINATES"
-                              : "STATUS: UNKNOWN",
-                          style: TextStyle(
+                              ? "CURRENT LOCATION"
+                              : "NO LOCATION SET",
+                          style: theme.textTheme.labelSmall?.copyWith(
                             color: hasLocation
                                 ? ghostGray
-                                : warningAmber.withValues(alpha: 0.7),
-                            fontSize: 9,
+                                : warning.withValues(alpha: 0.8),
                             fontWeight: FontWeight.bold,
                           ),
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          location ?? "GEOSPATIAL DATA MISSING",
-                          style: TextStyle(
-                            color: hasLocation ? Colors.white : warningAmber,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 14,
-                            fontFamily: hasLocation ? null : 'monospace',
+                          location ?? "Add a location to enable bookings",
+                          style: theme.textTheme.bodyMedium?.copyWith(
+                            color: hasLocation
+                                ? colorScheme.onSurface
+                                : warning,
+                            fontWeight: FontWeight.w600,
                           ),
                         ),
                       ],

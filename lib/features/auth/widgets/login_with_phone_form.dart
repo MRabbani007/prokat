@@ -42,7 +42,7 @@ class _LoginWithPhoneFormState extends ConsumerState<LoginWithPhoneForm> {
     }
 
     if (!isValidKazakhstanPhone(value)) {
-      widget.onError("Enter a valid Kazakhstan phone (+7XXXXXXXXXX)");
+      widget.onError("Enter a valid Kazakhstan phone (+7 XXX XXX XXXX)");
       return;
     }
 

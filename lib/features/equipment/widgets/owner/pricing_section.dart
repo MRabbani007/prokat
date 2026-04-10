@@ -18,51 +18,50 @@ class PricingSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const cardColor = Color(0xFF1E2125);
-    const ghostGray = Color(0x4DFFFFFF); // White @ 30%
-    const accentBlue = Color(0xFF4E73DF);
-    const warningAmber = Color(0xFFD97706);
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
+    final cardColor = colorScheme.surfaceContainerHighest;
+    final ghostGray = colorScheme.onSurface.withValues(alpha: 0.6);
+    final accent = colorScheme.primary;
+    final warning = colorScheme.tertiary;
 
     final bool canAddMore = prices.length < maxRates;
 
     return Container(
       decoration: BoxDecoration(
         color: cardColor,
-        borderRadius: BorderRadius.circular(28), // Large Item Radius
+        borderRadius: BorderRadius.circular(24),
         border: Border.all(
-          color: Colors.white.withValues(alpha: 0.08),
-        ), // Rim Light
+          color: colorScheme.onSurface.withValues(alpha: 0.08),
+        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Header with Industrial Blue Action
+          /// HEADER
           Padding(
             padding: const EdgeInsets.fromLTRB(20, 12, 12, 4),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text(
+                Text(
                   "PRICES",
-                  style: TextStyle(
-                    color: Color.fromARGB(255, 190, 190, 190),
-                    fontSize: 16,
+                  style: theme.textTheme.labelMedium?.copyWith(
+                    color: ghostGray,
                     fontWeight: FontWeight.bold,
                     letterSpacing: 1.5,
                   ),
                 ),
+
                 if (canAddMore)
                   IconButton(
                     onPressed: onAdd,
-                    icon: const Icon(
-                      Icons.add_box_rounded,
-                      color: accentBlue,
-                      size: 24,
-                    ),
+                    icon: Icon(Icons.add_box_rounded, color: accent, size: 24),
                   )
                 else
-                  const Padding(
-                    padding: EdgeInsets.all(12),
+                  Padding(
+                    padding: const EdgeInsets.all(12),
                     child: Icon(
                       Icons.lock_clock_outlined,
                       color: ghostGray,
@@ -73,15 +72,14 @@ class PricingSection extends StatelessWidget {
             ),
           ),
 
-          // Pricing List
+          /// EMPTY STATE
           if (prices.isEmpty)
-            const Padding(
-              padding: EdgeInsets.fromLTRB(20, 10, 20, 20),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(20, 10, 20, 20),
               child: Text(
                 "NO ACTIVE TARIFFS CONFIGURED",
-                style: TextStyle(
-                  color: warningAmber,
-                  fontSize: 11,
+                style: theme.textTheme.labelSmall?.copyWith(
+                  color: warning,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -98,23 +96,22 @@ class PricingSection extends StatelessWidget {
               ),
             ),
 
-          // Industrial Status Footer
+          /// FOOTER (MAX REACHED)
           if (!canAddMore)
             Container(
               width: double.infinity,
-              padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 20),
+              padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
               decoration: BoxDecoration(
-                color: Colors.black.withOpacity(0.2),
+                color: colorScheme.surfaceContainerHigh,
                 borderRadius: const BorderRadius.vertical(
-                  bottom: Radius.circular(28),
+                  bottom: Radius.circular(24),
                 ),
               ),
-              child: const Text(
+              child: Text(
                 "MAXIMUM RATE CAPACITY REACHED",
                 textAlign: TextAlign.center,
-                style: TextStyle(
+                style: theme.textTheme.labelSmall?.copyWith(
                   color: ghostGray,
-                  fontSize: 9,
                   fontWeight: FontWeight.bold,
                 ),
               ),

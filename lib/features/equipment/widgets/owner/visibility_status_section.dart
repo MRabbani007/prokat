@@ -33,50 +33,58 @@ class _VisibilityStatusSectionState extends State<VisibilityStatusSection> {
 
   @override
   Widget build(BuildContext context) {
-    const cardColor = Color(0xFF1E2125);
-    const ghostGray = Color(0x4DFFFFFF);
-    const accentBlue = Color(0xFF4E73DF);
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
+    final cardColor = colorScheme.surfaceContainerHighest;
+    final ghostGray = colorScheme.onSurface.withValues(alpha: 0.6);
+    final accent = colorScheme.primary;
+    final warning = colorScheme.tertiary;
 
     return Container(
       decoration: BoxDecoration(
         color: cardColor,
-        borderRadius: BorderRadius.circular(28),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(
+          color: colorScheme.onSurface.withValues(alpha: 0.08),
+        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Header with State-Aware Save Button
+          /// HEADER
           Padding(
             padding: const EdgeInsets.fromLTRB(20, 12, 12, 4),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text(
+                Text(
                   "STATUS",
-                  style: TextStyle(
-                    color: Color.fromARGB(255, 190, 190, 190),
-                    fontSize: 16,
+                  style: theme.textTheme.labelMedium?.copyWith(
+                    color: ghostGray,
                     fontWeight: FontWeight.bold,
                     letterSpacing: 1.5,
                   ),
                 ),
+
                 if (_isDirty)
-                  TextButton.icon(
+                  FilledButton.icon(
                     onPressed: () => widget.onSave(_tempVisible, _tempStatus),
                     icon: const Icon(Icons.sync_rounded, size: 16),
                     label: const Text("Save"),
-                    style: TextButton.styleFrom(
-                      foregroundColor: Colors.white,
-                      backgroundColor: accentBlue,
+                    style: FilledButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 14,
+                        vertical: 10,
+                      ),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
                     ),
                   )
                 else
-                  const Padding(
-                    padding: EdgeInsets.all(12),
+                  Padding(
+                    padding: const EdgeInsets.all(12),
                     child: Icon(
                       Icons.lock_outline_rounded,
                       color: ghostGray,
@@ -87,50 +95,42 @@ class _VisibilityStatusSectionState extends State<VisibilityStatusSection> {
             ),
           ),
 
-          // is Visibile / available for rent
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            // decoration: BoxDecoration(
-            //   color: Colors.black.withValues(alpha: 0.2),
-            //   borderRadius: BorderRadius.circular(16),
-            //   border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
-            // ),
+          /// VISIBILITY SWITCH
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
             child: Row(
               children: [
                 Expanded(
                   child: Text(
                     "Available for rent",
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
+                    style: theme.textTheme.bodyLarge?.copyWith(
+                      fontWeight: FontWeight.w600,
                     ),
                   ),
                 ),
                 Switch.adaptive(
                   value: _tempVisible,
-                  activeColor: accentBlue,
-                  activeTrackColor: accentBlue.withValues(alpha: 0.3),
+                  activeThumbColor: accent,
+                  activeTrackColor: accent.withValues(alpha: 0.3),
                   onChanged: (v) => setState(() => _tempVisible = v),
                 ),
               ],
             ),
           ),
 
-          // Equipment Status: Booked / Maintenance
-          const Padding(
-            padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          /// STATUS LABEL
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 8, 16, 4),
             child: Text(
-              "Operating Status",
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
+              "Operating status",
+              style: theme.textTheme.bodyMedium?.copyWith(
+                fontWeight: FontWeight.w600,
+                color: ghostGray,
               ),
             ),
           ),
 
-          // 2. Industrial Status Selector
+          /// STATUS SELECTOR
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
             child: SingleChildScrollView(
@@ -139,9 +139,8 @@ class _VisibilityStatusSectionState extends State<VisibilityStatusSection> {
                 children: ["AVAILABLE", "BOOKED", "MAINTENANCE"].map((s) {
                   final isSelected = _tempStatus == s;
                   final isWarning = s == "MAINTENANCE";
-                  final Color activeColor = isWarning
-                      ? const Color(0xFFD97706)
-                      : accentBlue;
+
+                  final Color activeColor = isWarning ? warning : accent;
 
                   return GestureDetector(
                     onTap: () => setState(() => _tempStatus = s),
@@ -154,20 +153,19 @@ class _VisibilityStatusSectionState extends State<VisibilityStatusSection> {
                       ),
                       decoration: BoxDecoration(
                         color: isSelected
-                            ? activeColor.withValues(alpha: 0.1)
-                            : Colors.black.withValues(alpha: 0.2),
+                            ? activeColor.withValues(alpha: 0.12)
+                            : colorScheme.surfaceContainerHigh,
                         borderRadius: BorderRadius.circular(12),
                         border: Border.all(
                           color: isSelected
                               ? activeColor
-                              : Colors.white.withValues(alpha: 0.05),
+                              : colorScheme.onSurface.withValues(alpha: 0.05),
                           width: 1.5,
                         ),
                       ),
                       child: Text(
                         s,
-                        style: TextStyle(
-                          fontSize: 14,
+                        style: theme.textTheme.labelMedium?.copyWith(
                           fontWeight: FontWeight.bold,
                           letterSpacing: 1,
                           color: isSelected ? activeColor : ghostGray,

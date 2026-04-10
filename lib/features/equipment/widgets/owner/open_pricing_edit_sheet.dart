@@ -69,9 +69,10 @@ void openPricingEditSheet(
   String equipmentId, {
   PriceEntry? priceEntry,
 }) {
+  final theme = Theme.of(context);
+  final colorScheme = theme.colorScheme;
+
   final isEditing = priceEntry != null;
-  const ghostGray = Color(0x4DFFFFFF);
-  const accentBlue = Color(0xFF4E73DF);
 
   final priceController = TextEditingController(
     text: isEditing ? priceEntry.price.toString() : "",
@@ -104,21 +105,22 @@ void openPricingEditSheet(
           return Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // 1. PRICE INPUT (Recessed Terminal Style)
+              /// 1. PRICE INPUT
               IndustrialInputContainer(
                 label: "UNIT PRICE (₸)",
                 child: TextField(
                   controller: priceController,
                   keyboardType: TextInputType.number,
-                  style: const TextStyle(
-                    color: Colors.white,
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    color: colorScheme.onSurface,
                     fontWeight: FontWeight.bold,
-                    fontSize: 18,
                     fontFamily: 'monospace',
                   ),
-                  decoration: const InputDecoration(
+                  decoration: InputDecoration(
                     hintText: "0.00",
-                    hintStyle: TextStyle(color: ghostGray),
+                    hintStyle: theme.textTheme.bodyMedium?.copyWith(
+                      color: colorScheme.onSurface.withValues(alpha: 0.4),
+                    ),
                     border: InputBorder.none,
                     isDense: true,
                   ),
@@ -127,7 +129,7 @@ void openPricingEditSheet(
 
               const SizedBox(height: 16),
 
-              // 2. RATE TYPE SELECTOR
+              /// 2. RATE TYPE SELECTOR
               IndustrialInputContainer(
                 label: "PRICE RATE",
                 child: DropdownButtonHideUnderline(
@@ -135,11 +137,11 @@ void openPricingEditSheet(
                     value: priceRateOptions.any((e) => e.value == selectedRate)
                         ? selectedRate
                         : priceRateOptions.first.value,
-                    dropdownColor: const Color(0xFF1E2125),
+                    dropdownColor: colorScheme.surface,
                     isExpanded: true,
-                    icon: const Icon(
+                    icon: Icon(
                       Icons.expand_more_rounded,
-                      color: accentBlue,
+                      color: colorScheme.primary,
                     ),
                     items: priceRateOptions
                         .map(
@@ -147,9 +149,8 @@ void openPricingEditSheet(
                             value: option.value,
                             child: Text(
                               option.label.toUpperCase(),
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 14,
+                              style: theme.textTheme.bodyMedium?.copyWith(
+                                color: colorScheme.onSurface,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
@@ -158,7 +159,7 @@ void openPricingEditSheet(
                         .toList(),
                     onChanged: (value) {
                       if (value != null) {
-                        setLocalState(() => selectedRate = value.toUpperCase());
+                        setLocalState(() => selectedRate = value);
                       }
                     },
                   ),
@@ -167,19 +168,21 @@ void openPricingEditSheet(
 
               const SizedBox(height: 16),
 
-              // 3. SERVICE TIME
+              /// 3. SERVICE TIME
               IndustrialInputContainer(
                 label: "SERVICE DURATION (MINUTES)",
                 child: TextField(
                   controller: serviceTimeController,
                   keyboardType: TextInputType.number,
-                  style: const TextStyle(
-                    color: Colors.white,
+                  style: theme.textTheme.bodyLarge?.copyWith(
+                    color: colorScheme.onSurface,
                     fontWeight: FontWeight.bold,
                   ),
-                  decoration: const InputDecoration(
+                  decoration: InputDecoration(
                     hintText: "60",
-                    hintStyle: TextStyle(color: ghostGray),
+                    hintStyle: theme.textTheme.bodyMedium?.copyWith(
+                      color: colorScheme.onSurface.withValues(alpha: 0.4),
+                    ),
                     border: InputBorder.none,
                     isDense: true,
                   ),
@@ -192,5 +195,3 @@ void openPricingEditSheet(
     ),
   );
 }
-
-// Reusable Industrial Input Wrapper for the Sheet

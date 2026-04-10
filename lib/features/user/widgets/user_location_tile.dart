@@ -43,8 +43,8 @@ class UserLocationTile extends ConsumerWidget {
     //   } else if (location.street.isNotEmpty) {
     //     displayText = location.street;
     //   }
-    // }  
-    
+    // }
+
     if (selectedCity != null && selectedCity != "") {
       displayText = selectedCity;
     }
@@ -67,7 +67,7 @@ class UserLocationTile extends ConsumerWidget {
           border: Border.all(
             color: theme.colorScheme.outline.withValues(alpha: 0.3),
           ),
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(12),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withValues(alpha: 0.3),
@@ -77,19 +77,32 @@ class UserLocationTile extends ConsumerWidget {
           ],
         ),
         child: Row(
-          mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(Icons.location_on, color: accent, size: 20),
-            const SizedBox(width: 6),
-            Text(
-              displayText,
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-                color: selectedCity == null ? Colors.grey[600] : accent,
+            Icon(Icons.location_on, color: accent, size: 28),
+
+            const SizedBox(width: 8),
+
+            Expanded(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(displayText, style: theme.textTheme.labelMedium),
+                  const SizedBox(width: 4),
+                  Text(
+                    displayText,
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      color: selectedCity == null ? Colors.grey[600] : accent,
+                    ),
+                  ),
+                ],
               ),
             ),
+
             const SizedBox(width: 4),
+
             Icon(Icons.keyboard_arrow_down, size: 20, color: accent),
           ],
         ),

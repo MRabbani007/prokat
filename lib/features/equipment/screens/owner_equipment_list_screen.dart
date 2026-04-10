@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:prokat/core/widgets/page_header.dart';
 import 'package:prokat/features/equipment/providers/equipment_provider.dart';
 import 'package:prokat/features/equipment/widgets/owner/owner_equipment_card.dart';
+import 'package:shimmer/shimmer.dart';
 
 class OwnerEquipmentListScreen extends ConsumerStatefulWidget {
   const OwnerEquipmentListScreen({super.key});
@@ -19,12 +19,10 @@ class _OwnerEquipmentListScreenState
   @override
   void initState() {
     super.initState();
-
     WidgetsBinding.instance.addObserver(this);
-
-    Future.microtask(() {
-      ref.read(equipmentProvider.notifier).getOwnerEquipment();
-    });
+    Future.microtask(
+      () => ref.read(equipmentProvider.notifier).getOwnerEquipment(),
+    );
   }
 
   @override
@@ -33,146 +31,164 @@ class _OwnerEquipmentListScreenState
     super.dispose();
   }
 
-  /// Refetch when coming back to the page
-  @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
-    if (state == AppLifecycleState.resumed) {
-      ref.read(equipmentProvider.notifier).getOwnerEquipment();
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
-    // Industrial Midnight Palette
-    const bgColor = Color(0xFF121417);
-    const accentColor = Color(0xFF4E73DF); // Industrial Blue
-    const ghostGray = Color(0x4DFFFFFF); // White @ 30%
-
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
     final state = ref.watch(equipmentProvider);
 
     return Scaffold(
-      backgroundColor: bgColor,
-      body: SafeArea(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [ 
-            // 1. Management Header Style
-            PageHeader(title: "My Equipment"),
-
-            // Subtle "Owner Mode" Indicator
-            // Padding(
-            //   padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-            //   child: Row(
-            //     children: [
-            //       Container(
-            //         width: 8,
-            //         height: 8,
-            //         decoration: const BoxDecoration(
-            //           color: Color(0xFFD97706), // Amber/Warning
-            //           shape: BoxShape.circle,
-            //         ),
-            //       ),
-            //       const SizedBox(width: 8),
-            //       Text(
-            //         "ADMINISTRATIVE ACCESS ACTIVE",
-            //         style: TextStyle(
-            //           color: ghostGray,
-            //           fontSize: 10,
-            //           fontWeight: FontWeight.bold,
-            //           letterSpacing: 1.5,
-            //         ),
-            //       ),
-            //     ],
-            //   ),
-            // ),
-
-            // 2. Scrollable Content
-            Expanded(
-              child: state.isLoading
-                  ? const Center(
-                      child: CircularProgressIndicator(color: accentColor),
-                    )
-                  : ListView.builder(
-                      padding: const EdgeInsets.fromLTRB(
-                        16,
-                        10,
-                        20,
-                        90,
-                      ), // Extra bottom padding for the bar
-                      itemCount: state.ownerEquipment.length,
-                      itemBuilder: (context, index) {
-                        return Padding(
-                          padding: const EdgeInsets.only(bottom: 16),
-                          child: OwnerEquipmentCard(
-                            equipment: state.ownerEquipment[index],
-                          ),
-                        );
-                      },
-                    ),
+      backgroundColor: colorScheme.surface,
+      body: CustomScrollView(
+        slivers: [
+          // 1. App Bar with Back Button
+          SliverAppBar(
+            floating: true,
+            pinned: true,
+            elevation: 0,
+            backgroundColor: colorScheme.surface,
+            leading: IconButton(
+              icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 20),
+              onPressed: () => context.pop(),
             ),
-          ],
-        ),
-      ),
-
-      // 3. Fixed Bottom Action Bar (Replaces FAB)
-      bottomNavigationBar: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
-        decoration: BoxDecoration(
-          color: bgColor,
-          // The "Rim Light" top border to separate from the list
-          border: Border(
-            top: BorderSide(
-              color: Colors.white.withValues(alpha: 0.08),
-              width: 1,
+            title: Text(
+              "My Equipment",
+              style: theme.textTheme.titleLarge?.copyWith(
+                fontWeight: FontWeight.bold,
+              ),
             ),
           ),
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  "TOTAL ASSETS",
-                  style: TextStyle(
-                    color: ghostGray,
-                    fontSize: 10,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                Text(
-                  "${state.ownerEquipment.length} UNITS",
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ],
-            ),
 
-            // The "Add Equipment" Button
-            ElevatedButton.icon(
-              onPressed: () => context.push('/owner/equipment/create'),
-              icon: const Icon(Icons.add_rounded, size: 20),
-              label: const Text("ADD EQUIPMENT"),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: accentColor,
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 24,
-                  vertical: 16,
-                ),
-                elevation: 0,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16), // Small Item Radius
+          // 2. Stats and Add Button Section
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(24, 8, 24, 24),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        "TOTAL ASSETS",
+                        style: theme.textTheme.labelMedium?.copyWith(
+                          color: colorScheme.onSurface.withValues(alpha: 0.5),
+                          fontWeight: FontWeight.bold,
+                          letterSpacing: 1.1,
+                        ),
+                      ),
+                      Text(
+                        "${state.ownerEquipment.length} UNITS",
+                        style: theme.textTheme.bodyLarge,
+                      ),
+                    ],
+                  ),
+                  _AddEquipmentButton(
+                    onPressed: () => context.push('/owner/equipment/create'),
+                  ),
+                ],
+              ),
+            ),
+          ),
+
+          // 3. Dynamic List Content
+          if (state.isLoading)
+            _buildSliverSkeleton(context)
+          else if (state.ownerEquipment.isEmpty)
+            _buildSliverEmptyState(context)
+          else
+            SliverPadding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              sliver: SliverList(
+                delegate: SliverChildBuilderDelegate(
+                  (context, index) => Padding(
+                    padding: const EdgeInsets.only(bottom: 12),
+                    child: OwnerEquipmentCard(
+                      equipment: state.ownerEquipment[index],
+                    ),
+                  ),
+                  childCount: state.ownerEquipment.length,
                 ),
               ),
             ),
-          ],
+
+          // Bottom spacing for scroll comfort
+          const SliverToBoxAdapter(child: SizedBox(height: 100)),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSliverSkeleton(BuildContext context) {
+    return SliverPadding(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      sliver: SliverList(
+        delegate: SliverChildBuilderDelegate(
+          (context, index) => Shimmer.fromColors(
+            baseColor: Colors.grey.shade200,
+            highlightColor: Colors.grey.shade50,
+            child: Container(
+              height: 140,
+              margin: const EdgeInsets.only(bottom: 12),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(16),
+              ),
+            ),
+          ),
+          childCount: 4,
         ),
+      ),
+    );
+  }
+
+  Widget _buildSliverEmptyState(BuildContext context) {
+    return SliverFillRemaining(
+      hasScrollBody: false,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            Icons.inventory_2_outlined,
+            size: 64,
+            color: Colors.grey.shade300,
+          ),
+          const SizedBox(height: 16),
+          const Text(
+            "No equipment listed yet",
+            style: TextStyle(color: Colors.grey, fontSize: 16),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _AddEquipmentButton extends StatelessWidget {
+  final VoidCallback onPressed;
+  const _AddEquipmentButton({required this.onPressed});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return ElevatedButton.icon(
+      onPressed: onPressed,
+      icon: Icon(
+        Icons.add,
+        size: 24,
+        color: theme.colorScheme.onPrimary,
+        weight: 4,
+      ),
+      label: Text(
+        "ADD NEW",
+        style: TextStyle(color: theme.colorScheme.onPrimary),
+      ),
+      style: ElevatedButton.styleFrom(
+        elevation: 0,
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        backgroundColor: theme.primaryColor,
       ),
     );
   }

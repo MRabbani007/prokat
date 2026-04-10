@@ -58,24 +58,30 @@ class _OtpVerificationFormState extends ConsumerState<OtpVerificationForm> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     final authState = ref.watch(authProvider);
+
+    final onSurface = theme.colorScheme.onSurface;
+    final primary = theme.colorScheme.primary;
 
     return Column(
       children: [
         const SizedBox(height: 20),
 
         Text(
-          "Enter the 6-digit code sent to ${widget.phone}",
-          style: TextStyle(
-            color: Colors.white.withValues(alpha: 0.5),
-            fontSize: 14,
+          "Enter the 6-digit code sent to",
+          style: theme.textTheme.bodySmall?.copyWith(
+            color: onSurface.withOpacity(0.6),
           ),
         ),
+
+        const SizedBox(height: 4),
+
         Text(
           widget.phone,
-          style: const TextStyle(
-            color: Colors.white,
+          style: theme.textTheme.bodyLarge?.copyWith(
             fontWeight: FontWeight.bold,
+            color: onSurface,
           ),
         ),
 
@@ -87,7 +93,7 @@ class _OtpVerificationFormState extends ConsumerState<OtpVerificationForm> {
 
         AuthButton(
           loading: authState.isLoading,
-          text: "Verify Otp",
+          text: "Verify OTP",
           loadingText: "Verifying...",
           onPressed: verifyOtp,
         ),
@@ -99,10 +105,10 @@ class _OtpVerificationFormState extends ConsumerState<OtpVerificationForm> {
             onPressed: authState.isLoading
                 ? null
                 : () => Navigator.of(context).pop(),
-            child: const Text(
+            child: Text(
               "Change Phone Number",
-              style: TextStyle(
-                color: Color(0xFF4E73DF),
+              style: theme.textTheme.labelLarge?.copyWith(
+                color: primary,
                 fontWeight: FontWeight.w600,
               ),
             ),

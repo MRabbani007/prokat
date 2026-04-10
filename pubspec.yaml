@@ -62,6 +62,7 @@ dependencies:
   geocoding: ^4.0.0
   lucide_icons: ^0.257.0
   shimmer: ^3.0.0
+  flutter_chat_ui: ^2.11.1
 
 dev_dependencies:
   flutter_test:

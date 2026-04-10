@@ -89,7 +89,7 @@ class EquipmentService {
     }
   }
 
-  Future<Equipment> updateVisibilityStatus(
+  Future<bool> updateVisibilityStatus(
     String equipmentId,
     bool isVisible,
     String status,
@@ -100,9 +100,15 @@ class EquipmentService {
         data: {"id": equipmentId, "isVisible": isVisible, "status": status},
       );
 
-      return Equipment.fromJson(response.data);
-    } on DioException catch (e) {
-      throw Exception(e.response?.data ?? 'Failed to update equipment');
+      print(response.toString());
+
+      // return Equipment.fromJson(response.data);
+      return true;
+    } catch (e) {
+      if (e is DioException) {
+        throw Exception(e.response?.data ?? 'Failed to update equipment');
+      }
+      return false;
     }
   }
 

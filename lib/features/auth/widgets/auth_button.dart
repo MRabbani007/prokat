@@ -16,13 +16,16 @@ class AuthButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const accentColor = Color(0xFF4E73DF);
+    final theme = Theme.of(context);
+
+    final primary = theme.colorScheme.primary;
+    final onPrimary = theme.colorScheme.onPrimary;
 
     return ElevatedButton(
       style: ElevatedButton.styleFrom(
-        backgroundColor: accentColor,
-        foregroundColor: Colors.white,
-        disabledBackgroundColor: accentColor.withValues(alpha: 0.5),
+        backgroundColor: primary,
+        foregroundColor: onPrimary,
+        disabledBackgroundColor: primary.withValues(alpha: 0.5),
         minimumSize: const Size(double.infinity, 56),
         elevation: 0,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -32,30 +35,32 @@ class AuthButton extends StatelessWidget {
           ? Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const SizedBox(
+                SizedBox(
                   height: 20,
                   width: 20,
                   child: CircularProgressIndicator(
                     strokeWidth: 2,
-                    color: Colors.white,
+                    color: onPrimary,
                   ),
                 ),
                 const SizedBox(width: 12),
                 Text(
                   loadingText.toUpperCase(),
-                  style: const TextStyle(
+                  style: theme.textTheme.labelLarge?.copyWith(
                     fontWeight: FontWeight.bold,
                     letterSpacing: 1.1,
+                    color: onPrimary,
                   ),
                 ),
               ],
             )
           : Text(
               text.toUpperCase(),
-              style: const TextStyle(
+              style: theme.textTheme.labelLarge?.copyWith(
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
                 letterSpacing: 1.1,
+                color: onPrimary,
               ),
             ),
     );

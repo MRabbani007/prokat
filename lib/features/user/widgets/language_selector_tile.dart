@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 
-class LanguagePillSelector extends StatelessWidget {
+class LanguageSelectorTile extends StatelessWidget {
   final String value;
   final ValueChanged<String> onChanged;
 
-  const LanguagePillSelector({
+  const LanguageSelectorTile({
     super.key,
     required this.value,
     required this.onChanged,
@@ -13,19 +13,22 @@ class LanguagePillSelector extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final accent = Colors.amber; // same orange as rating star
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+      margin: const EdgeInsets.all(8),
+      padding: EdgeInsets.all(8),
       decoration: BoxDecoration(
         color: theme.colorScheme.surface,
-        borderRadius: BorderRadius.circular(999),
-        border: Border.all(color: accent.withValues(alpha: 0.8), width: 1),
+        shape: BoxShape.circle,
+        border: Border.all(
+          color: Colors.black.withValues(alpha: 0.3),
+          width: 1,
+        ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.15),
-            blurRadius: 4,
-            offset: const Offset(0, 2),
+            color: Colors.black.withValues(alpha: 0.4),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
           ),
         ],
       ),
@@ -36,7 +39,7 @@ class LanguagePillSelector extends StatelessWidget {
           icon: const SizedBox.shrink(), // no arrow
           dropdownColor: theme.colorScheme.surface,
           borderRadius: BorderRadius.circular(12),
-          style: theme.textTheme.labelMedium?.copyWith(
+          style: theme.textTheme.bodyMedium?.copyWith(
             color: theme.colorScheme.primary,
             fontWeight: FontWeight.w600,
             letterSpacing: 1.1,

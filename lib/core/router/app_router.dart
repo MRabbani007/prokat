@@ -12,7 +12,6 @@ import 'package:prokat/features/categories/screens/categories_screen.dart';
 import 'package:prokat/features/chat/screens/owner_chat_info_screen.dart';
 import 'package:prokat/features/chat/screens/owner_chat_list_screen.dart';
 import 'package:prokat/features/chat/screens/owner_chat_screen.dart';
-import 'package:prokat/features/equipment/screens/equipment_id_screen.dart';
 import 'package:prokat/features/equipment/screens/equipment_list_screen.dart';
 import 'package:prokat/features/layout/main_scaffold.dart';
 import 'package:prokat/features/auth/screens/forgot_password_screen.dart';
@@ -168,7 +167,7 @@ GoRouter createRouter(WidgetRef ref) {
                 path: '/equipment/:id',
                 builder: (context, state) {
                   final id = state.pathParameters['id']!;
-                  return EquipmentIdScreen(equipmentId: id);
+                  return CreateBookingScreen(equipmentId: id);
                 },
                 routes: [
                   // Screen for creating a booking on an equipment
@@ -350,7 +349,7 @@ GoRouter createRouter(WidgetRef ref) {
                         AppRoutes.chatDetail, // Full path: /owner/chat/list/:id
                     builder: (context, state) {
                       final id = state.pathParameters['id']!;
-                      return OwnerChatScreen(); //chatId: id
+                      return OwnerChatScreen(chatId: id); //
                     },
                     routes: [
                       GoRoute(

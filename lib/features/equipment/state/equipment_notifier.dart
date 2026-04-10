@@ -125,20 +125,19 @@ class EquipmentNotifier extends StateNotifier<EquipmentState> {
     String status,
   ) async {
     try {
-      final updated = await api.updateVisibilityStatus(
-        equipmentId,
-        isVisible,
-        status,
-      );
+      await api.updateVisibilityStatus(equipmentId, isVisible, status);
 
-      final updatedList = state.ownerEquipment.map((e) {
-        if (e.id == equipmentId) {
-          return updated;
-        }
-        return e;
-      }).toList();
+      await getOwnerEquipment();
 
-      state = state.copyWith(ownerEquipment: updatedList);
+      // final updatedList = state.ownerEquipment.map((e) {
+      //   if (e.id == equipmentId) {
+      //     return updated;
+      //   }
+
+      //   return e;
+      // }).toList();
+
+      // state = state.copyWith(ownerEquipment: updatedList);
 
       return true;
     } catch (e) {

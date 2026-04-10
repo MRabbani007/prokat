@@ -42,7 +42,7 @@ class _UserDashboardPageState extends ConsumerState<UserDashboardPage> {
             // Header
             const UserDashboardHeader(),
 
-            const SizedBox(height: 12),
+            const SizedBox(height: 18),
 
             UserLocationTile(),
 

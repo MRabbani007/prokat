@@ -1,14 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
-import 'package:prokat/features/auth/widgets/auth_switch_link.dart';
 import 'package:prokat/features/auth/widgets/login_with_phone_form.dart';
 import 'package:prokat/features/auth/widgets/login_with_username_form.dart';
-import 'package:prokat/features/auth/widgets/register_tabs.dart';
-
-const bgColor = Color(0xFF121417);
-const ghostGray = Color(0x4DFFFFFF); // White @ 30%
-const accentColor = Color(0xFF4E73DF);
-const errorColor = Color(0xFFE53935);
+import 'package:go_router/go_router.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -18,109 +11,154 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  String? errorMessage; // Simple field to store backend/validation errors
+  String? errorMessage;
+  bool usePassword = false;
 
   void setErrorMessage(String? msg) {
-    setState(() {
-      errorMessage = msg;
-    });
+    setState(() => errorMessage = msg);
   }
 
   @override
   Widget build(BuildContext context) {
-    return DefaultTabController(
-      length: 2,
-      child: Scaffold(
-        backgroundColor: bgColor,
-        body: SafeArea(
-          child: LayoutBuilder(
-            builder: (context, constraints) {
-              return SingleChildScrollView(
-                physics: const ClampingScrollPhysics(),
-                child: ConstrainedBox(
-                  constraints: BoxConstraints(minHeight: constraints.maxHeight),
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 24),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        const SizedBox(height: 40),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            const Text(
-                              "Welcome Back",
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 32,
-                                fontWeight: FontWeight.bold,
-                                letterSpacing: -1,
-                              ),
-                            ),
-                            const Text(
-                              "Pick up where you left off",
-                              style: TextStyle(
-                                color: ghostGray,
-                                fontSize: 16,
-                              ),
-                            ),
-                            const SizedBox(height: 32),
-                            
-                            // Error Field Rendering
-                            if (errorMessage != null) ...[
-                              Container(
-                                padding: const EdgeInsets.all(12),
-                                decoration: BoxDecoration(
-                                  color: errorColor.withValues(alpha: 0.1),
-                                  borderRadius: BorderRadius.circular(8),
-                                  border: Border.all(color: errorColor.withValues(alpha: 0.5)),
-                                ),
-                                child: Row(
-                                  children: [
-                                    const Icon(Icons.error_outline, color: errorColor, size: 20),
-                                    const SizedBox(width: 10),
-                                    Expanded(
-                                      child: Text(
-                                        errorMessage!,
-                                        style: const TextStyle(color: errorColor, fontSize: 14),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              const SizedBox(height: 20),
-                            ],
+    final theme = Theme.of(context);
 
-                            const RegisterTabs(), // Ensure this widget uses accentColor for indicators
-                            SizedBox(
-                              height: 400, // Increased slightly for error spacing
-                              child: TabBarView(
-                                children: [
-                                  LoginWithPhoneForm(onError: setErrorMessage),
-                                  LoginWithUsernameForm(onError: setErrorMessage),
-                                ],
+    return Scaffold(
+      backgroundColor: theme.scaffoldBackgroundColor,
+      body: SafeArea(
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            return SingleChildScrollView(
+              physics: const ClampingScrollPhysics(),
+              child: ConstrainedBox(
+                constraints: BoxConstraints(minHeight: constraints.maxHeight),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 24),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const SizedBox(height: 40),
+
+                      /// TOP CONTENT
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            "Welcome Back",
+                            style: theme.textTheme.headlineMedium?.copyWith(
+                              fontWeight: FontWeight.bold,
+                              letterSpacing: -1,
+                            ),
+                          ),
+                          Text(
+                            "Pick up where you left off",
+                            style: theme.textTheme.bodyMedium?.copyWith(
+                              color: theme.colorScheme.onSurface.withValues(
+                                alpha: 0.6,
                               ),
                             ),
-                          ],
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.only(bottom: 20),
-                          child: AuthSwitchLink(
-                            message: "New to Prokat? ",
-                            actionText: "Create Account",
-                            // Style this text with ghostGray and accentColor
-                            onTap: () => context.go('/register'), 
+                          ),
+
+                          const SizedBox(height: 32),
+
+                          if (errorMessage != null) _buildErrorBox(theme),
+
+                          AnimatedSwitcher(
+                            duration: const Duration(milliseconds: 300),
+                            child: usePassword
+                                ? LoginWithUsernameForm(
+                                    key: const ValueKey('pw'),
+                                    onError: setErrorMessage,
+                                  )
+                                : LoginWithPhoneForm(
+                                    key: const ValueKey('phone'),
+                                    onError: setErrorMessage,
+                                  ),
+                          ),
+
+                          const SizedBox(height: 16),
+
+                          Center(
+                            child: TextButton(
+                              onPressed: () => setState(() {
+                                usePassword = !usePassword;
+                                errorMessage = null;
+                              }),
+                              child: Text(
+                                usePassword
+                                    ? "Use Phone & OTP instead"
+                                    : "Sign in with password",
+                                style: theme.textTheme.labelLarge?.copyWith(
+                                  color: theme.colorScheme.primary,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+
+                      /// BOTTOM LINK
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 20),
+                        child: GestureDetector(
+                          onTap: () =>
+                              context.push('/register'),
+                          child: RichText(
+                            text: TextSpan(
+                              text: "New to Prokat? ",
+                              style: theme.textTheme.bodySmall?.copyWith(
+                                color: theme.colorScheme.onSurface.withValues(
+                                  alpha: 0.6,
+                                ),
+                              ),
+                              children: [
+                                TextSpan(
+                                  text: "Create Account",
+                                  style: theme.textTheme.bodySmall?.copyWith(
+                                    color: theme.colorScheme.primary,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                         ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
                 ),
-              );
-            },
-          ),
+              ),
+            );
+          },
         ),
+      ),
+    );
+  }
+
+  Widget _buildErrorBox(ThemeData theme) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 25),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: theme.colorScheme.error.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: theme.colorScheme.error.withValues(alpha: 0.5),
+        ),
+      ),
+      child: Row(
+        children: [
+          Icon(Icons.error_outline, color: theme.colorScheme.error, size: 20),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Text(
+              errorMessage!,
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: theme.colorScheme.error,
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

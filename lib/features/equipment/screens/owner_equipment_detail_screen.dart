@@ -20,9 +20,12 @@ class OwnerEquipmentDetailScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    const bgColor = Color(0xFF121417);
-    const ghostGray = Color(0x4DFFFFFF); // White @ 30%
-    const accentColor = Color(0xFF4E73DF);
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
+    final bgColor = colorScheme.surface;
+    final ghostGray = colorScheme.onSurface.withValues(alpha: 0.6);
+    final accentColor = colorScheme.primary;
 
     final state = ref.watch(equipmentProvider);
 
@@ -36,7 +39,7 @@ class OwnerEquipmentDetailScreen extends ConsumerWidget {
         .where((item) => item.id == equipment?.categoryId)
         .firstOrNull;
 
-    // Industrial Fallback for Error State
+    /// ERROR STATE
     if (equipment == null) {
       return Scaffold(
         backgroundColor: bgColor,
@@ -44,27 +47,29 @@ class OwnerEquipmentDetailScreen extends ConsumerWidget {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Icon(
+              Icon(
                 Icons.error_outline,
-                color: Color(0xFFD97706),
+                color: colorScheme.tertiary, // softer warning vs hard orange
                 size: 48,
               ),
               const SizedBox(height: 16),
-              const Text(
+              Text(
                 "SYSTEM ERROR",
-                style: TextStyle(
+                style: theme.textTheme.labelMedium?.copyWith(
                   color: ghostGray,
                   fontWeight: FontWeight.bold,
                   letterSpacing: 2,
                 ),
               ),
-              const Text(
+              Text(
                 "EQUIPMENT DATA NOT LOCATED",
-                style: TextStyle(color: Colors.white, fontSize: 16),
+                style: theme.textTheme.titleMedium?.copyWith(
+                  color: colorScheme.onSurface,
+                ),
               ),
               TextButton(
                 onPressed: () => context.pop(),
-                child: const Text(
+                child: Text(
                   "BACK TO FLEET",
                   style: TextStyle(color: accentColor),
                 ),
@@ -98,9 +103,7 @@ class OwnerEquipmentDetailScreen extends ConsumerWidget {
 
                 const SizedBox(height: 20),
 
-                // 2. PRICING PANEL
                 PricingSection(
-                  // Ensure PricingSection internal widgets use the 0.08 alpha white border
                   prices: equipment.prices,
                   onAdd: () => openPricingEditSheet(context, ref, equipment.id),
                   onEdit: (entry) => openPricingEditSheet(
@@ -113,7 +116,6 @@ class OwnerEquipmentDetailScreen extends ConsumerWidget {
 
                 const SizedBox(height: 20),
 
-                // 3. LOGISTICS PANEL
                 LocationSection(
                   location: equipment.location != null
                       ? '${equipment.location?.street}, ${equipment.location?.city}'
@@ -124,7 +126,6 @@ class OwnerEquipmentDetailScreen extends ConsumerWidget {
 
                 const SizedBox(height: 20),
 
-                // 4. SYSTEM STATUS PANEL
                 VisibilityStatusSection(
                   isVisible: equipment.isVisible,
                   status: equipment.status,
@@ -137,7 +138,6 @@ class OwnerEquipmentDetailScreen extends ConsumerWidget {
 
                 const SizedBox(height: 40),
 
-                // 5. DESTRUCTIVE ACTION
                 DeleteEquipmentSection(
                   onDelete: () => _confirmDelete(context, ref, equipmentId),
                 ),
@@ -150,90 +150,96 @@ class OwnerEquipmentDetailScreen extends ConsumerWidget {
   }
 
   void _confirmDelete(BuildContext context, WidgetRef ref, String equipmentId) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
       isScrollControlled: true,
-      builder: (ctx) => Container(
+      builder: (context) => Container(
         decoration: BoxDecoration(
-          color: Theme.of(context).colorScheme.surface,
+          color: colorScheme.surface,
           borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
         ),
         padding: EdgeInsets.fromLTRB(
           24,
           12,
           24,
-          MediaQuery.of(ctx).padding.bottom + 24,
+          MediaQuery.of(context).padding.bottom + 24,
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
+            /// DRAG HANDLE
             Container(
               width: 40,
               height: 4,
               decoration: BoxDecoration(
-                color: Colors.grey.shade300,
+                color: colorScheme.onSurface.withValues(alpha: 0.2),
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
             const SizedBox(height: 32),
 
-            // Warning Icon with soft glow (2026 style)
+            /// ICON
             Container(
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
-                color: Theme.of(
-                  context,
-                ).colorScheme.errorContainer.withAlpha(40),
+                color: colorScheme.errorContainer.withValues(alpha: 0.3),
                 shape: BoxShape.circle,
               ),
               child: Icon(
                 Icons.delete_sweep_rounded,
-                color: Theme.of(context).colorScheme.error,
+                color: colorScheme.error,
                 size: 40,
               ),
             ),
             const SizedBox(height: 24),
 
-            const Text(
+            /// TITLE
+            Text(
               "Delete Equipment?",
-              style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+              style: theme.textTheme.titleLarge?.copyWith(
+                fontWeight: FontWeight.bold,
+              ),
             ),
+
             const SizedBox(height: 12),
-            const Text(
+
+            /// DESCRIPTION
+            Text(
               "This will remove the item from the marketplace and delete all its rental history.",
               textAlign: TextAlign.center,
-              style: TextStyle(height: 1.5),
+              style: theme.textTheme.bodyMedium?.copyWith(
+                height: 1.5,
+                color: colorScheme.onSurface.withValues(alpha: 0.7),
+              ),
             ),
+
             const SizedBox(height: 32),
 
-            // GO-ROUTER INTEGRATION HERE
+            /// DELETE BUTTON
             SizedBox(
               width: double.infinity,
               height: 60,
               child: FilledButton(
                 style: FilledButton.styleFrom(
-                  backgroundColor: Theme.of(context).colorScheme.error,
+                  backgroundColor: colorScheme.error,
+                  foregroundColor: colorScheme.onError,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(20),
                   ),
                 ),
                 onPressed: () async {
-                  // 1. Trigger the logic
                   await ref
                       .read(equipmentProvider.notifier)
                       .deleteEquipment(equipmentId);
 
-                  // 2. Close the BottomSheet (using GoRouter)
-                  if (ctx.canPop()) ctx.pop();
+                  if (context.mounted && context.canPop()) context.pop();
 
-                  // 3. Navigate back to the list/previous screen
                   if (context.mounted) {
-                    // Option A: Just go back
                     context.pop();
-
-                    // Option B: Hard redirect to equipment list if preferred
-                    // context.go('/owner/inventory');
                   }
                 },
                 child: const Text(
@@ -242,10 +248,16 @@ class OwnerEquipmentDetailScreen extends ConsumerWidget {
                 ),
               ),
             ),
+
             const SizedBox(height: 12),
+
+            /// CANCEL
             TextButton(
-              onPressed: () => ctx.pop(), // Close sheet only
-              child: const Text("Keep it for now"),
+              onPressed: () => context.pop(),
+              child: Text(
+                "Keep it for now",
+                style: TextStyle(color: colorScheme.primary),
+              ),
             ),
           ],
         ),
