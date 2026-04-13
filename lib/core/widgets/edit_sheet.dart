@@ -16,9 +16,9 @@ class EditSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const bgColor = Color.fromARGB(255, 31, 34, 39); // Deep Midnight
-    const accentBlue = Color(0xFF4E73DF); // Industrial Blue
-    // const ghostGray = Color(0x4DFFFFFF); // White @ 30%
+    final theme = Theme.of(context);
+    final bgColor = theme.colorScheme.surface;
+    final accentColor = theme.colorScheme.primary;
 
     return Container(
       decoration: BoxDecoration(
@@ -43,7 +43,7 @@ class EditSheet extends StatelessWidget {
               width: 36,
               height: 4,
               decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.1),
+                color: theme.colorScheme.onSurface,
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
@@ -53,8 +53,8 @@ class EditSheet extends StatelessWidget {
             /// Technical Title Header
             Text(
               title,
-              style: const TextStyle(
-                color: Colors.white,
+              style:  TextStyle(
+                color: theme.colorScheme.onSurface,
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
                 letterSpacing: 1.2,
@@ -75,18 +75,18 @@ class EditSheet extends StatelessWidget {
               child: ElevatedButton(
                 onPressed: onSubmit,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: accentBlue,
-                  foregroundColor: Colors.white,
+                  backgroundColor: accentColor,
+                  foregroundColor: theme.colorScheme.onPrimary,
                   elevation: 0,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(16), // Small Item Radius
                   ),
                 ),
                 child: Text(
-                  buttonText.toUpperCase(),
+                  buttonText,
                   style: const TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                    fontWeight: FontWeight.normal,
                     letterSpacing: 1.5,
                   ),
                 ),
@@ -103,11 +103,13 @@ void showEditSheet({
   required BuildContext context,
   required Widget sheet,
 }) {
+    final theme = Theme.of(context);
+    final bgColor = theme.colorScheme.surface;
+
   showModalBottomSheet(
     context: context,
     isScrollControlled: true,
-    backgroundColor: Colors.transparent,
-    // Add a slight barrier color to darken the background further
+    backgroundColor: bgColor,
     barrierColor: Colors.black.withValues(alpha: 0.7),
     builder: (_) => sheet,
   );

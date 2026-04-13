@@ -3,18 +3,14 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:prokat/features/categories/models/category.dart';
 import 'package:prokat/features/equipment/models/equipment_model.dart';
 import 'package:prokat/features/equipment/providers/equipment_provider.dart';
-import 'package:prokat/features/equipment/widgets/owner/category_selection_sheet.dart';
-import 'package:prokat/features/equipment/widgets/owner/category_selector_tile.dart';
 
 class EditEquipmentDetailsForm extends StatefulWidget {
   final Equipment equipment;
-  final Category? category;
   final WidgetRef ref;
 
   const EditEquipmentDetailsForm({
     super.key,
     required this.equipment,
-    this.category,
     required this.ref,
   });
 
@@ -37,6 +33,7 @@ class _EditEquipmentDetailsFormState extends State<EditEquipmentDetailsForm> {
   @override
   void initState() {
     super.initState();
+
     _nameController = TextEditingController(text: widget.equipment.name);
     _modelController = TextEditingController(text: widget.equipment.model);
     _capacityController = TextEditingController(
@@ -48,8 +45,6 @@ class _EditEquipmentDetailsFormState extends State<EditEquipmentDetailsForm> {
     _rentConditionController = TextEditingController(
       text: widget.equipment.rentCondition,
     );
-
-    _selectedCategory = widget.category;
   }
 
   void _onChanged() {
@@ -127,23 +122,6 @@ class _EditEquipmentDetailsFormState extends State<EditEquipmentDetailsForm> {
     final ghostGray = colorScheme.onSurface.withValues(alpha: 0.6);
     final accent = colorScheme.primary;
 
-    void onCategoryTap() async {
-      final Category? picked = await showModalBottomSheet<Category>(
-        context: context,
-        isScrollControlled: true,
-        backgroundColor: Colors.transparent,
-        builder: (context) =>
-            const CategorySelectionSheet(service: "equipment"),
-      );
-
-      if (picked != null) {
-        setState(() {
-          _selectedCategory = picked;
-          _isDirty = true;
-        });
-      }
-    }
-
     return Container(
       decoration: BoxDecoration(
         color: cardColor,
@@ -169,7 +147,7 @@ class _EditEquipmentDetailsFormState extends State<EditEquipmentDetailsForm> {
                     letterSpacing: 1.5,
                   ),
                 ),
-
+      
                 _isDirty
                     ? TextButton.icon(
                         onPressed: _isSaving ? null : _handleSave,
@@ -204,12 +182,7 @@ class _EditEquipmentDetailsFormState extends State<EditEquipmentDetailsForm> {
               ],
             ),
           ),
-
-          CategorySelectorTile(
-            selectedCategory: _selectedCategory,
-            onTap: onCategoryTap,
-          ),
-
+      
           _ThemedInputField(
             label: "Name",
             controller: _nameController,
@@ -238,7 +211,7 @@ class _EditEquipmentDetailsFormState extends State<EditEquipmentDetailsForm> {
             onChanged: _onChanged,
             isLast: true,
           ),
-
+      
           const SizedBox(height: 16),
         ],
       ),

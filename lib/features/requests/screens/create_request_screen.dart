@@ -3,9 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:prokat/core/widgets/industrial_text_field.dart';
 import 'package:prokat/core/widgets/page_header.dart';
-import 'package:prokat/features/categories/models/category.dart';
 import 'package:prokat/features/categories/providers/category_provider.dart';
-import 'package:prokat/features/equipment/widgets/owner/category_selection_sheet.dart';
 import 'package:prokat/features/equipment/widgets/owner/category_selector_tile.dart';
 import 'package:prokat/features/locations/state/location_provider.dart';
 import 'package:prokat/features/locations/widgets/address_picker_card.dart';
@@ -27,8 +25,6 @@ class _CreateRequestScreenState extends ConsumerState<CreateRequestScreen> {
   final rateController = TextEditingController();
   final commentController = TextEditingController();
 
-  Category? _selectedCategory;
-
   void _openAddressSheet(BuildContext context) {
     showModalBottomSheet(
       context: context,
@@ -36,23 +32,6 @@ class _CreateRequestScreenState extends ConsumerState<CreateRequestScreen> {
       isScrollControlled: true,
       builder: (context) => const SelectAddressSheet(),
     );
-  }
-
-  Future<void> onCategoryTap(BuildContext context) async {
-    final theme = Theme.of(context);
-
-    final Category? picked = await showModalBottomSheet<Category>(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: theme.scaffoldBackgroundColor,
-      builder: (context) => const CategorySelectionSheet(service: "request"),
-    );
-
-    if (picked != null) {
-      setState(() {
-        _selectedCategory = picked;
-      });
-    }
   }
 
   @override
@@ -102,10 +81,7 @@ class _CreateRequestScreenState extends ConsumerState<CreateRequestScreen> {
           children: [
             const PageHeader(title: "New Request"),
 
-            CategorySelectorTile(
-              selectedCategory: _selectedCategory,
-              onTap: () => onCategoryTap(context),
-            ),
+            CategorySelectorTile(mode: "create_request"),
 
             const SizedBox(height: 24),
 

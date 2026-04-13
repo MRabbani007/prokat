@@ -101,14 +101,14 @@ class UserBookingTile extends StatelessWidget {
           Row(
             children: [
               Expanded(
-                child: _actionButton(Icons.phone, Colors.green, () {}),
+                child: _actionButton(Icons.chat, Colors.green, () {}),
               ),
 
               const SizedBox(width: 8),
 
-              Expanded(child: _actionButton(Icons.visibility, accent, () {})),
+              // Expanded(child: _actionButton(Icons.visibility, accent, () {})),
 
-              const SizedBox(width: 8),
+              // const SizedBox(width: 8),
 
               Expanded(
                 child: _actionButton(Icons.close, Colors.redAccent, () {}),

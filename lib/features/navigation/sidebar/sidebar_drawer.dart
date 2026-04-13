@@ -4,7 +4,6 @@ import 'package:prokat/core/router/app_routes.dart';
 import 'package:prokat/features/auth/providers/auth_provider.dart';
 import 'package:prokat/features/categories/providers/category_provider.dart';
 import 'package:prokat/features/navigation/sidebar/sidebar_tile.dart';
-import 'package:prokat/features/appstatic/screens/main_screen.dart';
 import 'sidebar_header.dart';
 import 'package:go_router/go_router.dart';
 
@@ -50,7 +49,6 @@ class SidebarDrawer extends ConsumerWidget {
               children: [
                 const SizedBox(height: 10),
                 // SECTION: SERVICES
-                const SectionHeader(title: "Services"),
 
                 // MAIN SELECTED SERVICE
                 _ActiveServiceTile(
@@ -95,7 +93,6 @@ class SidebarDrawer extends ConsumerWidget {
                   const SizedBox(height: 32),
 
                   // SECTION: OWNER (Conditional logic can be added here)
-                  const SectionHeader(title: "Owner"),
 
                   SidebarTile(
                     icon: Icons.construction,

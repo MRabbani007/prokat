@@ -29,28 +29,15 @@ class PageHeader extends StatelessWidget {
           alignment: Alignment.centerLeft,
           children: [
             if (showBack)
-              Container(
-                decoration: BoxDecoration(
-                  color: Theme.of(context).cardColor,
-                  shape: BoxShape.circle,
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.4),
-                      blurRadius: 12,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
+              IconButton(
+                icon: const Icon(LucideIcons.chevronLeft, size: 25),
+                onPressed:
+                    onBack ?? () => context.canPop() ? context.pop() : null,
+                constraints: const BoxConstraints(
+                  minWidth: 40,
+                  minHeight: 40,
                 ),
-                child: IconButton(
-                  icon: const Icon(LucideIcons.chevronLeft, size: 25),
-                  onPressed:
-                      onBack ?? () => context.canPop() ? context.pop() : null,
-                  constraints: const BoxConstraints(
-                    minWidth: 40,
-                    minHeight: 40,
-                  ),
-                  padding: EdgeInsets.zero,
-                ),
+                padding: EdgeInsets.zero,
               ),
 
             if (title != null)

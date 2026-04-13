@@ -17,13 +17,51 @@ class EquipmentNotifier extends StateNotifier<EquipmentState> {
     state = state.copyWith(editEquipment: equipment);
   }
 
+  List<Equipment> _sortEquipment(List<Equipment> list) {
+    final sorted = [...list];
+
+    int statusPriority(String status) {
+      switch (status) {
+        case 'available':
+          return 0;
+        case 'booked':
+          return 1;
+        case 'maintenance':
+          return 2;
+        default:
+          return 99;
+      }
+    }
+
+    sorted.sort((a, b) {
+      /// 1. Online first
+      final aOnline = a.status == 'available' ? 0 : 1;
+      final bOnline = b.status == 'available' ? 0 : 1;
+      if (aOnline != bOnline) return aOnline.compareTo(bOnline);
+
+      /// 2. Status priority
+      final statusCompare = statusPriority(
+        a.status,
+      ).compareTo(statusPriority(b.status));
+      if (statusCompare != 0) return statusCompare;
+
+      /// 3. Last updated (descending)
+      return (b.updatedAt ?? DateTime(0)).compareTo(a.updatedAt ?? DateTime(0));
+    });
+
+    return sorted;
+  }
+
   Future<void> getOwnerEquipment() async {
     state = state.copyWith(isLoading: true, error: null);
 
     try {
       final equipment = await api.getOwnerEquipment();
 
-      state = state.copyWith(ownerEquipment: equipment, isLoading: false);
+      state = state.copyWith(
+        ownerEquipment: _sortEquipment(equipment),
+        isLoading: false,
+      );
     } catch (e) {
       state = state.copyWith(isLoading: false, error: e.toString());
     }
@@ -115,6 +153,33 @@ class EquipmentNotifier extends StateNotifier<EquipmentState> {
     } catch (e) {
       print(e);
       state = state.copyWith(error: e.toString());
+      return false;
+    }
+  }
+
+  Future<bool> updateEquipmentCategory({
+    required String equipmentId,
+    required String categoryId,
+  }) async {
+    try {
+      state = state.copyWith(isLoading: true);
+
+      final updated = await api.updateEquipmentCategory(
+        equipmentId: equipmentId,
+        categoryId: categoryId,
+      );
+
+      if (updated == true) {
+        await getOwnerEquipment();
+
+        return true;
+      }
+
+      state = state.copyWith(isLoading: false);
+
+      return false;
+    } catch (e) {
+      state = state.copyWith(isLoading: false, error: e.toString());
       return false;
     }
   }

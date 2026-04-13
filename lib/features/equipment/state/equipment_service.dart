@@ -89,6 +89,30 @@ class EquipmentService {
     }
   }
 
+  Future<bool> updateEquipmentCategory({
+    required String equipmentId,
+    required String categoryId,
+  }) async {
+    try {
+      final res = await _dio.patch(
+        '/equipment/$equipmentId/category',
+        data: {"id": equipmentId, "categoryId": categoryId},
+      );
+
+      if (res.statusCode == 200 || res.statusCode == 201) {
+        return true;
+        // return RequestModel.fromJson(res.data['data']);
+      }
+
+      return false;
+    } catch (e) {
+      if (e is DioException) {
+        throw Exception(e.response?.data ?? 'Failed to update equipment');
+      }
+      return false;
+    }
+  }
+
   Future<bool> updateVisibilityStatus(
     String equipmentId,
     bool isVisible,

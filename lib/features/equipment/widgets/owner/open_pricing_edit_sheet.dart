@@ -107,13 +107,12 @@ void openPricingEditSheet(
             children: [
               /// 1. PRICE INPUT
               IndustrialInputContainer(
-                label: "UNIT PRICE (₸)",
+                label: "Price (₸)",
                 child: TextField(
                   controller: priceController,
                   keyboardType: TextInputType.number,
-                  style: theme.textTheme.titleMedium?.copyWith(
+                  style: theme.textTheme.bodyLarge?.copyWith(
                     color: colorScheme.onSurface,
-                    fontWeight: FontWeight.bold,
                     fontFamily: 'monospace',
                   ),
                   decoration: InputDecoration(
@@ -131,7 +130,7 @@ void openPricingEditSheet(
 
               /// 2. RATE TYPE SELECTOR
               IndustrialInputContainer(
-                label: "PRICE RATE",
+                label: "Price Rate",
                 child: DropdownButtonHideUnderline(
                   child: DropdownButton<String>(
                     value: priceRateOptions.any((e) => e.value == selectedRate)

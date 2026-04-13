@@ -1,3 +1,4 @@
+import 'package:prokat/core/utils/parse.dart';
 import 'package:prokat/features/auth/models/user_model.dart';
 import 'package:prokat/features/categories/models/category.dart';
 import 'package:prokat/features/equipment/models/equipment_location.dart';
@@ -19,6 +20,7 @@ class Equipment {
   final EquipmentLocation? location;
   final String? categoryId;
   final Category? category;
+  final DateTime? updatedAt;
 
   Equipment({
     required this.id,
@@ -36,6 +38,7 @@ class Equipment {
     this.category,
     this.location,
     required this.prices,
+    this.updatedAt,
   });
 
   Map<String, dynamic> toJson() {
@@ -50,6 +53,7 @@ class Equipment {
       "isVisible": isVisible,
       "owner": owner,
       "category": category,
+      "updatedAt": updatedAt,
     };
 
     if (ownerComment != null) {
@@ -103,9 +107,12 @@ class Equipment {
         categoryId: json["categoryId"] != null
             ? json["categoryId"].toString()
             : null,
+
         category: json["category"] != null
             ? Category.fromJson(json["category"])
             : null,
+
+        updatedAt: parseNullableDate(json['updatedAt']),
       );
     } catch (e, stack) {
       print("❌ Equipment parsing failed");

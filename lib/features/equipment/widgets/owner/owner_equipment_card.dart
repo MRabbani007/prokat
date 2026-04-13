@@ -77,21 +77,18 @@ class OwnerEquipmentCard extends ConsumerWidget {
                         style: theme.textTheme.labelLarge,
                       ),
                       const SizedBox(height: 8),
-                      _StatusBadge(status: equipment.status),
                     ],
                   ),
                 ),
 
                 // Dedicated Edit Button
-                ElevatedButton.icon(
+                ElevatedButton(
                   onPressed: () {
                     ref
                         .read(equipmentProvider.notifier)
                         .selectEditEquipment(equipment);
                     context.push('/owner/equipment/${equipment.id}');
                   },
-                  icon: const Icon(Icons.edit, size: 16),
-                  label: const Text("Edit"),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: colorScheme.primaryContainer,
                     foregroundColor: colorScheme.onPrimaryContainer,
@@ -100,6 +97,7 @@ class OwnerEquipmentCard extends ConsumerWidget {
                       borderRadius: BorderRadius.circular(8),
                     ),
                   ),
+                  child: const Icon(Icons.edit, size: 16),
                 ),
               ],
             ),
@@ -113,29 +111,33 @@ class OwnerEquipmentCard extends ConsumerWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          Icon(Icons.location_on, size: 16, color: ghostGray),
-                          const SizedBox(width: 4),
-                          Text(locationText, style: theme.textTheme.bodyMedium),
-                        ],
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Icon(Icons.location_on, size: 16, color: ghostGray),
+                        const SizedBox(width: 4),
+                        Text(locationText, style: theme.textTheme.bodyMedium),
+                      ],
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      priceDisplay,
+                      style: TextStyle(
+                        color: accentColor,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
                       ),
-                      const SizedBox(height: 4),
-                      Text(
-                        priceDisplay,
-                        style: TextStyle(
-                          color: accentColor,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16,
-                        ),
-                      ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
+
+                Spacer(),
+
+                _StatusBadge(status: equipment.status),
+
+                Spacer(),
 
                 // Online Toggle
                 _onlineToggle(context, ref),
@@ -183,7 +185,6 @@ class OwnerEquipmentCard extends ConsumerWidget {
             value: equipment.isVisible,
             activeThumbColor: const Color(0xFF4E73DF),
             onChanged: (val) async {
-              print(val);
               await ref
                   .read(equipmentProvider.notifier)
                   .updateVisibilityStatus(equipment.id, val, equipment.status);
@@ -201,20 +202,23 @@ class _StatusBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final bool isActive = status.toLowerCase() == 'available';
-    final Color statusColor = isActive
-        ? const Color.fromARGB(255, 247, 90, 0)
-        : const Color.fromARGB(255, 24, 143, 0);
+    final Color statusColor = status.toLowerCase() == 'available'
+        ? const Color.fromARGB(255, 24, 143, 0)
+        : status.toLowerCase() == 'booked'
+        ? const Color.fromARGB(255, 255, 102, 13)
+        : status.toLowerCase() == 'maintenance'
+        ? const Color.fromARGB(255, 255, 0, 0)
+        : const Color.fromARGB(255, 131, 131, 131);
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
       decoration: BoxDecoration(
         color: Colors.white, // White background to show the shadow
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.black.withValues(alpha: 0.3)),
+        border: Border.all(color: Colors.black.withValues(alpha: 0.2)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.4),
+            color: Colors.black.withValues(alpha: 0.2),
             blurRadius: 4,
             offset: const Offset(0, 4),
           ),
@@ -223,7 +227,7 @@ class _StatusBadge extends StatelessWidget {
       child: Text(
         status.toUpperCase(),
         style: TextStyle(
-          fontSize: 16,
+          fontSize: 12,
           fontWeight: FontWeight.bold,
           color: statusColor,
           letterSpacing: 0.5,

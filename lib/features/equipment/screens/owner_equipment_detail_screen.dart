@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:prokat/features/categories/providers/category_provider.dart';
 import 'package:prokat/features/equipment/providers/equipment_provider.dart';
+import 'package:prokat/features/equipment/widgets/owner/category_selector_tile.dart';
 import 'package:prokat/features/equipment/widgets/owner/delete_equipment_section.dart';
 import 'package:prokat/features/equipment/widgets/owner/edit_equipment_details_form.dart';
 import 'package:prokat/features/equipment/widgets/owner/equipment_image_header.dart';
@@ -13,13 +14,29 @@ import 'package:prokat/features/equipment/widgets/owner/pricing_section.dart';
 import 'package:prokat/features/equipment/widgets/owner/show_image_picker_sheet.dart';
 import 'package:prokat/features/equipment/widgets/owner/visibility_status_section.dart';
 
-class OwnerEquipmentDetailScreen extends ConsumerWidget {
+class OwnerEquipmentDetailScreen extends ConsumerStatefulWidget {
   final String equipmentId;
 
   const OwnerEquipmentDetailScreen({super.key, required this.equipmentId});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<OwnerEquipmentDetailScreen> createState() =>
+      _OwnerEquipmentDetailScreenState();
+}
+
+class _OwnerEquipmentDetailScreenState
+    extends ConsumerState<OwnerEquipmentDetailScreen> {
+  @override
+  void initState() {
+    super.initState();
+
+    Future.microtask(() async {
+      await ref.read(categoriesProvider.notifier).getCategories();
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
 
@@ -31,12 +48,6 @@ class OwnerEquipmentDetailScreen extends ConsumerWidget {
 
     final equipment = state.ownerEquipment
         .where((item) => item.id == state.editEquipment?.id)
-        .firstOrNull;
-
-    final categories = ref.read(categoriesProvider).categories;
-
-    final foundCategory = categories
-        .where((item) => item.id == equipment?.categoryId)
         .firstOrNull;
 
     /// ERROR STATE
@@ -82,66 +93,98 @@ class OwnerEquipmentDetailScreen extends ConsumerWidget {
 
     return Scaffold(
       backgroundColor: bgColor,
-      body: CustomScrollView(
-        slivers: [
-          SliverToBoxAdapter(
-            child: EquipmentImageHeader(
-              imageUrl: equipment.imageUrl,
-              onEdit: () => showImagePickerSheet(context),
-            ),
+      body: Stack(
+        children: [
+          CustomScrollView(
+            slivers: [
+              SliverToBoxAdapter(
+                child: EquipmentImageHeader(
+                  imageUrl: equipment.imageUrl,
+                  onEdit: () => showImagePickerSheet(context),
+                ),
+              ),
+
+              SliverPadding(
+                padding: const EdgeInsets.fromLTRB(16, 24, 16, 24),
+                sliver: SliverList(
+                  delegate: SliverChildListDelegate([
+                    CategorySelectorTile(mode: "edit_equipment",),
+
+                    const SizedBox(height: 20),
+
+                    EditEquipmentDetailsForm(equipment: equipment, ref: ref),
+
+                    const SizedBox(height: 20),
+
+                    PricingSection(
+                      prices: equipment.prices,
+                      onAdd: () =>
+                          openPricingEditSheet(context, ref, equipment.id),
+                      onEdit: (entry) => openPricingEditSheet(
+                        context,
+                        ref,
+                        equipment.id,
+                        priceEntry: entry,
+                      ),
+                    ),
+
+                    const SizedBox(height: 20),
+
+                    LocationSection(
+                      location: equipment.location != null
+                          ? '${equipment.location?.street}, ${equipment.location?.city}'
+                          : "NO LOCATION SET",
+                      onAction: () =>
+                          openLocationPickerSheet(context, ref, equipment.id),
+                    ),
+
+                    const SizedBox(height: 20),
+
+                    VisibilityStatusSection(
+                      isVisible: equipment.isVisible,
+                      status: equipment.status,
+                      onSave: (visible, status) {
+                        ref
+                            .read(equipmentProvider.notifier)
+                            .updateVisibilityStatus(
+                              equipment.id,
+                              visible,
+                              status,
+                            );
+                      },
+                    ),
+
+                    const SizedBox(height: 20),
+
+                    DeleteEquipmentSection(
+                      onDelete: () =>
+                          _confirmDelete(context, ref, widget.equipmentId),
+                    ),
+                  ]),
+                ),
+              ),
+            ],
           ),
 
-          SliverPadding(
-            padding: const EdgeInsets.fromLTRB(16, 24, 16, 40),
-            sliver: SliverList(
-              delegate: SliverChildListDelegate([
-                EditEquipmentDetailsForm(
-                  equipment: equipment,
-                  ref: ref,
-                  category: foundCategory,
+          Positioned(
+            top:
+                MediaQuery.of(context).padding.top +
+                12, // Respects notch/status bar
+            left: 16,
+            child: GestureDetector(
+              onTap: () => context.pop(), // GoRouter back action
+              child: Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: Colors.black.withValues(alpha: 0.3), // Low alpha shade
+                  shape: BoxShape.circle,
                 ),
-
-                const SizedBox(height: 20),
-
-                PricingSection(
-                  prices: equipment.prices,
-                  onAdd: () => openPricingEditSheet(context, ref, equipment.id),
-                  onEdit: (entry) => openPricingEditSheet(
-                    context,
-                    ref,
-                    equipment.id,
-                    priceEntry: entry,
-                  ),
+                child: const Icon(
+                  Icons.arrow_back_ios_new_rounded,
+                  color: Colors.white,
+                  size: 20,
                 ),
-
-                const SizedBox(height: 20),
-
-                LocationSection(
-                  location: equipment.location != null
-                      ? '${equipment.location?.street}, ${equipment.location?.city}'
-                      : "NO LOCATION SET",
-                  onAction: () =>
-                      openLocationPickerSheet(context, ref, equipment.id),
-                ),
-
-                const SizedBox(height: 20),
-
-                VisibilityStatusSection(
-                  isVisible: equipment.isVisible,
-                  status: equipment.status,
-                  onSave: (visible, status) {
-                    ref
-                        .read(equipmentProvider.notifier)
-                        .updateVisibilityStatus(equipment.id, visible, status);
-                  },
-                ),
-
-                const SizedBox(height: 40),
-
-                DeleteEquipmentSection(
-                  onDelete: () => _confirmDelete(context, ref, equipmentId),
-                ),
-              ]),
+              ),
             ),
           ),
         ],

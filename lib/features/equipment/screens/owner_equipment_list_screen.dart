@@ -46,7 +46,8 @@ class _OwnerEquipmentListScreenState
             floating: true,
             pinned: true,
             elevation: 0,
-            backgroundColor: colorScheme.surface,
+            scrolledUnderElevation: 2, 
+            backgroundColor: theme.colorScheme.surface,
             leading: IconButton(
               icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 20),
               onPressed: () => context.pop(),
@@ -57,34 +58,63 @@ class _OwnerEquipmentListScreenState
                 fontWeight: FontWeight.bold,
               ),
             ),
+            centerTitle: true,
+            actions: [
+              Padding(
+                padding: const EdgeInsets.only(right: 16),
+                child: IconButton.filled(
+                  // filled variant uses primary by default
+                  onPressed: () => context.push('/owner/equipment/create'),
+                  icon: const Icon(Icons.add, size: 24),
+                  style: IconButton.styleFrom(
+                    backgroundColor: theme.colorScheme.primary,
+                    foregroundColor: theme.colorScheme.onPrimary,
+                    shape: CircleBorder(),
+                  ),
+                ),
+              ),
+            ],
           ),
 
           // 2. Stats and Add Button Section
           SliverToBoxAdapter(
             child: Padding(
-              padding: const EdgeInsets.fromLTRB(24, 8, 24, 24),
+              padding: const EdgeInsets.all(16),
               child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        "TOTAL ASSETS",
-                        style: theme.textTheme.labelMedium?.copyWith(
-                          color: colorScheme.onSurface.withValues(alpha: 0.5),
-                          fontWeight: FontWeight.bold,
-                          letterSpacing: 1.1,
-                        ),
-                      ),
-                      Text(
-                        "${state.ownerEquipment.length} UNITS",
-                        style: theme.textTheme.bodyLarge,
-                      ),
-                    ],
+                  Expanded(
+                    child: _buildStatusItem(
+                      context,
+                      label: "ONLINE",
+                      count: state.ownerEquipment
+                          .where((e) => e.status.toLowerCase() == 'available')
+                          .length,
+                      color: Colors.greenAccent[700]!,
+                    ),
                   ),
-                  _AddEquipmentButton(
-                    onPressed: () => context.push('/owner/equipment/create'),
+                  SizedBox(width: 12),
+
+                  Expanded(
+                    child: _buildStatusItem(
+                      context,
+                      label: "OFFLINE",
+                      count: state.ownerEquipment
+                          .where((e) => e.status.toLowerCase() == 'booked')
+                          .length,
+                      color: Colors.redAccent[400]!,
+                    ),
+                  ),
+                  SizedBox(width: 12),
+
+                  Expanded(
+                    child: _buildStatusItem(
+                      context,
+                      label: "REPAIR",
+                      count: state.ownerEquipment
+                          .where((e) => e.status.toLowerCase() == 'maintenance')
+                          .length,
+                      color: Colors.orangeAccent[700]!,
+                    ),
                   ),
                 ],
               ),
@@ -162,33 +192,44 @@ class _OwnerEquipmentListScreenState
       ),
     );
   }
-}
 
-class _AddEquipmentButton extends StatelessWidget {
-  final VoidCallback onPressed;
-  const _AddEquipmentButton({required this.onPressed});
-
-  @override
-  Widget build(BuildContext context) {
+  Widget _buildStatusItem(
+    BuildContext context, {
+    required String label,
+    required int count,
+    required Color color,
+  }) {
     final theme = Theme.of(context);
 
-    return ElevatedButton.icon(
-      onPressed: onPressed,
-      icon: Icon(
-        Icons.add,
-        size: 24,
-        color: theme.colorScheme.onPrimary,
-        weight: 4,
+    return Container(
+      width: double.infinity,
+      padding: EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.15),
+        borderRadius: BorderRadius.circular(16),
       ),
-      label: Text(
-        "ADD NEW",
-        style: TextStyle(color: theme.colorScheme.onPrimary),
-      ),
-      style: ElevatedButton.styleFrom(
-        elevation: 0,
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        backgroundColor: theme.primaryColor,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          // The Large Count
+          Text(
+            count.toString(),
+            style: theme.textTheme.titleLarge?.copyWith(
+              fontWeight: FontWeight.bold,
+              color: theme.colorScheme.onSurface,
+            ),
+          ),
+          const SizedBox(height: 2),
+          // The Label
+          Text(
+            label.toUpperCase(),
+            style: theme.textTheme.labelSmall?.copyWith(
+              color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
+              fontWeight: FontWeight.w800,
+              letterSpacing: 0.5,
+            ),
+          ),
+        ],
       ),
     );
   }
