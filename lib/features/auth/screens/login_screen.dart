@@ -38,7 +38,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     padding: const EdgeInsets.symmetric(horizontal: 24),
                     child: Column(
                       crossAxisAlignment:
-                          CrossAxisAlignment.start, // Align text to start
+                          CrossAxisAlignment.center, // Align text to start
                       children: [
                         const SizedBox(height: 40),
 

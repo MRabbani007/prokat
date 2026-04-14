@@ -1,45 +1,69 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:prokat/core/router/app_routes.dart';
+import 'package:prokat/core/widgets/base_tile.dart';
+import 'package:prokat/features/auth/widgets/logout_button.dart';
+import 'package:prokat/features/user/state/user_profile_provider.dart';
+import 'package:prokat/features/user/widgets/display_name.dart';
+import 'package:go_router/go_router.dart';
 
-class OwnerProfileScreen extends StatelessWidget {
+class OwnerProfileScreen extends ConsumerWidget {
   const OwnerProfileScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final theme = Theme.of(context);
+    final state = ref.watch(userProfileProvider);
+    final profileImageUrl = state.userProfile?.profileImageUrl ?? "";
+
     return Scaffold(
       body: CustomScrollView(
         slivers: [
           // 1. Collapsing Header with Profile Info
           SliverAppBar(
+            leading: IconButton(
+              icon: Icon(
+                Icons.arrow_back_ios_new_rounded,
+                size: 20,
+                color: theme.colorScheme.onPrimary,
+              ),
+              onPressed: () => context.pop(),
+            ),
             expandedHeight: 240,
             pinned: true,
             automaticallyImplyLeading: false,
             backgroundColor: Theme.of(context).primaryColor,
             flexibleSpace: FlexibleSpaceBar(
-              collapseMode: CollapseMode.pin,
+              collapseMode: CollapseMode.parallax,
               background: Container(
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
                     begin: Alignment.topCenter,
                     end: Alignment.bottomCenter,
-                    colors: [Colors.blue.shade800, Colors.blue.shade600],
+                    colors: [theme.primaryColor, Colors.blue.shade600],
                   ),
                 ),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const CircleAvatar(
-                      radius: 45,
-                      backgroundImage: NetworkImage('https://placeholder.com'),
-                    ),
-                    const SizedBox(height: 12),
-                    const Text(
-                      "Alex Thompson",
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 22,
-                        fontWeight: FontWeight.bold,
+                    CircleAvatar(
+                      radius: 50,
+                      backgroundColor: theme.colorScheme.surface,
+                      child: ClipOval(
+                        child: Image.network(
+                          profileImageUrl,
+                          width: 100,
+                          height: 100,
+                          fit: BoxFit.cover,
+                          errorBuilder: (_, _, _) =>
+                              const Icon(Icons.person, size: 40),
+                        ),
                       ),
                     ),
+                    const SizedBox(height: 12),
+
+                    DisplayName(),
+
                     const SizedBox(height: 4),
                     // Registration Status Badge
                     Container(
@@ -67,12 +91,12 @@ class OwnerProfileScreen extends StatelessWidget {
                 ),
               ),
             ),
-            actions: [
-              IconButton(
-                icon: const Icon(Icons.settings, color: Colors.white),
-                onPressed: () => print("Navigate to Settings"),
-              ),
-            ],
+            // actions: [
+            //   IconButton(
+            //     icon: const Icon(Icons.settings, color: Colors.white),
+            //     onPressed: () => context.push(AppRoutes.ownerSettings),
+            //   ),
+            // ],
           ),
 
           // 2. Body Content
@@ -82,53 +106,117 @@ class OwnerProfileScreen extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _buildSectionTitle("Equipment Analytics"),
-                  _buildStatsRow(),
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 12),
+                    child: Text(
+                      "Balance",
+                      style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black87,
+                      ),
+                    ),
+                  ),
+
+                  Row(
+                    children: [
+                      _buildStatCard(
+                        context,
+                        "Online Time",
+                        "2 Weeks",
+                        const Color.fromARGB(255, 255, 0, 0),
+                        AppRoutes.ownerPayment,
+                      ),
+                    ],
+                  ),
+
                   const SizedBox(height: 24),
 
-                  _buildSectionTitle("Account Management"),
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 12),
+                    child: Text(
+                      "Performance",
+                      style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black87,
+                      ),
+                    ),
+                  ),
+
+                  Row(
+                    children: [
+                      _buildStatCard(
+                        context,
+                        "Total Assets",
+                        "24",
+                        Colors.blue,
+                        AppRoutes.ownerEquiment,
+                      ),
+                      const SizedBox(width: 12),
+                      _buildStatCard(
+                        context,
+                        "Active Rents",
+                        "08",
+                        Colors.orange,
+                        AppRoutes.ownerBookings,
+                      ),
+                    ],
+                  ),
+
+                  const SizedBox(height: 24),
+
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 12),
+                    child: Text(
+                      "Account",
+                      style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black87,
+                      ),
+                    ),
+                  ),
+
                   _buildMenuTile(
                     icon: Icons.assignment_turned_in_outlined,
                     title: "Registration Status",
                     subtitle: "Fully Verified (Expires 2025)",
                     trailing: const Icon(Icons.chevron_right),
-                    onTap: () {},
+                    onTap: () {
+                      context.push(AppRoutes.ownerRegistration);
+                    },
                   ),
+
+                  const SizedBox(height: 12),
+
                   _buildMenuTile(
                     icon: Icons.settings_outlined,
                     title: "App Settings",
                     subtitle: "Notifications, Privacy, Theme",
                     trailing: const Icon(Icons.chevron_right),
-                    onTap: () {},
+                    onTap: () {
+                      context.push(AppRoutes.ownerSettings);
+                    },
                   ),
+                  const SizedBox(height: 12),
                   _buildMenuTile(
                     icon: Icons.help_outline,
                     title: "Support & Help",
                     subtitle: "FAQs, Contact Support",
                     trailing: const Icon(Icons.chevron_right),
-                    onTap: () {},
+                    onTap: () {
+                      context.push(AppRoutes.helpSupport);
+                    },
                   ),
 
                   const SizedBox(height: 12),
+
                   const Divider(),
+
                   const SizedBox(height: 12),
 
-                  // Logout Button
-                  SizedBox(
-                    width: double.infinity,
-                    child: OutlinedButton.icon(
-                      onPressed: () => print("Logout logic"),
-                      icon: const Icon(Icons.logout, color: Colors.red),
-                      label: const Text(
-                        "Logout",
-                        style: TextStyle(color: Colors.red),
-                      ),
-                      style: OutlinedButton.styleFrom(
-                        side: const BorderSide(color: Colors.red),
-                        padding: const EdgeInsets.symmetric(vertical: 12),
-                      ),
-                    ),
-                  ),
+                  LogoutButton(),
                 ],
               ),
             ),
@@ -138,54 +226,43 @@ class OwnerProfileScreen extends StatelessWidget {
     );
   }
 
-  // --- Helper Widgets ---
-
-  Widget _buildSectionTitle(String title) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 12),
-      child: Text(
-        title,
-        style: const TextStyle(
-          fontSize: 18,
-          fontWeight: FontWeight.bold,
-          color: Colors.black87,
-        ),
-      ),
-    );
-  }
-
-  Widget _buildStatsRow() {
-    return Row(
-      children: [
-        _buildStatCard("Total Assets", "24", Colors.blue),
-        const SizedBox(width: 12),
-        _buildStatCard("Active Rents", "08", Colors.orange),
-      ],
-    );
-  }
-
-  Widget _buildStatCard(String label, String value, Color color) {
+  Widget _buildStatCard(
+    BuildContext context,
+    String label,
+    String value,
+    Color color,
+    String url,
+  ) {
     return Expanded(
-      child: Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: color.withOpacity(0.1),
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: color.withOpacity(0.3)),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              label,
-              style: TextStyle(color: color, fontWeight: FontWeight.w600),
+      child: GestureDetector(
+        onTap: () => context.push(url),
+        child: BaseTile(
+          padding: const EdgeInsets.all(0),
+          color: color.withValues(alpha: 0.15),
+          child: Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: color.withValues(alpha: 0.15),
+              borderRadius: BorderRadius.circular(20),
             ),
-            const SizedBox(height: 8),
-            Text(
-              value,
-              style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  label,
+                  style: TextStyle(color: color, fontWeight: FontWeight.w600),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  value,
+                  style: const TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
             ),
-          ],
+          ),
         ),
       ),
     );
@@ -198,22 +275,28 @@ class OwnerProfileScreen extends StatelessWidget {
     required Widget trailing,
     required VoidCallback onTap,
   }) {
-    return Card(
-      elevation: 0,
-      margin: const EdgeInsets.only(bottom: 8),
-      shape: RoundedRectangleBorder(
+    return BaseTile(
+      padding: EdgeInsets.zero,
+      borderRadius: 12,
+      onTap: onTap, // 👈 move tap here if BaseTile supports InkWell
+      child: ClipRRect(
         borderRadius: BorderRadius.circular(12),
-        side: BorderSide(color: Colors.grey.shade200),
-      ),
-      child: ListTile(
-        leading: CircleAvatar(
-          backgroundColor: Colors.blue.shade50,
-          child: Icon(icon, color: Colors.blue.shade700),
+        child: Material(
+          color: Colors.transparent,
+          child: ListTile(
+            leading: CircleAvatar(
+              backgroundColor: Colors.blue.shade50,
+              child: Icon(icon, color: Colors.blue.shade700),
+            ),
+            title: Text(
+              title,
+              style: const TextStyle(fontWeight: FontWeight.w600),
+            ),
+            subtitle: Text(subtitle, style: const TextStyle(fontSize: 12)),
+            trailing: trailing,
+            onTap: null,
+          ),
         ),
-        title: Text(title, style: const TextStyle(fontWeight: FontWeight.w600)),
-        subtitle: Text(subtitle, style: const TextStyle(fontSize: 12)),
-        trailing: trailing,
-        onTap: onTap,
       ),
     );
   }

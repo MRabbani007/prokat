@@ -4,6 +4,8 @@ class AppRoutes {
   static const String error = '/error';
   static const String landing = '/landing';
 
+  static const String helpSupport = '/help';
+
   // Auth
   static const String login = '/login';
   static const String register = '/register';
@@ -39,7 +41,7 @@ class AppRoutes {
   static const String ownerEquimentId = '/owner/equipment/:id';
   static const String ownerEquimentIdEdit = '/owner/equipment/:id/edit';
   static const String ownerEquimentCreate = '/owner/equipment/create';
-  
+
   static const String ownerAddresses = '/owner/addresses';
   static const String ownerAddressCreate = '/owner/addresses/create';
   static const String ownerAddressEdit = '/owner/addresses/edit';
@@ -53,6 +55,9 @@ class AppRoutes {
 
   static const String ownerProfile = '/owner/profile';
   static const String ownerSettings = '/owner/settings';
+
+  static const String ownerPayment = '/owner/payment';
+  static const String ownerRegistration = '/owner/registration';
 
   static const String ownerChatList =
       '/owner/chat'; // Show chat list, receive bookingId or requestId and navigate to chat?id=

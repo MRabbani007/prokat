@@ -18,9 +18,9 @@ abstract class BaseRepository {
     } on DioException catch (e) {
       final error = ApiException.fromDio(e);
 
-      return ApiResponse.error(error.message);
+      return ApiResponse(success: false, error: error.message);
     } catch (e) {
-      return ApiResponse.error(e.toString());
+      return ApiResponse(success: false, error: e.toString());
     }
   }
 

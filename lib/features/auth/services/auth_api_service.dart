@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:prokat/core/api/api_response.dart';
 import 'package:prokat/features/auth/services/auth_secure_storage.dart';
 import '../models/auth_session.dart';
 import '../models/auth_credentials.dart';
@@ -60,18 +61,18 @@ class AuthApiService {
     }
   }
 
-  Future<AuthSession> register({
-    required String method,
-    required String username,
-    required String password,
-    required String firstName,
-    required String lastName,
+  Future<ApiResponse<AuthSession>> registerCredentials({
+    String? method,
+    String? username,
+    String? password,
+    String? firstName,
+    String? lastName,
   }) async {
     try {
       final response = await dio.post(
         '/auth/register',
         data: {
-          'authMethod': method,
+          'authMethod': "PASSWORD",
           'username': username,
           'password': password,
           'firstName': firstName,
@@ -79,13 +80,36 @@ class AuthApiService {
         },
       );
 
-      if (response.statusCode == 200) {
-        return AuthSession.fromJson(response.data);
+      if (response.statusCode == 201) {
+        return ApiResponse.success(
+          AuthSession.fromJson(response.data),
+          message: "Account created successfully",
+        );
+      } else {
+        return ApiResponse.failure(error: "Something went wrong");
+      }
+    } on DioException catch (e) {
+       String message = "Something went wrong";
+
+      if (e.response?.statusCode == 400) {
+        message = "Missing or invalid credentials";
+      } else if (e.response?.statusCode == 409) {
+        message = "Username already registered";
+      } else if (e.response?.statusCode == 410) {
+        message = "Wrong data";
+      } else if (e.response?.statusCode == 500) {
+        message = "Server Error";
       }
 
-      throw Exception("Registration failed");
-    } on DioException catch (e) {
-      throw _handleError(e);
+      return ApiResponse.failure(
+        message: message, // real backend message: extractBackendMessage(e)
+        error: e.response?.data?.toString(),
+      );
+    } catch (e) {
+      return ApiResponse.failure(
+        message: "Unexpected error",
+        error: e.toString(),
+      );
     }
   }
 

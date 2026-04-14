@@ -312,7 +312,8 @@ class _TechMetaRow extends StatelessWidget {
               value,
               style: theme.textTheme.bodyMedium?.copyWith(
                 color: colors.onSurface.withValues(alpha: 0.8),
-                fontWeight: FontWeight.w500,
+                fontWeight: FontWeight.w500, 
+                    overflow: TextOverflow.ellipsis,
               ),
             ),
           ],

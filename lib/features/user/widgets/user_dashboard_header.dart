@@ -20,64 +20,26 @@ class _UserHeaderState extends ConsumerState<UserDashboardHeader> {
   Widget build(BuildContext context) {
     final userProfileState = ref.watch(userProfileProvider);
     final profileImageUrl = userProfileState.userProfile?.profileImageUrl ?? "";
-
     final theme = Theme.of(context);
-    final colorScheme = Theme.of(context).colorScheme;
+    final onPrimary = theme.colorScheme.onPrimary;
 
-    return Container(
+    return Padding(
+      // Padding adjusted for the AppBar's safe area
       padding: const EdgeInsets.fromLTRB(20, 20, 20, 20),
-      decoration: BoxDecoration(
-        color: colorScheme.surface,
-        border: Border(bottom: BorderSide(color: colorScheme.outlineVariant)),
-      ),
       child: Row(
+        // mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          // Profile Image
           GestureDetector(
-            onTap: () {
-              context.push(AppRoutes.profile);
-            },
-            child: Stack(
-              clipBehavior: Clip.none,
-              children: [
-                // Profile image
-                Container(
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    border: Border.all(
-                      color: theme.colorScheme.outline.withValues(alpha: 0.3),
-                      width: 1,
-                    ),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.4),
-                        blurRadius: 10,
-                        offset: const Offset(0, 4),
-                      ),
-                    ],
-                  ),
-                  child: CircleAvatar(
-                    radius: 35,
-                    backgroundColor: colorScheme.primaryContainer,
-                    child: ClipOval(
-                      child: Image.network(
-                        profileImageUrl,
-                        width: 100,
-                        height: 100,
-                        fit: BoxFit.cover,
-                        errorBuilder: (_, _, _) =>
-                            const Icon(Icons.person, size: 40),
-                      ),
-                    ),
-                  ),
-                ),
-              ],
+            onTap: () => context.push(AppRoutes.profile),
+            child: CircleAvatar(
+              radius: 30,
+              backgroundColor: theme.colorScheme.primaryContainer,
+              backgroundImage: NetworkImage(profileImageUrl),
+              onBackgroundImageError: (_, __) => const Icon(Icons.person),
             ),
           ),
-
           const SizedBox(width: 16),
-
-          // Name and Rating
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -85,9 +47,12 @@ class _UserHeaderState extends ConsumerState<UserDashboardHeader> {
               children: [
                 Text(
                   userProfileState.userProfile?.displayName ?? 'Hello!',
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: onPrimary, // Use onPrimary
+                  ),
                 ),
-
                 Row(
                   children: [
                     const Icon(LucideIcons.star, size: 16, color: Colors.amber),
@@ -95,27 +60,27 @@ class _UserHeaderState extends ConsumerState<UserDashboardHeader> {
                     Text(
                       (userProfileState.userProfile?.ratingStars ?? 0)
                           .toStringAsFixed(1),
-                      style: TextStyle(fontWeight: FontWeight.bold),
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: onPrimary,
+                      ),
                     ),
                     const SizedBox(width: 4),
                     Text(
                       '(${(userProfileState.userProfile?.ratingStars ?? 0).toStringAsFixed(0)} reviews)',
-                      style: TextStyle(color: Colors.grey[600], fontSize: 13),
+                      style: TextStyle(
+                        color: onPrimary.withValues(alpha: 0.8),
+                        fontSize: 13,
+                      ),
                     ),
                   ],
                 ),
               ],
             ),
           ),
-
-          const SizedBox(width: 12),
-
-          // Language selector
           LanguageSelectorTile(
             value: selectedLanguage,
-            onChanged: (lang) {
-              setState(() => selectedLanguage = lang);
-            },
+            onChanged: (lang) => setState(() => selectedLanguage = lang),
           ),
         ],
       ),

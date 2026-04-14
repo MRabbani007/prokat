@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:prokat/core/router/app_routes.dart';
 import 'package:prokat/features/auth/providers/auth_provider.dart';
 import 'package:prokat/features/auth/widgets/auth_button.dart';
 import 'package:prokat/features/auth/widgets/auth_text_field.dart';
@@ -15,7 +16,8 @@ class RegisterWithUsernameForm extends ConsumerStatefulWidget {
       _RegisterWithUsernameFormState();
 }
 
-class _RegisterWithUsernameFormState extends ConsumerState<RegisterWithUsernameForm> {
+class _RegisterWithUsernameFormState
+    extends ConsumerState<RegisterWithUsernameForm> {
   final nameController = TextEditingController();
   final usernameController = TextEditingController();
   final passwordController = TextEditingController();
@@ -28,45 +30,52 @@ class _RegisterWithUsernameFormState extends ConsumerState<RegisterWithUsernameF
     super.dispose();
   }
 
-  Future<void> _register() async {
-    final fullName = nameController.text.trim();
-    final username = usernameController.text.trim();
-    final password = passwordController.text;
-
-    // 1. Frontend Validation: Prevent submission if empty
-    if (fullName.isEmpty || username.isEmpty || password.isEmpty) {
-      widget.onError("Please fill in all registration fields");
-      return;
-    }
-
-    // Clear previous errors
-    widget.onError(null);
-
-    try {
-      List<String> nameParts = fullName.split(" ");
-      String firstName = nameParts[0];
-      String lastName = nameParts.length > 1 ? nameParts.sublist(1).join(" ") : "";
-
-      final success = await ref.read(authProvider.notifier).register(
-            "PASSWORD",
-            username,
-            password,
-            firstName,
-            lastName,
-          );
-
-      if (success == true && mounted) {
-        context.push("/search/map");
-      }
-    } catch (e) {
-      // 2. Handle Backend/Connection Errors
-      widget.onError(e.toString().replaceAll('Exception: ', ''));
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     final authState = ref.watch(authProvider);
+
+    Future<void> register() async {
+      final fullName = nameController.text.trim();
+      final username = usernameController.text.trim();
+      final password = passwordController.text;
+
+      // 1. Frontend Validation: Prevent submission if empty
+      if (fullName.isEmpty || username.isEmpty || password.isEmpty) {
+        widget.onError("Please fill in all registration fields");
+        return;
+      }
+
+      // Clear previous errors
+      widget.onError(null);
+
+      try {
+        List<String> nameParts = fullName.split(" ");
+        String firstName = nameParts[0];
+        String lastName = nameParts.length > 1
+            ? nameParts.sublist(1).join(" ")
+            : "";
+
+        final result = await ref
+            .read(authProvider.notifier)
+            .registerCredentials(
+              username: username,
+              password: password,
+              firstName: firstName,
+              lastName: lastName,
+            );
+
+        print(result);
+
+        if (result == true && mounted) {
+          context.push(AppRoutes.dashboard);
+        } else {
+          widget.onError(authState.error ?? "UI: Something went wrong!");
+        }
+      } catch (e) {
+        // 2. Handle Backend/Connection Errors
+        widget.onError("unknown error ${e.toString().replaceAll('Exception: ', '')}");
+      }
+    }
 
     return SingleChildScrollView(
       physics: const BouncingScrollPhysics(),
@@ -103,9 +112,9 @@ class _RegisterWithUsernameFormState extends ConsumerState<RegisterWithUsernameF
             loading: authState.isLoading,
             text: "CREATE ACCOUNT",
             loadingText: "CREATING...",
-            onPressed: _register,
+            onPressed: register,
           ),
-          
+
           const SizedBox(height: 20),
         ],
       ),

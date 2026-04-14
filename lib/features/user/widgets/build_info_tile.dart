@@ -25,7 +25,7 @@ class InfoTile extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        margin: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+        margin: const EdgeInsets.symmetric(horizontal: 24, vertical: 0),
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
           color: theme.cardColor,

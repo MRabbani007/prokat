@@ -21,7 +21,6 @@ class _UserDashboardPageState extends ConsumerState<UserDashboardPage> {
   @override
   void initState() {
     super.initState();
-
     Future.microtask(() {
       ref.read(equipmentProvider.notifier).getRenterEquipment();
     });
@@ -36,57 +35,64 @@ class _UserDashboardPageState extends ConsumerState<UserDashboardPage> {
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
       body: SafeArea(
-        child: ListView(
-          padding: const EdgeInsets.only(bottom: 24),
-          children: [
-            // Header
-            const UserDashboardHeader(),
-
-            const SizedBox(height: 18),
-
-            UserLocationTile(),
-
-            const SizedBox(height: 12),
-
-            // View active orders (created and confirmed), up to 2 orders, a history button and a view all button
-            ClientBookingsSection(),
-
-            const SizedBox(height: 12),
-
-            // Button to create a custom request
-            CreateRequestTile(),
-
-            const SizedBox(height: 12),
-
-            // Category selector
-            const UserCategorySelector(),
-
-            const SizedBox(height: 12),
-
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 12),
-              child: Text(
-                "Browse Equipment",
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+        child: CustomScrollView(
+          slivers: [
+            SliverAppBar(
+              automaticallyImplyLeading: false,
+              expandedHeight: 160.0, // Adjust height as needed
+              floating: true, // AppBar reappears immediately when scrolling up
+              pinned: false, // AppBar hides completely when scrolling down
+              backgroundColor: theme.colorScheme.primary,
+              flexibleSpace: FlexibleSpaceBar(
+                background: UserDashboardHeader(), // Your header widget
               ),
             ),
 
-            // Equipment list (NO local scroll)
-            ...items.map(
-              (equipment) => Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 0),
-                child: EquipmentCard(
+            // 1. Static components wrapped in SliverToBoxAdapter
+            SliverToBoxAdapter(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const SizedBox(height: 18),
+                  UserLocationTile(),
+                  const SizedBox(height: 12),
+                  ClientBookingsSection(),
+                  const SizedBox(height: 12),
+                  CreateRequestTile(),
+                  const SizedBox(height: 12),
+                  const UserCategorySelector(),
+                  const SizedBox(height: 12),
+                  const Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 12),
+                    child: Text(
+                      "Browse Equipment",
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                ],
+              ),
+            ),
+
+            // 2. The dynamic list using SliverList
+            SliverList(
+              delegate: SliverChildBuilderDelegate((context, index) {
+                final equipment = items[index];
+                return EquipmentCard(
                   equipment: equipment,
                   onTap: () {
-                    // Select equipment
                     bookingNotifier.selectEquipment(equipment);
-                    // Navigate to booking screen
                     context.push('/equipment/${equipment.id}/book');
                   },
-                  // isRenter: true,
-                ),
-              ),
+                );
+              }, childCount: items.length),
             ),
+
+            // 3. Bottom padding
+            const SliverToBoxAdapter(child: SizedBox(height: 24)),
           ],
         ),
       ),

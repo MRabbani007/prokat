@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
-import 'package:prokat/core/widgets/page_header.dart';
 import 'package:prokat/features/bookings/models/booking_model.dart';
 import 'package:prokat/features/bookings/state/booking_provider.dart';
 import 'package:go_router/go_router.dart';
 import 'package:prokat/features/bookings/widgets/owner_booking_card.dart';
+import 'package:lucide_icons/lucide_icons.dart';
 
 class OwnerBookingsScreen extends ConsumerStatefulWidget {
   const OwnerBookingsScreen({super.key});
@@ -16,10 +16,10 @@ class OwnerBookingsScreen extends ConsumerStatefulWidget {
 }
 
 class _OwnerBookingsScreenState extends ConsumerState<OwnerBookingsScreen> {
-  final bgColor = const Color(0xFF121417);
-  final accentBlue = const Color(0xFF4E73DF);
-  final amberWarning = const Color(0xFFD97706);
-  final ghostGray = const Color(0x4DFFFFFF);
+  // final bgColor = const Color(0xFF121417);
+  // final accentBlue = const Color(0xFF4E73DF);
+  // final amberWarning = const Color(0xFFD97706);
+  // final ghostGray = const Color(0x4DFFFFFF);
 
   @override
   void initState() {
@@ -31,6 +31,7 @@ class _OwnerBookingsScreenState extends ConsumerState<OwnerBookingsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     final state = ref.watch(bookingProvider);
 
     // Logic: Split into actionable categories
@@ -44,13 +45,53 @@ class _OwnerBookingsScreenState extends ConsumerState<OwnerBookingsScreen> {
     return DefaultTabController(
       length: 2,
       child: Scaffold(
-        backgroundColor: bgColor,
+        backgroundColor: theme.scaffoldBackgroundColor,
         body: SafeArea(
           child: Column(
             children: [
               // 1. Header with Archive Button
-              _OwnerHeader(
-                onArchiveTap: () => context.push('/owner/bookings/history'),
+              Padding(
+                padding: const EdgeInsets.only(right: 12),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    IconButton(
+                      icon: const Icon(LucideIcons.chevronLeft, size: 25),
+                      onPressed: () => context.canPop() ? context.pop() : null,
+                      constraints: const BoxConstraints(
+                        minWidth: 40,
+                        minHeight: 40,
+                      ),
+                      padding: EdgeInsets.zero,
+                    ),
+
+                    Align(
+                      alignment: Alignment.center,
+                      child: Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 48.0),
+                        child: Text(
+                          "My Orders",
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: theme.textTheme.headlineSmall?.copyWith(
+                            fontWeight: FontWeight.w700,
+                            letterSpacing: -0.5,
+                          ),
+                        ),
+                      ),
+                    ),
+                    // Small technical Archive button
+                    IconButton(
+                      onPressed: () => context.push('/owner/bookings/history'),
+                      icon:  Icon(
+                        Icons.history_toggle_off_rounded,
+                        color: theme.colorScheme.secondary,
+                        size: 24,
+                      ),
+                      tooltip: "Job History",
+                    ),
+                  ],
+                ),
               ),
 
               // 2. Owner Industrial Segmented TabBar
@@ -58,26 +99,22 @@ class _OwnerBookingsScreenState extends ConsumerState<OwnerBookingsScreen> {
                 margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
                 height: 48,
                 decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.03),
+                  color: theme.textTheme.bodyMedium?.color,
                   borderRadius: BorderRadius.circular(14), // Small Item Radius
-                  border: Border.all(
-                    color: Colors.white.withValues(alpha: 0.05),
-                  ),
+                  border: Border.all(color: theme.colorScheme.outline),
                 ),
                 child: TabBar(
                   indicatorSize: TabBarIndicatorSize.tab,
-                  dividerColor: Colors.transparent,
+                  dividerColor: theme.colorScheme.outline,
                   indicator: BoxDecoration(
-                    color: const Color(0xFF1E2125), // Industrial Charcoal
+                    color: theme.colorScheme.primary, // Industrial Charcoal
                     borderRadius: BorderRadius.circular(12),
                     border: Border.all(
-                      color: Colors.white.withValues(alpha: 0.1),
+                      color: theme.colorScheme.outline,
                     ),
                   ),
-                  labelColor: Colors.white,
-                  unselectedLabelColor: Colors.white.withValues(
-                    alpha: 0.3,
-                  ), // Ghost Gray
+                  labelColor: theme.colorScheme.onPrimary,
+                  unselectedLabelColor: theme.colorScheme.onSecondary, // Ghost Gray
                   labelStyle: const TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 12,
@@ -110,34 +147,6 @@ class _OwnerBookingsScreenState extends ConsumerState<OwnerBookingsScreen> {
             ],
           ),
         ),
-      ),
-    );
-  }
-}
-
-class _OwnerHeader extends StatelessWidget {
-  final VoidCallback onArchiveTap;
-  const _OwnerHeader({required this.onArchiveTap});
- 
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(right: 12),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          const Expanded(child: PageHeader(title: "Bookings")),
-          // Small technical Archive button
-          IconButton(
-            onPressed: onArchiveTap,
-            icon: const Icon(
-              Icons.history_toggle_off_rounded,
-              color: Color(0x4DFFFFFF),
-              size: 24,
-            ),
-            tooltip: "Job History",
-          ),
-        ],
       ),
     );
   }
@@ -178,6 +187,8 @@ class _SwipeableBookingCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final theme = Theme.of(context);
+
     final notifier = ref.read(bookingProvider.notifier);
     final isLoading = ref.watch(bookingProvider).isLoading;
 
@@ -202,10 +213,10 @@ class _SwipeableBookingCard extends ConsumerWidget {
                                 'id': booking.id,
                               });
                             },
-                      backgroundColor: const Color(
-                        0xFF4E73DF,
-                      ).withValues(alpha: 0.2),
-                      foregroundColor: const Color(0xFF4E73DF),
+                      backgroundColor: theme.primaryColor.withValues(
+                        alpha: 0.2,
+                      ),
+                      foregroundColor: theme.colorScheme.onPrimary,
                       icon: Icons.check_circle_outline,
                       label: 'ACCEPT',
                     ),

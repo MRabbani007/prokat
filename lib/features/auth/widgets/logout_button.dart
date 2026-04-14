@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:prokat/core/widgets/base_tile.dart';
 import '../../auth/providers/auth_provider.dart';
 
 class LogoutButton extends ConsumerWidget {
@@ -23,7 +24,7 @@ class LogoutButton extends ConsumerWidget {
         content: Text(
           'Are you sure you want to logout?',
           style: textTheme.bodyMedium?.copyWith(
-            color: colorScheme.onSurface.withOpacity(0.7),
+            color: colorScheme.onSurface.withValues(alpha: 0.7),
           ),
         ),
         actions: [
@@ -58,52 +59,36 @@ class LogoutButton extends ConsumerWidget {
     final colorScheme = theme.colorScheme;
     final authState = ref.watch(authProvider);
 
-    return InkWell(
+    return BaseTile(
+      color: colorScheme.error.withValues(alpha: 0.2),
       onTap: authState.isLoading ? null : () => _confirmLogout(context, ref),
-      borderRadius: BorderRadius.circular(16),
-      child: Container(
-        margin: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: theme.cardColor,
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: colorScheme.error.withValues(alpha: 0.3)),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.3),
-              blurRadius: 10,
-              offset: const Offset(0, 4),
-            ),
-          ],
-        ),
-        child: Row(
-          children: [
-            /// Icon / Loader
-            authState.isLoading
-                ? SizedBox(
-                    width: 20,
-                    height: 20,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2,
-                      color: colorScheme.error,
-                    ),
-                  )
-                : Icon(Icons.logout_rounded, color: colorScheme.error),
+      child: Row(
+        children: [
+          /// Icon / Loader
+          authState.isLoading
+              ? SizedBox(
+                  width: 20,
+                  height: 20,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    color: colorScheme.error,
+                  ),
+                )
+              : Icon(Icons.logout, color: colorScheme.error),
 
-            const SizedBox(width: 16),
+          const SizedBox(width: 16),
 
-            /// Text
-            Expanded(
-              child: Text(
-                'Logout',
-                style: theme.textTheme.bodyLarge?.copyWith(
-                  color: colorScheme.error,
-                  fontWeight: FontWeight.w600,
-                ),
+          /// Text
+          Expanded(
+            child: Text(
+              'Logout',
+              style: theme.textTheme.bodyLarge?.copyWith(
+                color: colorScheme.error,
+                fontWeight: FontWeight.w600,
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

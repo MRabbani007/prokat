@@ -20,6 +20,7 @@ class DisplayName extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final theme = Theme.of(context);
     final state = ref.watch(userProfileProvider);
     final name = state.userProfile?.displayName ?? '';
 
@@ -30,9 +31,10 @@ class DisplayName extends ConsumerWidget {
           onTap: () => _openEditSheet(context, ref, name),
           child: Text(
             name,
-            style: Theme.of(
-              context,
-            ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w700),
+            style: theme.textTheme.titleLarge?.copyWith(
+              fontWeight: FontWeight.w700,
+              color: theme.colorScheme.onPrimary,
+            ),
           ),
         ),
       ],

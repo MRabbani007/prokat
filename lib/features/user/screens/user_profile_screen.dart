@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
-import 'package:prokat/core/widgets/page_header.dart';
 import 'package:prokat/features/auth/widgets/logout_button.dart';
 import 'package:prokat/features/user/state/user_profile_provider.dart';
 import 'package:prokat/features/user/widgets/become_owner_cta.dart';
@@ -19,146 +18,64 @@ class UserProfileScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final state = ref.watch(userProfileProvider);
-    // final userAddresses = ref.watch(locationProvider).renterLocations;
-    // final selectedAddress = userAddresses
-    //     .where((address) => state.userProfile?.selectedAddressId == address.id)
-    //     .firstOrNull;
     final username = state.userProfile?.username;
     final profileImageUrl = state.userProfile?.profileImageUrl ?? "";
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
-      body: SafeArea(
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const PageHeader(),
-
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 24.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Center(
-                      child: Stack(
-                        children: [
-                          Container(
-                            width:
-                                108, // slightly bigger than avatar (100 + padding)
-                            height: 108,
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black.withValues(alpha: 0.25),
-                                  blurRadius: 20,
-                                  spreadRadius: 2,
-                                  offset: const Offset(0, 6),
-                                ),
-                              ],
-                            ),
-                          ),
-
-                          Container(
-                            padding: const EdgeInsets.all(4),
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              border: Border.all(
-                                color: theme.colorScheme.outline.withValues(
-                                  alpha: 0.6,
-                                ),
-                                width: 2,
-                              ),
-                              color: theme
-                                  .colorScheme
-                                  .surface, 
-                            ),
-                            child: CircleAvatar(
-                              radius: 50,
-                              backgroundColor: theme.colorScheme.surface,
-                              child: ClipOval(
-                                child: Image.network(
-                                  profileImageUrl,
-                                  width: 100,
-                                  height: 100,
-                                  fit: BoxFit.cover,
-                                  errorBuilder: (_, _, _) =>
-                                      const Icon(Icons.person, size: 40),
-                                ),
-                              ),
-                            ),
-                          ),
-
-                          Positioned(
-                            bottom: 0,
-                            right: 4,
-                            child: Container(
-                              padding: const EdgeInsets.all(8),
-                              decoration: BoxDecoration(
-                                color: theme.colorScheme.primary,
-                                shape: BoxShape.circle,
-                              ),
-                              child: const Icon(
-                                Icons.edit_rounded,
-                                color: Colors.white,
-                                size: 18,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-
-                    const SizedBox(width: 12),
-
-                    Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      crossAxisAlignment: CrossAxisAlignment.start,
+      body: CustomScrollView(
+        slivers: [
+          SliverAppBar(
+            expandedHeight: 180.0,
+            automaticallyImplyLeading: false,
+            leading: IconButton(
+              icon: Icon(
+                Icons.arrow_back_ios_new_rounded,
+                size: 20,
+                color: theme.colorScheme.onPrimary,
+              ),
+              onPressed: () => context.pop(),
+            ),
+            pinned: false,
+            stretch: true,
+            flexibleSpace: FlexibleSpaceBar(
+              background: Container(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [
+                      theme.colorScheme.primary,
+                      theme.colorScheme.primary.withValues(alpha: 0.7),
+                    ],
+                  ),
+                ),
+                child: SafeArea(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        DisplayName(),
-
-                        const SizedBox(height: 4), 
-                        
-                        // Rating
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            const Icon(
-                              Icons.star,
-                              size: 18,
-                              color: Colors.amber,
-                            ),
-                            const SizedBox(width: 6),
-                            Text(
-                              (state.userProfile?.ratingStars ?? 0).toStringAsFixed(
-                                1,
-                              ),
-                              style: Theme.of(context).textTheme.bodyLarge
-                                  ?.copyWith(fontWeight: FontWeight.w600),
-                            ),
-                          ],
-                        ),
-
-                        /// Member since
-                        if (state.userProfile?.createdAt != null)
-                          Text(
-                            "Member since ${DateFormat('MMMM yyyy').format(state.userProfile!.createdAt!)}",
-                            style: Theme.of(context).textTheme.bodySmall
-                                ?.copyWith(
-                                  color: Theme.of(context).colorScheme.onSurface
-                                      .withValues(alpha: 0.6),
-                                ),
-                          ),
+                        // Profile Image Stack
+                        _buildProfileImage(theme, profileImageUrl),
+                        const SizedBox(width: 16),
+                        // Name and Rating Info
+                        // Note: Ensure _buildProfileInfo uses theme.colorScheme.onPrimary
+                        // for text colors to be readable against the gradient.
+                        _buildProfileInfo(context, state),
                       ],
                     ),
-                  ],
+                  ),
                 ),
               ),
+            ),
+          ),
 
-              const SizedBox(height: 32),
-
-              // 2. Info Section (Cards)
+          // 2. The Settings/Info List
+          SliverList(
+            delegate: SliverChildListDelegate([
+              const SizedBox(height: 20),
               InfoTile(
                 icon: Icons.phone_android_rounded,
                 label: "Phone Number",
@@ -170,62 +87,130 @@ class UserProfileScreen extends ConsumerWidget {
                 ),
                 trailing: const Icon(Icons.edit, color: Colors.white54),
               ),
+              const SizedBox(height: 20),
               InfoTile(
                 icon: Icons.email_outlined,
                 label: "Email Address",
                 value: username ?? "Add username",
                 onTap: () => showEditUsernameSheet(context, ref, username),
-
-                // onTap: username == null
-                //     ? () => showEditUsernameSheet(context, ref, username)
-                //     : null,
                 trailing: username == null
                     ? const Icon(Icons.add, color: Colors.white54)
                     : null,
               ),
-
               const SizedBox(height: 20),
-
-              BecomeOwnerCTA(),
-
+              const BecomeOwnerCTA(),
               const SizedBox(height: 20),
-
-              /// Support / Growth
               SettingsLinkTile(
                 icon: Icons.favorite_outline,
                 title: 'Support Us',
                 subtitle: 'Donate or help us grow',
-                onTap: () {
-                  context.push('/support-us');
-                },
+                onTap: () => context.push('/support-us'),
               ),
-
-              /// Legal
               SettingsLinkTile(
                 icon: Icons.description_outlined,
                 title: 'Terms & Conditions',
-                onTap: () {
-                  context.push('/terms');
-                },
+                onTap: () => context.push('/terms'),
               ),
-
-              /// Help & Support
               SettingsLinkTile(
                 icon: Icons.help_outline,
                 title: 'Help & Support',
                 subtitle: 'Get help or contact support',
-                onTap: () {
-                  context.push('/help');
-                },
+                onTap: () => context.push('/help'),
               ),
+              const LogoutButton(),
+              const SizedBox(height: 40), // Bottom spacing
+            ]),
+          ),
+        ],
+      ),
+    );
+  }
 
-              LogoutButton(),
-
-              const SizedBox(height: 20),
+  // Helper to keep the build method clean
+  Widget _buildProfileImage(ThemeData theme, String url) {
+    return Stack(
+      children: [
+        Container(
+          width: 108,
+          height: 108,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.25),
+                blurRadius: 20,
+                offset: const Offset(0, 6),
+              ),
             ],
           ),
         ),
-      ),
+        Container(
+          padding: const EdgeInsets.all(4),
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            border: Border.all(
+              color: theme.colorScheme.outline.withValues(alpha: 0.6),
+              width: 2,
+            ),
+            color: theme.colorScheme.surface,
+          ),
+          child: CircleAvatar(
+            radius: 50,
+            backgroundColor: theme.colorScheme.surface,
+            backgroundImage: NetworkImage(url),
+            child: url.isEmpty ? const Icon(Icons.person, size: 40) : null,
+          ),
+        ),
+        Positioned(
+          bottom: 0,
+          right: 4,
+          child: Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: theme.colorScheme.primary,
+              shape: BoxShape.circle,
+            ),
+            child: const Icon(
+              Icons.edit_rounded,
+              color: Colors.white,
+              size: 18,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildProfileInfo(BuildContext context, dynamic state) {
+    final theme = Theme.of(context);
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        const DisplayName(),
+        const SizedBox(height: 4),
+        Row(
+          children: [
+            const Icon(Icons.star, size: 18, color: Colors.amber),
+            const SizedBox(width: 6),
+            Text(
+              (state.userProfile?.ratingStars ?? 0).toStringAsFixed(1),
+              style: theme.textTheme.bodyLarge?.copyWith(
+                fontWeight: FontWeight.w600,
+                color: theme.colorScheme.onPrimary,
+              ),
+            ),
+          ],
+        ),
+        if (state.userProfile?.createdAt != null)
+          Text(
+            "Member since ${DateFormat('MMMM yyyy').format(state.userProfile!.createdAt!)}",
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+              color: theme.colorScheme.onPrimary.withValues(alpha: 0.6),
+            ),
+          ),
+      ],
     );
   }
 }

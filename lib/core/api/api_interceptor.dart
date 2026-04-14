@@ -40,34 +40,71 @@ class ApiInterceptor extends Interceptor {
   @override
   void onError(DioException err, ErrorInterceptorHandler handler) async {
     final statusCode = err.response?.statusCode;
-    final data = err.response?.data;
+    // final data = err.response?.data;
+
+    /// Extract backend error message
+    // String message = "Dio Error: Something went wrong";
+
+    // if (data is Map && data["message"] != null) {
+    //   message = data["message"];
+    // } else if (statusCode == 500) {
+    //   message = "Server error";
+    // } else if (err.type == DioExceptionType.connectionTimeout ||
+    //     err.type == DioExceptionType.receiveTimeout) {
+    //   message = "Connection timeout";
+    // } else if (err.type == DioExceptionType.connectionError) {
+    //   message = "Network error";
+    // }
 
     /// Session expired
     if (statusCode == 401) {
+      // message = "Dio Error: session expired";
+
       await secureStorage.clearSession();
     }
 
-    /// Extract backend error message
-    String message = "Something went wrong";
+    handler.next(err);
+    // handler.reject(
+    //   DioException(
+    //     requestOptions: err.requestOptions,
+    //     response: err.response,
+    //     type: err.type,
+    //     error: message,
+    //   ),
+    // );
+  }
+}
 
-    if (data is Map && data["message"] != null) {
-      message = data["message"];
-    } else if (statusCode == 500) {
-      message = "Server error";
-    } else if (err.type == DioExceptionType.connectionTimeout ||
-        err.type == DioExceptionType.receiveTimeout) {
-      message = "Connection timeout";
-    } else if (err.type == DioExceptionType.connectionError) {
-      message = "Network error";
+String extractBackendMessage(DioException e) {
+  final data = e.response?.data;
+
+  if (data is Map<String, dynamic>) {
+    if (data["message"] is String) return data["message"];
+    if (data["error"] is String) return data["error"];
+
+    /// Handle validation errors like:
+    /// { errors: { email: ["Invalid"] } }
+    if (data["errors"] is Map) {
+      final errors = data["errors"] as Map;
+
+      final firstError = errors.values.first;
+      if (firstError is List && firstError.isNotEmpty) {
+        return firstError.first.toString();
+      }
     }
 
-    handler.reject(
-      DioException(
-        requestOptions: err.requestOptions,
-        response: err.response,
-        type: err.type,
-        error: message,
-      ),
-    );
+    return "Request failed";
+  }
+
+  if (data is String) return data;
+
+  switch (e.type) {
+    case DioExceptionType.connectionTimeout:
+    case DioExceptionType.receiveTimeout:
+      return "Connection timeout";
+    case DioExceptionType.connectionError:
+      return "Network error";
+    default:
+      return "Request failed";
   }
 }

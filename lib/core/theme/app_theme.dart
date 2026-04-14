@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 class AppTheme {
   // A professional, deep and vibrant orange accent color
-  static const Color accentOrange = Color.fromARGB(255, 0, 72, 155);
+  static const Color accent = Color.fromARGB(255, 0, 72, 155);
 
   // Dark mode colors extracted from the current app
   static const Color darkBackground = Color(0xFF121417);
@@ -33,8 +33,8 @@ class AppTheme {
       brightness: Brightness.light,
       colorScheme:
           ColorScheme.fromSeed(
-            seedColor: accentOrange,
-            primary: accentOrange,
+            seedColor: accent,
+            primary: accent,
             brightness: Brightness.light,
             surface: lightCard,
           ).copyWith(
@@ -117,8 +117,8 @@ class AppTheme {
       brightness: Brightness.dark,
       colorScheme:
           ColorScheme.fromSeed(
-            seedColor: accentOrange,
-            primary: accentOrange,
+            seedColor: accent,
+            primary: accent,
             brightness: Brightness.dark,
             surface: darkCard,
           ).copyWith(

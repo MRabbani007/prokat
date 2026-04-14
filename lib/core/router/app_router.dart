@@ -4,6 +4,7 @@ import 'package:prokat/core/router/app_routes.dart';
 import 'package:prokat/core/router/refresh_stream.dart';
 import 'package:prokat/features/appstartup/app_startup_provider.dart';
 import 'package:prokat/features/appstatic/screens/error_screen.dart';
+import 'package:prokat/features/appstatic/screens/help_screen.dart';
 import 'package:prokat/features/auth/providers/auth_provider.dart';
 import 'package:prokat/features/auth/screens/register_screen.dart';
 import 'package:prokat/features/bookings/screens/create_booking_screen.dart';
@@ -34,7 +35,9 @@ import 'package:prokat/features/requests/screens/create_request_screen.dart';
 import 'package:prokat/features/requests/screens/renter_requests_history_screen.dart';
 import 'package:prokat/features/requests/screens/renter_requests_screen.dart';
 import 'package:prokat/features/user/screens/owner_dashboard_screen.dart';
+import 'package:prokat/features/user/screens/owner_payments_screen.dart';
 import 'package:prokat/features/user/screens/owner_profile_screen.dart';
+import 'package:prokat/features/user/screens/owner_registration_screen.dart';
 import 'package:prokat/features/user/screens/owner_settings_screen.dart';
 import 'package:prokat/features/user/screens/register_owner_screen.dart';
 import 'package:prokat/features/user/screens/user_dashboard_screen.dart';
@@ -138,6 +141,11 @@ GoRouter createRouter(WidgetRef ref) {
                 path: AppRoutes.main,
                 builder: (_, _) => const MainScreen(),
               ),
+              GoRoute(
+                path: AppRoutes.helpSupport,
+                builder: (_, _) => const HelpScreen(),
+              ),
+              // TODO: REMOVE ROUTE
               GoRoute(
                 path: AppRoutes.categories,
                 builder: (_, _) => const CategoriesScreen(),
@@ -336,6 +344,14 @@ GoRouter createRouter(WidgetRef ref) {
               GoRoute(
                 path: AppRoutes.ownerSettings,
                 builder: (_, _) => const OwnerSettingsScreen(),
+              ),
+              GoRoute(
+                path: AppRoutes.ownerRegistration,
+                builder: (_, _) => const OwnerRegistrationScreen(),
+              ),
+              GoRoute(
+                path: AppRoutes.ownerPayment,
+                builder: (_, _) => const OwnerPaymentsScreen(),
               ),
               //
               // Owner Chat

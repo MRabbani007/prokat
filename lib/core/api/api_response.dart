@@ -1,17 +1,31 @@
 class ApiResponse<T> {
-  final T? data;
   final bool success;
+  final T? data;
   final String? message;
+  final dynamic error;
 
-  ApiResponse({this.data, required this.success, this.message});
+  ApiResponse({required this.success, this.data, this.message, this.error});
 
   /// Success response
-  factory ApiResponse.success(T data, {String? message}) {
-    return ApiResponse<T>(data: data, success: true, message: message);
+  factory ApiResponse.success(T data, {String message = "Success"}) {
+    return ApiResponse(
+      success: true,
+      data: data,
+      message: message,
+      error: null,
+    );
   }
 
   /// Error response
-  factory ApiResponse.error(String message) {
-    return ApiResponse<T>(success: false, message: message);
+  factory ApiResponse.failure({
+    String message = "Something went wrong",
+    String? error,
+  }) {
+    return ApiResponse(
+      success: false,
+      data: null,
+      message: message,
+      error: error,
+    );
   }
 }

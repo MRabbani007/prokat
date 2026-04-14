@@ -20,7 +20,9 @@ class AuthNotifier extends StateNotifier<AuthState> {
   Future<AuthSession?> restoreSession() async {
     final session = await storage.readSession();
 
-    if (session != null && (session.sessionToken !=null && session.sessionToken?.isNotEmpty == true)) {
+    if (session != null &&
+        (session.sessionToken != null &&
+            session.sessionToken?.isNotEmpty == true)) {
       state = state.copyWith(session: session);
 
       return session;
@@ -65,7 +67,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
       state = state.copyWith(session: session, isLoading: false);
 
       await ref.read(appStartupProvider.notifier).reloadApp();
-      
+
       return true;
     } catch (e) {
       state = state.copyWith(isLoading: false, error: 'Login failed');
@@ -74,31 +76,36 @@ class AuthNotifier extends StateNotifier<AuthState> {
   }
 
   /// REGISTER USER
-  Future<bool> register(
-    String method,
-    String username,
-    String password,
-    String firstName,
-    String lastName,
-  ) async {
+  Future<bool> registerCredentials({
+    String? username,
+    String? password,
+    String? firstName,
+    String? lastName,
+  }) async {
     state = state.copyWith(isLoading: true, error: null);
 
     try {
-      final session = await api.register(
-        method: method,
+      final result = await api.registerCredentials(
         username: username,
         password: password,
         firstName: firstName,
         lastName: lastName,
       );
 
-      /// Save token
-      await storage.saveSession(session);
+      if (result.success && result.data != null) {
+        /// Save token
+        await storage.saveSession(result.data as AuthSession);
 
-      state = state.copyWith(session: session, isLoading: false);
+        state = state.copyWith(session: result.data, isLoading: false);
+        return true;
+      } else {
+        print("Notifier ${result.error.toString()}");
+        state = state.copyWith(isLoading: false, error: result.error);
 
-      return true;
+        return false;
+      }
     } catch (e) {
+      print(e.toString());
       state = state.copyWith(isLoading: false, error: 'Registration failed');
 
       return false;

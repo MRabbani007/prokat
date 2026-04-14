@@ -28,6 +28,14 @@ class _OwnerDashboardHeaderState extends ConsumerState<OwnerDashboardHeader> {
       padding: const EdgeInsets.fromLTRB(20, 20, 20, 20),
       decoration: BoxDecoration(
         color: colorScheme.surface,
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            theme.primaryColor,
+            theme.primaryColor.withValues(alpha: 0.7),
+          ],
+        ),
         border: Border(bottom: BorderSide(color: colorScheme.outlineVariant)),
       ),
       child: Row(
@@ -85,7 +93,11 @@ class _OwnerDashboardHeaderState extends ConsumerState<OwnerDashboardHeader> {
               children: [
                 Text(
                   userProfileState.userProfile?.displayName ?? 'Hello!',
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: theme.colorScheme.onPrimary,
+                  ),
                 ),
 
                 Row(
@@ -95,12 +107,18 @@ class _OwnerDashboardHeaderState extends ConsumerState<OwnerDashboardHeader> {
                     Text(
                       (userProfileState.userProfile?.ratingStars ?? 0)
                           .toStringAsFixed(1),
-                      style: TextStyle(fontWeight: FontWeight.bold),
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: theme.colorScheme.onPrimary,
+                      ),
                     ),
                     const SizedBox(width: 4),
                     Text(
                       '(${(userProfileState.userProfile?.ratingStars ?? 0).toStringAsFixed(0)} reviews)',
-                      style: TextStyle(color: Colors.grey[600], fontSize: 13),
+                      style: TextStyle(
+                        color: theme.colorScheme.onPrimary,
+                        fontSize: 13,
+                      ),
                     ),
                   ],
                 ),
