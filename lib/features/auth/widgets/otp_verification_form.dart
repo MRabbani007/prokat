@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:prokat/core/router/app_routes.dart';
 import 'package:prokat/features/auth/providers/auth_provider.dart';
 import '../widgets/auth_button.dart';
 import '../widgets/otp_field.dart';
@@ -45,14 +46,16 @@ class _OtpVerificationFormState extends ConsumerState<OtpVerificationForm> {
           .read(authProvider.notifier)
           .verifyOtp(widget.phone, otp);
 
-      if (success != null) {
-        if (mounted) context.go('/search/map');
+      if (success == true) {
+        if (mounted) context.go(AppRoutes.dashboard);
       } else {
         widget.onError("Invalid or expired OTP");
       }
     } catch (e) {
       // 2. Handle Backend/Network Errors
-      widget.onError(e.toString().replaceAll('Exception: ', ''));
+      widget.onError(
+        "Something went wrong!",
+      ); // e.toString().replaceAll('Exception: ', '')
     }
   }
 
@@ -71,7 +74,7 @@ class _OtpVerificationFormState extends ConsumerState<OtpVerificationForm> {
         Text(
           "Enter the 6-digit code sent to",
           style: theme.textTheme.bodySmall?.copyWith(
-            color: onSurface.withOpacity(0.6),
+            color: onSurface.withValues(alpha: 0.6),
           ),
         ),
 
@@ -104,7 +107,9 @@ class _OtpVerificationFormState extends ConsumerState<OtpVerificationForm> {
           child: TextButton(
             onPressed: authState.isLoading
                 ? null
-                : () => Navigator.of(context).pop(),
+                : () async {
+                    await ref.read(authProvider.notifier).clearOtpSession();
+                  },
             child: Text(
               "Change Phone Number",
               style: theme.textTheme.labelLarge?.copyWith(

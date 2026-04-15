@@ -1,6 +1,5 @@
 import 'package:dio/dio.dart';
 import 'package:prokat/core/api/api_response.dart';
-import 'package:prokat/features/auth/services/auth_secure_storage.dart';
 import '../models/auth_session.dart';
 import '../models/auth_credentials.dart';
 
@@ -89,7 +88,7 @@ class AuthApiService {
         return ApiResponse.failure(error: "Something went wrong");
       }
     } on DioException catch (e) {
-       String message = "Something went wrong";
+      String message = "Something went wrong";
 
       if (e.response?.statusCode == 400) {
         message = "Missing or invalid credentials";
@@ -141,8 +140,8 @@ class AuthApiService {
   Future<bool> requestOtp(String phone) async {
     try {
       final response = await dio.post(
-        '/auth/request-otp',
-        data: {"phone": phone},
+        '/auth/otp',
+        data: {"phoneNumber": phone},
       );
 
       if (response.statusCode == 200) {
@@ -155,26 +154,43 @@ class AuthApiService {
     }
   }
 
-  Future<AuthSession?> verifyOtp(String phone, String otp) async {
+  Future<ApiResponse<AuthSession>> verifyOtp(String phone, String otp) async {
     try {
       final response = await dio.post(
-        '/auth/verify-otp',
-        data: {"phone": phone, "otp": otp},
+        '/auth/otp/verify',
+        data: {"phoneNumber": phone, "otp": otp},
       );
 
       if (response.statusCode == 200) {
-        final session = response.data;
+        return ApiResponse.success(
+          AuthSession.fromJson(response.data),
+          message: "Verification successfull",
+        );
+      } else {
+        return ApiResponse.failure(error: "Something went wrong");
+      }
+    } on DioException catch (e) {
+      String message = "Something went wrong";
 
-        if (session != null) {
-          await AuthSecureStorage().saveSession(session);
-        }
-
-        return session;
+      if (e.response?.statusCode == 400) {
+        message = "Missing or invalid credentials";
+      } else if (e.response?.statusCode == 409) {
+        message = "Username already registered";
+      } else if (e.response?.statusCode == 410) {
+        message = "Wrong data";
+      } else if (e.response?.statusCode == 500) {
+        message = "Server Error";
       }
 
-      return null;
+      return ApiResponse.failure(
+        message: message, // real backend message: extractBackendMessage(e)
+        error: e.response?.data?.toString(),
+      );
     } catch (e) {
-      return null;
+      return ApiResponse.failure(
+        message: "Unexpected error",
+        error: e.toString(),
+      );
     }
   }
 

@@ -39,6 +39,7 @@ class _CreateRequestScreenState extends ConsumerState<CreateRequestScreen> {
     super.initState();
 
     Future.microtask(() {
+      ref.read(categoriesProvider.notifier).getCategories();
       ref.read(locationProvider.notifier).getRenterLocations();
     });
   }

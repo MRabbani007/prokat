@@ -11,11 +11,25 @@ import 'package:prokat/features/user/widgets/setting_link_tile.dart';
 import 'package:prokat/features/user/widgets/show_edit_username.dart';
 import 'package:go_router/go_router.dart';
 
-class UserProfileScreen extends ConsumerWidget {
+class UserProfileScreen extends ConsumerStatefulWidget {
   const UserProfileScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<UserProfileScreen> createState() => _UserProfileScreenState();
+}
+
+class _UserProfileScreenState extends ConsumerState<UserProfileScreen> {
+  @override
+  void initState() {
+    super.initState();
+
+    Future.microtask(() {
+      ref.read(userProfileProvider.notifier).getUserProfile();
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final state = ref.watch(userProfileProvider);
     final username = state.userProfile?.username;
@@ -76,6 +90,7 @@ class UserProfileScreen extends ConsumerWidget {
           SliverList(
             delegate: SliverChildListDelegate([
               const SizedBox(height: 20),
+
               InfoTile(
                 icon: Icons.phone_android_rounded,
                 label: "Phone Number",
@@ -87,7 +102,9 @@ class UserProfileScreen extends ConsumerWidget {
                 ),
                 trailing: const Icon(Icons.edit, color: Colors.white54),
               ),
+
               const SizedBox(height: 20),
+
               InfoTile(
                 icon: Icons.email_outlined,
                 label: "Email Address",
@@ -97,27 +114,38 @@ class UserProfileScreen extends ConsumerWidget {
                     ? const Icon(Icons.add, color: Colors.white54)
                     : null,
               ),
+
               const SizedBox(height: 20),
+
               const BecomeOwnerCTA(),
+
               const SizedBox(height: 20),
+
               SettingsLinkTile(
                 icon: Icons.favorite_outline,
                 title: 'Support Us',
                 subtitle: 'Donate or help us grow',
                 onTap: () => context.push('/support-us'),
               ),
+
               SettingsLinkTile(
                 icon: Icons.description_outlined,
                 title: 'Terms & Conditions',
                 onTap: () => context.push('/terms'),
               ),
+
               SettingsLinkTile(
                 icon: Icons.help_outline,
                 title: 'Help & Support',
                 subtitle: 'Get help or contact support',
                 onTap: () => context.push('/help'),
               ),
-              const LogoutButton(),
+
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                child: const LogoutButton(),
+              ),
+
               const SizedBox(height: 40), // Bottom spacing
             ]),
           ),

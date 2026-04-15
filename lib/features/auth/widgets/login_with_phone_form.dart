@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:prokat/features/auth/providers/auth_provider.dart';
+import 'package:prokat/features/user/state/user_profile_provider.dart';
 import '../widgets/auth_text_field.dart';
 import '../widgets/auth_button.dart';
 import 'otp_verification_form.dart';
@@ -52,16 +53,17 @@ class _LoginWithPhoneFormState extends ConsumerState<LoginWithPhoneForm> {
     try {
       final success = await ref.read(authProvider.notifier).requestOtp(value);
 
-      if (success) {
-        setState(() {
-          phone = value;
-          showOtp = true;
-        });
-      } else {
+      if (!success) {
         widget.onError("Failed to send OTP. Please try again.");
       }
+
+      await ref.read(userProfileProvider.notifier).getUserProfile();
+      // setState(() {
+      //     phone = value;
+      //     showOtp = true;
+      //   });
     } catch (e) {
-      // 2. Handle Backend/Connection Errors
+      // Handle Backend/Connection Errors
       widget.onError(e.toString().replaceAll('Exception: ', ''));
     }
   }
@@ -70,9 +72,15 @@ class _LoginWithPhoneFormState extends ConsumerState<LoginWithPhoneForm> {
   Widget build(BuildContext context) {
     final authState = ref.watch(authProvider);
 
-    if (showOtp) {
+    final hasOtpSession =
+        authState.otpPhone != null && authState.otpRequestedAt != null;
+
+    if (hasOtpSession) {
       // Passing onError to the next form as well
-      return OtpVerificationForm(phone: phone, onError: widget.onError);
+      return OtpVerificationForm(
+        phone: authState.otpPhone!,
+        onError: widget.onError,
+      );
     }
 
     return Column(

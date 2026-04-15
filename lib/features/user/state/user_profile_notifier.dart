@@ -26,14 +26,12 @@ class UserProfileNotifier extends StateNotifier<UserProfileState> {
       state = state.copyWith(isLoading: true);
 
       final data = await service.getUserProfile();
+      
+      state = state.copyWith(isLoading: false, userProfile: data);
 
       if (data == null) {
         return false;
       }
-
-      print(data.toJson());
-
-      state = state.copyWith(isLoading: false, userProfile: data);
 
       return true;
     } catch (e) {

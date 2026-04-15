@@ -17,7 +17,8 @@ class RequestTile extends ConsumerStatefulWidget {
 class _RequestTileState extends ConsumerState<RequestTile> {
   @override
   Widget build(BuildContext context) {
-    const cardColor = Color.fromARGB(255, 52, 57, 63); // 0xFF1E2125
+    final theme = Theme.of(context);
+
     const accentColor = Color(0xFF4E73DF);
 
     final request = widget.request;
@@ -25,9 +26,9 @@ class _RequestTileState extends ConsumerState<RequestTile> {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
-        color: cardColor,
+        color: theme.cardColor,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
+        border: Border.all(color: theme.colorScheme.outline),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.1),
@@ -52,12 +53,11 @@ class _RequestTileState extends ConsumerState<RequestTile> {
                     children: [
                       Text(
                         request.capacity.toUpperCase(),
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          letterSpacing: 0.5,
-                        ),
+                        style: theme.textTheme.bodyLarge,
+                      ),
+                      Text(
+                        (request.category?.capacityUnit ?? "").toUpperCase(),
+                        style: theme.textTheme.bodyLarge,
                       ),
                       RequestStatusBadge(status: request.status),
                     ],
@@ -69,16 +69,18 @@ class _RequestTileState extends ConsumerState<RequestTile> {
                   Row(
                     children: [
                       _buildInfoItem(
+                        context: context,
                         icon: Icons.calendar_today_rounded,
                         label: "SCHEDULED FOR",
                         value: _formatDateTime(request),
                       ),
                       const SizedBox(width: 24),
                       _buildInfoItem(
+                        context: context,
                         icon: Icons.payments_outlined,
                         label: "OFFERED RATE",
                         value: "${request.offeredRate} ₸",
-                        valueColor: accentColor,
+                        valueColor: theme.primaryColor,
                       ),
                     ],
                   ),
@@ -94,13 +96,17 @@ class _RequestTileState extends ConsumerState<RequestTile> {
                         color: Colors.white.withValues(alpha: 0.03),
                         borderRadius: BorderRadius.circular(12),
                       ),
-                      child: Text(
-                        request.comment!,
-                        style: TextStyle(
-                          color: Colors.white.withValues(alpha: 0.6),
-                          fontSize: 13,
-                          fontStyle: FontStyle.italic,
-                        ),
+                      child: Column(
+                        children: [
+                          Text(
+                            "Comment:",
+                            style: theme.textTheme.labelMedium,
+                          ),
+                          Text(
+                            request.comment!,
+                            style: theme.textTheme.bodyMedium,
+                          ),
+                        ],
                       ),
                     ),
                   ],
@@ -114,7 +120,7 @@ class _RequestTileState extends ConsumerState<RequestTile> {
                 decoration: BoxDecoration(
                   border: Border(
                     top: BorderSide(
-                      color: Colors.white.withValues(alpha: 0.05),
+                      color: theme.colorScheme.outlineVariant,
                     ),
                   ),
                 ),
@@ -133,14 +139,13 @@ class _RequestTileState extends ConsumerState<RequestTile> {
                           icon: const Icon(Icons.close_rounded, size: 18),
                           label: const Text("CANCEL REQUEST"),
                           style: TextButton.styleFrom(
-                            foregroundColor: Colors.redAccent.withValues(
-                              alpha: 0.8,
-                            ),
+                            foregroundColor: theme.colorScheme.error,
                             padding: const EdgeInsets.symmetric(vertical: 14),
-                            textStyle: const TextStyle(
+                            textStyle:  TextStyle(
                               fontWeight: FontWeight.bold,
                               fontSize: 12,
                               letterSpacing: 1,
+                              color: theme.colorScheme.onErrorContainer
                             ),
                           ),
                         ),
@@ -156,23 +161,21 @@ class _RequestTileState extends ConsumerState<RequestTile> {
   }
 
   Widget _buildInfoItem({
+   required BuildContext context,
     required IconData icon,
     required String label,
     required String value,
     Color? valueColor,
   }) {
+    final theme = Theme.of(context);
+
     return Expanded(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
             label,
-            style: TextStyle(
-              color: Colors.white.withValues(alpha: 0.3),
-              fontSize: 9,
-              fontWeight: FontWeight.bold,
-              letterSpacing: 1.2,
-            ),
+            style: theme.textTheme.labelMedium,
           ),
           const SizedBox(height: 4),
           Row(
@@ -186,11 +189,7 @@ class _RequestTileState extends ConsumerState<RequestTile> {
               Expanded(
                 child: Text(
                   value,
-                  style: TextStyle(
-                    color: valueColor ?? Colors.white,
-                    fontSize: 13,
-                    fontWeight: FontWeight.w600,
-                  ),
+                  style: theme.textTheme.bodyLarge,
                   overflow: TextOverflow.ellipsis,
                 ),
               ),

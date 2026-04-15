@@ -45,3 +45,16 @@ DateTime? parseNullableDate(dynamic value) {
 
   return null;
 }
+
+bool parseBoolean(dynamic value) {
+  if (value == null) return false;
+
+  try {
+    if (value.toString().trim().toLowerCase() == "true") {
+      return true;
+    }
+    return false;
+  } catch (_) {
+    return false;
+  }
+}

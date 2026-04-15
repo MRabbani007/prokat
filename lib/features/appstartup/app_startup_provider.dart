@@ -29,8 +29,8 @@ class AppStartupController extends StateNotifier<AppStartupState> {
       if (authState.session != null) {
         await init();
       } else {
-      //   print("app startup session null session");
-      //   /// ✅ Otherwise don't run init at all
+        //   print("app startup session null session");
+        //   /// ✅ Otherwise don't run init at all
         state = AppStartupState.guest;
       }
     });
@@ -105,8 +105,14 @@ class AppStartupController extends StateNotifier<AppStartupState> {
       /// Restore session
       final session = await auth.restoreSession();
 
+      // If no session
       if (session == null) {
+        // set state as guest
         state = AppStartupState.guest;
+
+        // load OTP session
+        await ref.read(authProvider.notifier).restoreOtpSession();
+
         return;
       }
 

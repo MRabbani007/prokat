@@ -63,7 +63,7 @@ class UserProfileModel {
         lastName: json['lastName']?.toString(),
 
         phoneNumber: json['phoneNumber']?.toString(),
-        isPhoneVerified: json['isPhoneVerified'],
+        isPhoneVerified: parseBoolean(json['isPhoneVerified']),
 
         ratingStars: parseNullableInt(json['ratingStars']),
         ratingCount: parseNullableInt(json['ratingCount']),

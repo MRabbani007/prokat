@@ -31,6 +31,38 @@ class AuthNotifier extends StateNotifier<AuthState> {
     return null;
   }
 
+  Future<void> restoreOtpSession() async {
+    final data = await storage.readOtpSession();
+
+    if (data == null) return;
+
+    final isExpired =
+        DateTime.now().difference(data.requestedAt) >
+        const Duration(minutes: 5);
+
+    if (isExpired) {
+      await storage.clearOtpSession();
+      return;
+    }
+
+    state = state.copyWith(
+      otpPhone: data.phone,
+      otpRequestedAt: data.requestedAt,
+    );
+  }
+
+  Future<void> clearOtpSession() async {
+    await storage.clearOtpSession();
+
+    state = state.copyWith(
+      otpPhone: null,
+      otpRequestedAt: null,
+      clearOtp: true,
+    );
+
+    print("OTP SESSION CLEARED");
+  }
+
   Future<bool> refreshSession() async {
     final session = state.session;
 
@@ -97,6 +129,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
         await storage.saveSession(result.data as AuthSession);
 
         state = state.copyWith(session: result.data, isLoading: false);
+
         return true;
       } else {
         print("Notifier ${result.error.toString()}");
@@ -119,7 +152,21 @@ class AuthNotifier extends StateNotifier<AuthState> {
     try {
       final success = await api.requestOtp(phone);
 
+      if (success) {
+        final now = DateTime.now();
+
+        // SAVE TO STORAGE
+        await storage.saveOtpSession(phone, now);
+
+        state = state.copyWith(
+          isLoading: false,
+          otpPhone: phone,
+          otpRequestedAt: now,
+        );
+      }
+
       state = state.copyWith(isLoading: false);
+
       return success;
     } catch (e) {
       state = state.copyWith(isLoading: false, error: "Failed to request OTP");
@@ -128,21 +175,32 @@ class AuthNotifier extends StateNotifier<AuthState> {
   }
 
   /// VERIFY OTP
-  Future<AuthSession?> verifyOtp(String phone, String otp) async {
+  Future<bool> verifyOtp(String phone, String otp) async {
     state = state.copyWith(isLoading: true, error: null);
 
     try {
-      final session = await api.verifyOtp(phone, otp);
-      if (session != null) {
-        await storage.saveSession(session);
+      final result = await api.verifyOtp(phone, otp);
+
+      print(result.data?.toJson());
+
+      if (result.data != null) {
+        await storage.saveSession(result.data as AuthSession);
+
+        await storage.clearOtpSession();
+
+        state = state.copyWith(session: result.data, isLoading: false);
+
+        return true;
       }
 
-      // state = state.copyWith(session: token, isLoading: false);
+      state = state.copyWith(isLoading: false);
 
-      return null;
+      return false;
     } catch (e) {
-      state = state.copyWith(isLoading: false, error: "Invalid OTP");
-      return null;
+      print(e.toString());
+      state = state.copyWith(isLoading: false, error: 'Verification failed');
+
+      return false;
     }
   }
 

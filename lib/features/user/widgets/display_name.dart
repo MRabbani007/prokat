@@ -22,7 +22,11 @@ class DisplayName extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final state = ref.watch(userProfileProvider);
-    final name = state.userProfile?.displayName ?? '';
+    final name = (state.userProfile?.displayName ?? '').isNotEmpty
+        ? state.userProfile!.displayName
+        : (state.userProfile?.phoneNumber ?? '').isNotEmpty
+        ? state.userProfile!.phoneNumber!
+        : 'Hello!';
 
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,

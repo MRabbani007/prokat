@@ -69,7 +69,7 @@ class _RegisterWithUsernameFormState
         if (result == true && mounted) {
           context.push(AppRoutes.dashboard);
         } else {
-          widget.onError(authState.error ?? "UI: Something went wrong!");
+          widget.onError(authState.error ?? "Something went wrong!");
         }
       } catch (e) {
         // 2. Handle Backend/Connection Errors

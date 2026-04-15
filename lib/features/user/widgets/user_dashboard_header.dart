@@ -22,6 +22,12 @@ class _UserHeaderState extends ConsumerState<UserDashboardHeader> {
     final profileImageUrl = userProfileState.userProfile?.profileImageUrl ?? "";
     final theme = Theme.of(context);
     final onPrimary = theme.colorScheme.onPrimary;
+    final name = (userProfileState.userProfile?.displayName ?? '').isNotEmpty
+        ? userProfileState.userProfile!.displayName
+        : (userProfileState.userProfile?.phoneNumber ?? '').isNotEmpty
+        ? userProfileState.userProfile!.phoneNumber!
+        : 'Hello!';
+    // print(userProfileState.userProfile?.toJson());
 
     return Padding(
       // Padding adjusted for the AppBar's safe area
@@ -36,7 +42,7 @@ class _UserHeaderState extends ConsumerState<UserDashboardHeader> {
               radius: 30,
               backgroundColor: theme.colorScheme.primaryContainer,
               backgroundImage: NetworkImage(profileImageUrl),
-              onBackgroundImageError: (_, __) => const Icon(Icons.person),
+              onBackgroundImageError: (_, _) => const Icon(Icons.person),
             ),
           ),
           const SizedBox(width: 16),
@@ -46,7 +52,7 @@ class _UserHeaderState extends ConsumerState<UserDashboardHeader> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(
-                  userProfileState.userProfile?.displayName ?? 'Hello!',
+                  name,
                   style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,

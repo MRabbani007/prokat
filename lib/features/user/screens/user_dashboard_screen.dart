@@ -58,10 +58,15 @@ class _UserDashboardPageState extends ConsumerState<UserDashboardPage> {
                   const SizedBox(height: 12),
                   ClientBookingsSection(),
                   const SizedBox(height: 12),
+
                   CreateRequestTile(),
+
                   const SizedBox(height: 12),
+
                   const UserCategorySelector(),
+
                   const SizedBox(height: 12),
+                  
                   const Padding(
                     padding: EdgeInsets.symmetric(horizontal: 12),
                     child: Text(

@@ -28,6 +28,8 @@ class _RenterRequestsScreenState extends ConsumerState<RenterRequestsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     final authSession = ref.watch(authProvider).session;
     final state = ref.watch(requestProvider);
     final offersState = ref.watch(offersProvider);
@@ -55,7 +57,7 @@ class _RenterRequestsScreenState extends ConsumerState<RenterRequestsScreen> {
     }
 
     return Scaffold(
-      backgroundColor: bgColor,
+      backgroundColor: theme.scaffoldBackgroundColor,
       body: SafeArea(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
