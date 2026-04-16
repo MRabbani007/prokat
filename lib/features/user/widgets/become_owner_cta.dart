@@ -12,62 +12,58 @@ class BecomeOwnerCTA extends ConsumerWidget {
     final theme = Theme.of(context);
     final state = ref.watch(userProfileProvider);
     final role = state.userProfile?.role;
-    final isOwner = role == 'OWNER'; 
+    final isOwner = role == 'OWNER';
 
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-      child: SizedBox(
-        width: double.infinity,
-        child: ElevatedButton.icon(
-          icon: Icon(
-            isOwner ? Icons.dashboard_rounded : Icons.storefront,
-            size: 32,
-          ),
-          label: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: [
+    return SizedBox(
+      width: double.infinity,
+      child: ElevatedButton.icon(
+        icon: Icon(
+          isOwner ? Icons.dashboard_rounded : Icons.storefront,
+          size: 32,
+        ),
+        label: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              isOwner ? 'Go to Owner Section' : 'Become an Owner',
+              style: theme.textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.bold,
+                color: isOwner
+                    ? Colors.white
+                    : theme.colorScheme.onSecondaryContainer,
+              ),
+            ),
+            if (!isOwner) const SizedBox(height: 4),
+            if (!isOwner)
               Text(
-                isOwner ? 'Go to Owner Section' : 'Become an Owner',
-                style: theme.textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.bold,
-                  color: isOwner
-                      ? Colors.white
-                      : theme.colorScheme.onSecondaryContainer,
+                'List your equipment, offer services, and connect with clients.',
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: theme.colorScheme.onSecondaryContainer,
                 ),
               ),
-              if (!isOwner)
-                const SizedBox(height: 4),
-              if (!isOwner)
-                Text(
-                  'List your equipment, offer services, and connect with clients.',
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    color: theme.colorScheme.onSecondaryContainer,
-                  ),
-                ),
-            ],
-          ),
-          style: ElevatedButton.styleFrom(
-            elevation: 6,
-            padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
-            backgroundColor: isOwner
-                ? theme.colorScheme.primary
-                : theme.colorScheme.secondaryContainer,
-            foregroundColor: isOwner
-                ? Colors.white
-                : theme.colorScheme.onSecondaryContainer,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(16),
-            ),
-          ),
-          onPressed: () {
-            if (isOwner) {
-              context.push(AppRoutes.ownerDashboard); 
-            } else {
-              context.push(AppRoutes.becomeOwner);
-            }
-          },
+          ],
         ),
+        style: ElevatedButton.styleFrom(
+          elevation: 6,
+          padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
+          backgroundColor: isOwner
+              ? theme.colorScheme.primary
+              : theme.colorScheme.secondaryContainer,
+          foregroundColor: isOwner
+              ? Colors.white
+              : theme.colorScheme.onSecondaryContainer,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+        ),
+        onPressed: () {
+          if (isOwner) {
+            context.push(AppRoutes.ownerDashboard);
+          } else {
+            context.push(AppRoutes.becomeOwner);
+          }
+        },
       ),
     );
   }

@@ -1,18 +1,28 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:prokat/core/widgets/page_header.dart';
-import 'package:prokat/features/auth/providers/auth_provider.dart';
+import 'package:prokat/core/router/app_routes.dart';
 import 'package:prokat/features/bookings/state/booking_provider.dart';
 import 'package:prokat/features/equipment/providers/equipment_provider.dart';
-import 'package:prokat/features/equipment/widgets/list/equipment_city_selector.dart';
-import 'package:prokat/features/equipment/widgets/list/equipment_map_button.dart';
-import 'package:prokat/features/equipment/widgets/list/swipeable_list_tile.dart';
 import 'package:prokat/features/favorites/state/favorites_provider.dart';
+import 'package:prokat/features/favorites/widgets/favorites_section.dart';
+import 'package:prokat/features/locations/state/location_provider.dart';
+import 'package:prokat/features/user/widgets/user_category_selector.dart';
+import 'package:prokat/features/equipment/widgets/list/client_equipment_card.dart';
+import 'package:prokat/features/user/widgets/user_location_tile.dart';
 
 class EquipmentListScreen extends ConsumerStatefulWidget {
-  final String? q, category, city;
-  const EquipmentListScreen({super.key, this.q, this.category, this.city});
+  final String? query, category, city;
+  final int? page, limit;
+
+  const EquipmentListScreen({
+    super.key,
+    this.query,
+    this.category,
+    this.city,
+    this.page,
+    this.limit,
+  });
 
   @override
   ConsumerState<EquipmentListScreen> createState() =>
@@ -29,224 +39,178 @@ class _EquipmentListScreenState extends ConsumerState<EquipmentListScreen> {
   void initState() {
     super.initState();
 
-    Future.microtask(() {
-      ref.read(equipmentProvider.notifier).getRenterEquipment();
+    Future.microtask(() async {
+      final city = ref.watch(locationProvider).city;
+
+      ref
+          .read(equipmentProvider.notifier)
+          .getRenterEquipment(
+            categoryId: widget.category,
+            query: widget.query,
+            page: widget.page,
+            limit: widget.limit,
+            city: city,
+          );
+
       ref.read(favoriteProvider.notifier).getFavorites();
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    final equipmentState = ref.watch(equipmentProvider);
+    final theme = Theme.of(context);
+    final items = ref.watch(equipmentProvider).renterEquipment;
     final bookingNotifier = ref.read(bookingProvider.notifier);
-    final authSession = ref.watch(authProvider).session;
-    final isRenter = authSession != null ? true : false;
 
     return Scaffold(
-      backgroundColor: bgColor,
+      backgroundColor: theme.scaffoldBackgroundColor,
       body: SafeArea(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Padding(
-              padding: const EdgeInsets.only(right: 12.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  const Expanded(child: PageHeader(title: "Search")),
-                  // Small technical Archive button
-                  IconButton(
-                    onPressed: () => authSession == null
-                        ? null
-                        : context.push('/requests/history'),
-                    icon: const Icon(
-                      Icons.history_toggle_off_rounded,
-                      color: Color(0x4DFFFFFF),
-                      size: 24,
-                    ),
-                    tooltip: "Requests History",
-                  ),
-                ],
+        child: CustomScrollView(
+          slivers: [
+            SliverAppBar(
+              automaticallyImplyLeading: false,
+              expandedHeight: 60, // Adjust height as needed
+              floating: true, // AppBar reappears immediately when scrolling up
+              pinned: false, // AppBar hides completely when scrolling down
+              backgroundColor: theme.colorScheme.primary,
+              leading: IconButton(
+                icon: Icon(
+                  Icons.arrow_back_ios_new_rounded,
+                  size: 20,
+                  color: theme.colorScheme.onPrimary,
+                ),
+                onPressed: () => context.pop(),
               ),
-            ),
-
-            /// 1. INDUSTRIAL COMMAND HEADER
-            Container(
-              padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
-              decoration: BoxDecoration(
-                color: bgColor,
-                border: Border(
-                  bottom: BorderSide(
-                    color: Colors.white.withValues(alpha: 0.05),
-                  ),
+              title: Text(
+                "Browse Equipment",
+                style: theme.textTheme.titleLarge?.copyWith(
+                  color: theme.colorScheme.onPrimary,
                 ),
               ),
-              child: Column(
-                children: [
-                  Row(
-                    children: [
-                      const EquipmentCitySelector(), // Assuming this matches the theme
-                      const Spacer(),
-
-                      // Industrial Search Toggle
-                      _HeaderActionButton(
-                        icon: _isSearchVisible
-                            ? Icons.close_rounded
-                            : Icons.search_rounded,
-                        isActive: _isSearchVisible,
-                        onTap: () => setState(
-                          () => _isSearchVisible = !_isSearchVisible,
-                        ),
-                      ),
-
-                      const SizedBox(width: 12),
-                      const EquipmentMapButton(), // Ensure this is a Squircle too
-                    ],
+              centerTitle: false,
+              actions: [
+                IconButton(
+                  onPressed: () =>
+                      setState(() => _isSearchVisible = !_isSearchVisible),
+                  icon: Icon(
+                    Icons.search_rounded,
+                    color: theme.colorScheme.onPrimary,
+                    size: 24,
                   ),
+                  tooltip: "Search",
+                ),
+                IconButton(
+                  onPressed: () => context.push(AppRoutes.searchMap),
+                  icon: Icon(
+                    Icons.map,
+                    color: theme.colorScheme.onPrimary,
+                    size: 24,
+                  ),
+                  tooltip: "View on Map",
+                ),
+              ],
+            ),
 
-                  /// Animated Search Bar
-                  AnimatedVisibility(
-                    visible: _isSearchVisible,
-                    child: Padding(
-                      padding: const EdgeInsets.only(top: 16),
-                      child: TextField(
-                        style: const TextStyle(color: Colors.white),
-                        decoration: InputDecoration(
-                          hintText: "SEARCH FLEET...",
-                          hintStyle: TextStyle(
-                            color: Colors.white.withValues(alpha: 0.2),
-                            fontSize: 12,
-                            letterSpacing: 1,
-                          ),
-                          prefixIcon: Icon(
-                            Icons.search_rounded,
-                            color: accentColor,
-                            size: 20,
-                          ),
-                          filled: true,
-                          fillColor: Colors.white.withValues(alpha: 0.03),
-                          contentPadding: const EdgeInsets.symmetric(
-                            horizontal: 16,
-                            vertical: 12,
-                          ),
-                          enabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(14),
-                            borderSide: BorderSide(
-                              color: Colors.white.withValues(alpha: 0.08),
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 24,
+                  vertical: 24,
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    UserLocationTile(),
+
+                    const SizedBox(height: 24),
+
+                    /// Animated Search Bar
+                    AnimatedVisibility(
+                      visible: _isSearchVisible,
+                      child: Padding(
+                        padding: const EdgeInsets.only(top: 16),
+                        child: TextField(
+                          style: const TextStyle(color: Colors.white),
+                          decoration: InputDecoration(
+                            hintText: "SEARCH FLEET...",
+                            hintStyle: TextStyle(
+                              color: Colors.white.withValues(alpha: 0.2),
+                              fontSize: 12,
+                              letterSpacing: 1,
                             ),
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(14),
-                            borderSide: const BorderSide(
-                              color: Color(0xFF4E73DF),
+                            prefixIcon: Icon(
+                              Icons.search_rounded,
+                              color: accentColor,
+                              size: 20,
+                            ),
+                            filled: true,
+                            fillColor: Colors.white.withValues(alpha: 0.03),
+                            contentPadding: const EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 12,
+                            ),
+                            enabledBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(14),
+                              borderSide: BorderSide(
+                                color: Colors.white.withValues(alpha: 0.08),
+                              ),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(14),
+                              borderSide: const BorderSide(
+                                color: Color(0xFF4E73DF),
+                              ),
                             ),
                           ),
                         ),
                       ),
                     ),
-                  ),
-                ],
+
+                    const SizedBox(height: 12),
+
+                    FavoritesSection(),
+
+                    const SizedBox(height: 12),
+
+                    const UserCategorySelector(),
+
+                    const SizedBox(height: 12),
+
+                    Text(
+                      "Browse Equipment",
+                      style: theme.textTheme.titleLarge?.copyWith(
+                        fontWeight: FontWeight.w800,
+                        letterSpacing: -0.5,
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
 
-            /// 2. LIST CONTENT
-            Expanded(
-              child: equipmentState.isLoading
-                  ? const Center(
-                      child: CircularProgressIndicator(
-                        color: Color(0xFF4E73DF),
-                      ),
-                    )
-                  // : equipmentState.error != null
-                  // ? Center(
-                  //     child: Text(
-                  //       equipmentState.error.toString(),
-                  //       style: const TextStyle(color: Colors.redAccent),
-                  //     ),
-                  //   )
-                  : equipmentState.renterEquipment.isEmpty
-                  ? _buildEmptyState()
-                  : ListView.separated(
-                      padding: const EdgeInsets.all(0),
-                      itemCount: equipmentState.renterEquipment.length,
-                      separatorBuilder: (_, _) => const SizedBox(height: 12),
-                      itemBuilder: (context, index) => SwipeableListTile(
-                        equipment: equipmentState.renterEquipment[index],
-                        isRenter: isRenter,
-                        onTap: () {
-                          // Select equipment
-                          bookingNotifier.selectEquipment(
-                            equipmentState.renterEquipment[index],
-                          );
-                          // Navigate to booking screen
-                          context.push(
-                            '/equipment/${equipmentState.renterEquipment[index].id}/book',
-                          );
-                        },
-                      ),
-                    ),
+            // 2. The dynamic list using SliverList
+            SliverList(
+              delegate: SliverChildBuilderDelegate((context, index) {
+                final equipment = items[index];
+                return Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 24,
+                    vertical: 12,
+                  ),
+                  child: ClientEquipmentCard(
+                    equipment: equipment,
+                    onTap: () {
+                      bookingNotifier.selectEquipment(equipment);
+                      context.push('/equipment/${equipment.id}/book');
+                    },
+                  ),
+                );
+              }, childCount: items.length),
             ),
+
+            // 3. Bottom padding
+            const SliverToBoxAdapter(child: SizedBox(height: 24)),
           ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildEmptyState() {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(
-            Icons.search_off_rounded,
-            size: 64,
-            color: Colors.white.withValues(alpha: 0.05),
-          ),
-          const SizedBox(height: 16),
-          Text(
-            "NO EQUIPMENT MATCHES",
-            style: TextStyle(
-              color: Colors.white.withValues(alpha: 0.2),
-              letterSpacing: 1.5,
-              fontWeight: FontWeight.bold,
-              fontSize: 12,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _HeaderActionButton extends StatelessWidget {
-  final IconData icon;
-  final VoidCallback onTap;
-  final bool isActive;
-
-  const _HeaderActionButton({
-    required this.icon,
-    required this.onTap,
-    this.isActive = false,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.all(10),
-        decoration: BoxDecoration(
-          color: isActive
-              ? const Color(0xFF4E73DF)
-              : Colors.white.withValues(alpha: 0.03),
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
-        ),
-        child: Icon(
-          icon,
-          color: isActive ? Colors.white : const Color(0xFF4E73DF),
-          size: 20,
         ),
       ),
     );

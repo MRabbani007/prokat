@@ -27,3 +27,23 @@ String formatDate(DateTime date) {
 String formatTime(BuildContext context, DateTime date) {
   return TimeOfDay.fromDateTime(date).format(context);
 }
+
+String formatPhoneNumber(String phoneNumber) {
+  // 1. Remove all non-digit characters
+  String cleaned = phoneNumber.replaceAll(RegExp(r'\D'), '');
+
+  // 2. Handle Russian formatting (usually 11 digits, starting with 7 or 8)
+  // If it starts with 8, replace with 7
+  if (cleaned.length == 11 && cleaned.startsWith('8')) {
+    cleaned = '7' + cleaned.substring(1);
+  }
+
+  // 3. Ensure it has 11 digits for this format
+  if (cleaned.length != 11) {
+    // Return original or handle error if format is invalid
+    return phoneNumber; 
+  }
+
+  // 4. Format: +7 111 222 3333
+  return '+${cleaned[0]} ${cleaned.substring(1, 4)} ${cleaned.substring(4, 7)} ${cleaned.substring(7)}';
+}

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:prokat/core/router/app_routes.dart';
+import 'package:prokat/core/utils/format.dart';
 import 'package:prokat/features/user/state/user_profile_provider.dart';
 import 'package:prokat/features/user/widgets/language_selector_tile.dart';
 import 'package:lucide_icons/lucide_icons.dart';
@@ -25,7 +26,7 @@ class _UserHeaderState extends ConsumerState<UserDashboardHeader> {
     final name = (userProfileState.userProfile?.displayName ?? '').isNotEmpty
         ? userProfileState.userProfile!.displayName
         : (userProfileState.userProfile?.phoneNumber ?? '').isNotEmpty
-        ? userProfileState.userProfile!.phoneNumber!
+        ? formatPhoneNumber(userProfileState.userProfile!.phoneNumber!)
         : 'Hello!';
     // print(userProfileState.userProfile?.toJson());
 

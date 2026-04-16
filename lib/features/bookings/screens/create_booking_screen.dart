@@ -273,17 +273,20 @@ class _CreateBookingScreenState extends ConsumerState<CreateBookingScreen> {
                       onChanged: (v) => bookingNotifier.setComment(v),
                       decoration: InputDecoration(
                         hintText: "Site access details, conditions...",
-                        hintStyle: theme.textTheme.bodyMedium
-                            ?.copyWith(
-                              color: theme.colorScheme.onSurface.withValues(alpha: 0.4),
-                            ),
+                        hintStyle: theme.textTheme.bodyMedium?.copyWith(
+                          color: theme.colorScheme.onSurface.withValues(
+                            alpha: 0.4,
+                          ),
+                        ),
                         filled: true,
                         fillColor: theme.cardColor,
 
                         enabledBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(16),
                           borderSide: BorderSide(
-                            color: theme.colorScheme.outline.withValues(alpha: 0.5),
+                            color: theme.colorScheme.outline.withValues(
+                              alpha: 0.5,
+                            ),
                           ),
                         ),
 
@@ -328,8 +331,10 @@ class _CreateBookingScreenState extends ConsumerState<CreateBookingScreen> {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: theme.colorScheme.primary,
                     foregroundColor: theme.colorScheme.onPrimary,
-                    disabledBackgroundColor: theme.colorScheme.onSurface.withValues(alpha: 0.12),
-                    disabledForegroundColor: theme.colorScheme.onSurface.withValues(alpha: 0.38),
+                    disabledBackgroundColor: theme.colorScheme.onSurface
+                        .withValues(alpha: 0.12),
+                    disabledForegroundColor: theme.colorScheme.onSurface
+                        .withValues(alpha: 0.38),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(16),
                     ),
@@ -337,8 +342,9 @@ class _CreateBookingScreenState extends ConsumerState<CreateBookingScreen> {
                   ),
                   child: Text(
                     "CONFIRM",
-                    style: theme.textTheme.labelLarge?.copyWith(
+                    style: theme.textTheme.bodyLarge?.copyWith(
                       fontWeight: FontWeight.bold,
+                      color: theme.colorScheme.onPrimary,
                       letterSpacing: 1.2,
                     ),
                   ),

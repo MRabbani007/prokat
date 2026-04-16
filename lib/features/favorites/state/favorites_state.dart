@@ -3,6 +3,7 @@ class FavoritesState {
   final String? error;
 
   final Set<String>? favoritesIds;
+  // TODO: ADD EQUIPMENT LIST AND FETCH FROM SERVER
 
   FavoritesState({
     this.isLoading = false,

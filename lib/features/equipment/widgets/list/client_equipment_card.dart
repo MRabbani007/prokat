@@ -4,13 +4,11 @@ import 'package:prokat/features/auth/providers/auth_provider.dart';
 import 'package:prokat/features/equipment/models/equipment_model.dart';
 import 'package:prokat/features/favorites/state/favorites_provider.dart';
 
-// TODO: MOVE TO EQUIPMENT FEATURE AND RENAME
-
-class EquipmentCard extends ConsumerWidget {
+class ClientEquipmentCard extends ConsumerWidget {
   final Equipment equipment;
   final VoidCallback onTap;
 
-  const EquipmentCard({
+  const ClientEquipmentCard({
     super.key,
     required this.equipment,
     required this.onTap,
@@ -40,7 +38,6 @@ class EquipmentCard extends ConsumerWidget {
         : "";
 
     return Container(
-      margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
       decoration: BoxDecoration(
         color: theme.cardColor,
         borderRadius: BorderRadius.circular(20),
@@ -49,8 +46,8 @@ class EquipmentCard extends ConsumerWidget {
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.4),
-            blurRadius: 10,
+            color: Colors.black.withValues(alpha: 0.3),
+            blurRadius: 8,
             offset: const Offset(0, 4),
           ),
         ],
@@ -145,25 +142,6 @@ class EquipmentCard extends ConsumerWidget {
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    /// FAVORITE BUTTON
-                    GestureDetector(
-                      onTap: isClient
-                          ? () async {
-                              ref
-                                  .read(favoriteProvider.notifier)
-                                  .toggleFavorite(equipment.id);
-                            }
-                          : null,
-                      child: Padding(
-                        padding: const EdgeInsets.only(right: 8),
-                        child: Icon(
-                          isFavorite ? Icons.favorite : Icons.favorite_border,
-                          color: Colors.red,
-                          size: 32,
-                        ),
-                      ),
-                    ),
-
                     /// TEXT CONTENT
                     Expanded(
                       child: Column(
@@ -251,25 +229,47 @@ class EquipmentCard extends ConsumerWidget {
                 const SizedBox(height: 6),
 
                 /// RENT BUTTON
-                SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton(
-                    onPressed: onTap,
-                    style: ElevatedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 14),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(14),
+                Row(
+                  children: [
+                    /// FAVORITE BUTTON
+                    GestureDetector(
+                      onTap: isClient
+                          ? () async {
+                              ref
+                                  .read(favoriteProvider.notifier)
+                                  .toggleFavorite(equipment.id);
+                            }
+                          : null,
+                      child: Padding(
+                        padding: const EdgeInsets.only(right: 8),
+                        child: Icon(
+                          isFavorite ? Icons.favorite : Icons.favorite_border,
+                          color: Colors.red,
+                          size: 32,
+                        ),
                       ),
-                      backgroundColor: theme.primaryColor,
                     ),
-                    child: const Text(
-                      "RESERVE NOW",
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
+
+                    Expanded(
+                      child: ElevatedButton(
+                        onPressed: onTap,
+                        style: ElevatedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(vertical: 14),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(14),
+                          ),
+                          backgroundColor: theme.primaryColor,
+                        ),
+                        child: const Text(
+                          "RESERVE NOW",
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                        ),
                       ),
                     ),
-                  ),
+                  ],
                 ),
               ],
             ),

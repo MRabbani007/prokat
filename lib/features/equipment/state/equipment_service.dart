@@ -10,9 +10,24 @@ class EquipmentService {
 
   Dio get _dio => apiClient.dio;
 
-  Future<List<Equipment>> getRenterEquipment() async {
+  Future<List<Equipment>> getRenterEquipment({
+    String? categoryId,
+    String? query,
+    String? city,
+    int? page,
+    int? limit,
+  }) async {
     try {
-      final response = await _dio.get(ApiRoutes.equipment);
+      final response = await _dio.get(
+        ApiRoutes.equipment,
+        queryParameters: {
+          if (query != null && query.isNotEmpty) 'query': query,
+          if (categoryId != null && categoryId.isNotEmpty)
+            'categoryId': categoryId,
+          'page': page,
+          'limit': limit,
+        },
+      );
 
       final data = response.data["data"];
 

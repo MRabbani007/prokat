@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:prokat/core/router/app_routes.dart';
 import 'package:prokat/features/bookings/state/booking_provider.dart';
 import 'package:prokat/features/user/widgets/user_booking_tile.dart';
+import 'package:go_router/go_router.dart';
 
 class ClientBookingsSection extends ConsumerStatefulWidget {
   const ClientBookingsSection({super.key});
@@ -23,31 +25,93 @@ class _ClientBookingsSectionState extends ConsumerState<ClientBookingsSection> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     final bookingState = ref.watch(bookingProvider);
 
     final upcoming = bookingState.bookings
         .where((b) => b.status == "CREATED" || b.status == "CONFIRMED")
         .toList();
 
+    final completed = bookingState.bookings
+        .where((b) => b.status == "COMPLETED")
+        .toList();
+
+    if (completed.isNotEmpty) {}
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const SizedBox(height: 20),
-        const Padding(
-          padding: EdgeInsets.symmetric(horizontal: 16),
-          child: Text(
-            "Active Orders",
-            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-          ),
-        ),
-        const SizedBox(height: 10),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              "Active Orders",
+              style: theme.textTheme.titleLarge?.copyWith(
+                fontWeight: FontWeight.w800,
+                letterSpacing: -0.5,
+              ),
+            ),
 
-        // Uncommented and simplified
-        Column(
-          children: upcoming
-              .map((booking) => UserBookingTile(booking: booking))
-              .toList(),
+            IconButton(
+              onPressed: () => context.push(AppRoutes.clientOrdersHistory),
+              icon: Icon(
+                Icons.history_toggle_off_rounded,
+                color: theme.colorScheme.secondary,
+                size: 24,
+              ),
+              tooltip: "Job History",
+            ),
+          ],
         ),
+
+        const SizedBox(height: 16),
+
+        if (upcoming.isEmpty)
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.symmetric(vertical: 32, horizontal: 24),
+            decoration: BoxDecoration(
+              color: theme.colorScheme.surface,
+              borderRadius: BorderRadius.circular(24),
+              border: Border.all(
+                color: theme.colorScheme.outline.withValues(alpha: 0.1),
+              ),
+            ),
+            child: Column(
+              children: [
+                Icon(
+                  Icons.receipt_long_outlined,
+                  size: 40,
+                  color: theme.colorScheme.primary.withValues(alpha: 0.4),
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  "No active orders right now",
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  "Your current requests will appear here",
+                  textAlign: TextAlign.center,
+                  style: theme.textTheme.bodySmall,
+                ),
+              ],
+            ),
+          )
+        else
+          Column(
+            children: upcoming
+                .map(
+                  (booking) => Padding(
+                    padding: const EdgeInsets.only(bottom: 12),
+                    child: UserBookingTile(booking: booking),
+                  ),
+                )
+                .toList(),
+          ),
       ],
     );
   }

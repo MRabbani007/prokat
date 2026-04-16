@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:prokat/features/auth/providers/auth_provider.dart';
-import 'package:prokat/features/user/state/user_profile_provider.dart';
 import '../widgets/auth_text_field.dart';
 import '../widgets/auth_button.dart';
 import 'otp_verification_form.dart';
@@ -56,8 +55,6 @@ class _LoginWithPhoneFormState extends ConsumerState<LoginWithPhoneForm> {
       if (!success) {
         widget.onError("Failed to send OTP. Please try again.");
       }
-
-      await ref.read(userProfileProvider.notifier).getUserProfile();
       // setState(() {
       //     phone = value;
       //     showOtp = true;

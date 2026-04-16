@@ -9,7 +9,7 @@ import 'package:prokat/features/auth/providers/auth_provider.dart';
 import 'package:prokat/features/auth/screens/register_screen.dart';
 import 'package:prokat/features/bookings/screens/create_booking_screen.dart';
 import 'package:prokat/features/bookings/screens/renter_bookings_screen.dart';
-import 'package:prokat/features/categories/screens/categories_screen.dart';
+import 'package:prokat/features/chat/screens/client_chat_list_screen.dart';
 import 'package:prokat/features/chat/screens/owner_chat_info_screen.dart';
 import 'package:prokat/features/chat/screens/owner_chat_list_screen.dart';
 import 'package:prokat/features/chat/screens/owner_chat_screen.dart';
@@ -79,7 +79,6 @@ GoRouter createRouter(WidgetRef ref) {
         AppRoutes.settings,
         AppRoutes.dashboard,
         AppRoutes.favorites,
-        // AppRoutes.myRequests,
       ].any((path) => location.contains(path));
 
       /// 🔒 BOOKING (nested route)
@@ -87,7 +86,7 @@ GoRouter createRouter(WidgetRef ref) {
 
       /// 🔒 OWNER ROUTES
       final isOwnerRoute = location.startsWith('/owner');
-
+      
       /// 🔐 USER AUTH GUARD
       if (!isLoggedIn && (requiresAuth || isBookingRoute || isOwnerRoute)) {
         return AppRoutes.login;
@@ -145,23 +144,30 @@ GoRouter createRouter(WidgetRef ref) {
                 path: AppRoutes.helpSupport,
                 builder: (_, _) => const HelpScreen(),
               ),
-              // TODO: REMOVE ROUTE
-              GoRoute(
-                path: AppRoutes.categories,
-                builder: (_, _) => const CategoriesScreen(),
-              ),
               GoRoute(
                 path: AppRoutes.searchList,
                 builder: (context, state) {
-                  final q = state.uri.queryParameters['q'] ?? '';
+                  final query = state.uri.queryParameters['q'] ?? '';
                   final category = state.uri.queryParameters['category'] ?? '';
+
+                  final page =
+                      int.tryParse(state.uri.queryParameters['page'] ?? '1') ??
+                      1;
+                  final limit =
+                      int.tryParse(
+                        state.uri.queryParameters['limit'] ?? '10',
+                      ) ??
+                      10;
+
                   final city =
                       state.uri.queryParameters['city'] ?? 'All Locations';
 
                   return EquipmentListScreen(
-                    q: q,
+                    query: query,
                     category: category,
                     city: city,
+                    page: page,
+                    limit: limit,
                   );
                 },
               ),
@@ -230,8 +236,28 @@ GoRouter createRouter(WidgetRef ref) {
                 ],
               ),
               GoRoute(
-                path: AppRoutes.myOrders,
+                path: AppRoutes.clientOrders,
                 builder: (_, _) => const RenterBookingsScreen(),
+              ),
+              GoRoute(
+                path: AppRoutes.chat,
+                builder: (context, state) {
+                  final bookingId =
+                      state.uri.queryParameters['bookingId'] ?? '';
+                  final requestId =
+                      state.uri.queryParameters['requestId'] ?? '';
+
+                  return ClientChatListScreen(
+                    bookingId: bookingId,
+                    requestId: requestId,
+                  );
+                },
+                routes: [
+                  GoRoute(
+                    path: "/:id",
+                    builder: (_, _) => const RenterBookingsScreen(),
+                  ),
+                ],
               ),
               GoRoute(
                 path: AppRoutes.favorites,

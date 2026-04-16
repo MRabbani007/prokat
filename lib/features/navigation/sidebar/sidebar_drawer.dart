@@ -76,7 +76,7 @@ class SidebarDrawer extends ConsumerWidget {
                 SidebarTile(
                   icon: Icons.ads_click,
                   label: "My Requests",
-                  route: AppRoutes.myRequests,
+                  route: AppRoutes.clientRequests,
                 ),
                 SidebarTile(
                   icon: Icons.favorite_border,
@@ -86,7 +86,7 @@ class SidebarDrawer extends ConsumerWidget {
                 SidebarTile(
                   icon: Icons.calendar_month_outlined,
                   label: "My Orders",
-                  route: AppRoutes.myOrders,
+                  route: AppRoutes.clientOrders,
                 ),
 
                 if (isOwner) ...[

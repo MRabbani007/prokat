@@ -67,16 +67,26 @@ class EquipmentNotifier extends StateNotifier<EquipmentState> {
     }
   }
 
-  Future<void> getRenterEquipment() async {
+  Future<void> getRenterEquipment({
+    String? categoryId,
+    String? query,
+    String? city,
+    int? page,
+    int? limit,
+  }) async {
     state = state.copyWith(isLoading: true, error: null);
 
     try {
-      final equipment = await api.getRenterEquipment();
+      final equipment = await api.getRenterEquipment(
+        categoryId: categoryId,
+        query: query,
+        page: page,
+        limit: limit,
+        city: city,
+      );
 
-      print(equipment.toString());
       state = state.copyWith(renterEquipment: equipment, isLoading: false);
     } catch (e) {
-      print(e.toString());
       state = state.copyWith(isLoading: false, error: e.toString());
     }
   }

@@ -23,6 +23,7 @@ class _EquipmentCitySelectorState extends State<EquipmentCitySelector> {
     try {
       // 1. Check & Request Permissions
       LocationPermission permission = await Geolocator.checkPermission();
+      
       if (permission == LocationPermission.denied) {
         permission = await Geolocator.requestPermission();
       }

@@ -35,9 +35,6 @@ class _OwnerEquipmentDetailScreenState
               .where((cat) => cat.id == equipment?.categoryId)
               .firstOrNull;
 
-    print("selectorTileBuild");
-    print(selectedCategory?.toJson());
-
     final categoryName = selectedCategory?.name ?? "Select Service";
     final bool hasCategory =
         widget.mode == "create_request" || widget.mode == "create_equipment"

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:prokat/core/router/app_routes.dart';
 import 'package:prokat/features/bookings/models/booking_model.dart';
+import 'package:go_router/go_router.dart';
 
 class UserBookingTile extends StatelessWidget {
   final BookingModel booking;
@@ -9,20 +11,20 @@ class UserBookingTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final accent = theme.colorScheme.primary;
-
     final displayUrl = booking.equipment.imageUrl ?? "";
 
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
         color: theme.cardColor,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: theme.colorScheme.outline.withValues(alpha: 0.5)),
+        border: Border.all(
+          color: (theme.colorScheme.outline).withValues(alpha: 0.3),
+        ),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.3),
-            blurRadius: 10,
+            blurRadius: 8,
             offset: const Offset(0, 4),
           ),
         ],
@@ -101,7 +103,22 @@ class UserBookingTile extends StatelessWidget {
           Row(
             children: [
               Expanded(
-                child: _actionButton(Icons.chat, Colors.green, () {}),
+                child: _actionButton(Icons.chat, Colors.green, () async {
+                  // final notifier = ref.read(chatProvider.notifier);
+
+                  // final chatId = await notifier.getChatId(
+                  //   bookingId: booking.id,
+                  //   // OR requestId: request.id
+                  // );
+
+                  // if (chatId != null) {
+                  // context.push('${AppRoutes.chat}/${booking.id}');
+                  // } else {
+                  // optional: show error/snackbar
+                  // }
+
+                  context.push('${AppRoutes.chat}?${booking.id}');
+                }),
               ),
 
               const SizedBox(width: 8),
@@ -109,7 +126,6 @@ class UserBookingTile extends StatelessWidget {
               // Expanded(child: _actionButton(Icons.visibility, accent, () {})),
 
               // const SizedBox(width: 8),
-
               Expanded(
                 child: _actionButton(Icons.close, Colors.redAccent, () {}),
               ),

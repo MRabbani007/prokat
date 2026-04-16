@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:prokat/core/widgets/base_tile.dart';
 import 'package:prokat/features/locations/state/location_provider.dart';
 import 'package:prokat/features/user/state/user_profile_provider.dart';
 
@@ -31,23 +32,7 @@ class UserLocationTile extends ConsumerWidget {
     final theme = Theme.of(context);
     final accent = theme.colorScheme.primary;
 
-    // Determine display text
-    // final location = locationState.selectedAddress;
     final selectedCity = locationState.city;
-
-    String displayText = 'City';
-
-    // if (location != null) {
-    //   if (location.city.isNotEmpty) {
-    //     displayText = location.city;
-    //   } else if (location.street.isNotEmpty) {
-    //     displayText = location.street;
-    //   }
-    // }
-
-    if (selectedCity != null && selectedCity != "") {
-      displayText = selectedCity;
-    }
 
     return GestureDetector(
       onTap: () {
@@ -59,23 +44,22 @@ class UserLocationTile extends ConsumerWidget {
           builder: (context) => _CityPickerSheet(),
         );
       },
-      child: Container(
-        margin: EdgeInsets.symmetric(horizontal: 24),
+      child: BaseTile(
         padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
-        decoration: BoxDecoration(
-          color: theme.cardColor,
-          border: Border.all(
-            color: theme.colorScheme.outline.withValues(alpha: 0.3),
-          ),
-          borderRadius: BorderRadius.circular(12),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.3),
-              blurRadius: 10,
-              offset: const Offset(0, 4),
-            ),
-          ],
-        ),
+        // decoration: BoxDecoration(
+        //   color: theme.cardColor,
+        //   border: Border.all(
+        //     color: theme.colorScheme.outline.withValues(alpha: 0.3),
+        //   ),
+        //   borderRadius: BorderRadius.circular(12),
+        //   boxShadow: [
+        //     BoxShadow(
+        //       color: Colors.black.withValues(alpha: 0.3),
+        //       blurRadius: 6,
+        //       offset: const Offset(0, 4),
+        //     ),
+        //   ],
+        // ),
         child: Row(
           children: [
             Icon(Icons.location_on, color: accent, size: 28),
@@ -87,10 +71,19 @@ class UserLocationTile extends ConsumerWidget {
                 mainAxisAlignment: MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(displayText, style: theme.textTheme.labelMedium),
-                  const SizedBox(width: 4),
                   Text(
-                    displayText,
+                    selectedCity != null && selectedCity != ""
+                        ? "City"
+                        : "Location",
+                    style: theme.textTheme.labelMedium,
+                  ),
+
+                  const SizedBox(width: 4),
+
+                  Text(
+                    selectedCity != null && selectedCity != ""
+                        ? selectedCity
+                        : "Select City",
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
@@ -124,6 +117,7 @@ class _CityPickerSheet extends ConsumerWidget {
           children: [
             // Title
             Text('Select City', style: theme.textTheme.titleLarge),
+
             const SizedBox(height: 12),
 
             // City list

@@ -2,9 +2,6 @@ class AppRoutes {
   // Public
   static const String launch = '/';
   static const String error = '/error';
-  static const String landing = '/landing';
-
-  static const String helpSupport = '/help';
 
   // Auth
   static const String login = '/login';
@@ -14,6 +11,7 @@ class AppRoutes {
 
   // Guest Screens
   static const String main = '/main'; // Landing page with limited information
+  static const String helpSupport = '/help';
 
   // User Screens
   static const String dashboard = '/dashboard';
@@ -22,10 +20,13 @@ class AppRoutes {
   static const String searchMap = '/search/map';
   static const String equipmentId = '/equipment/:id';
   static const String booking = '/equipment/:id/book';
-  static const String myRequests = '/requests';
+  static const String clientRequests = '/requests';
   static const String createRequest = '/requests/create';
-  static const String myOrders = '/myOrders';
+  static const String clientOrders = '/orders';
+  static const String clientOrdersHistory = '/orders';
   static const String favorites = '/favorites';
+
+  static const String chat = '/chat';
 
   static const String profile = '/profile';
   static const String settings = '/settings';
@@ -39,7 +40,6 @@ class AppRoutes {
   static const String ownerEquiment = '/owner/equipment/list';
   static const String ownerEquimentMap = '/owner/equipment/map';
   static const String ownerEquimentId = '/owner/equipment/:id';
-  static const String ownerEquimentIdEdit = '/owner/equipment/:id/edit';
   static const String ownerEquimentCreate = '/owner/equipment/create';
 
   static const String ownerAddresses = '/owner/addresses';
@@ -60,9 +60,7 @@ class AppRoutes {
   static const String ownerRegistration = '/owner/registration';
 
   static const String ownerChatList =
-      '/owner/chat'; // Show chat list, receive bookingId or requestId and navigate to chat?id=
-  // static const String ownerChatId = '/owner/chat/:id';
-  // static const String ownerChatIdInfo = '/owner/chat/:id/info';
+      '/owner/chat'; // 
 
   static const String chatDetail = ':id';
   static const String chatInfo = 'info';
