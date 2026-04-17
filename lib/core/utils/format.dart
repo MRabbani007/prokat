@@ -47,3 +47,15 @@ String formatPhoneNumber(String phoneNumber) {
   // 4. Format: +7 111 222 3333
   return '+${cleaned[0]} ${cleaned.substring(1, 4)} ${cleaned.substring(4, 7)} ${cleaned.substring(7)}';
 }
+
+String formatPrice(dynamic price) {
+  final number = (price is num) 
+      ? price 
+      : (double.tryParse(price.toString()) ?? 0);
+      
+  // Custom pattern using space as a separator
+  final formatter = NumberFormat("#,###", "en_US"); 
+  String formatted = formatter.format(number).replaceAll(',', ' ');
+  
+  return "$formatted ₸";
+}

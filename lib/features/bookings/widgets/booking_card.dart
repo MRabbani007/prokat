@@ -9,20 +9,21 @@ class BookingCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const cardColor = Color(0xFF1E2125);
-    const accentColor = Color(0xFF4E73DF);
+    final theme = Theme.of(context);
 
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      // margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       decoration: BoxDecoration(
-        color: cardColor,
+        color: theme.cardColor,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
+        border: Border.all(
+          color: theme.colorScheme.outline.withValues(alpha: 0.3),
+        ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.2),
-            blurRadius: 12,
-            offset: const Offset(0, 6),
+            color: Colors.black.withValues(alpha: 0.3),
+            blurRadius: 6,
+            offset: const Offset(0, 4),
           ),
         ],
       ),
@@ -42,45 +43,48 @@ class BookingCard extends StatelessWidget {
                       Expanded(
                         child: Text(
                           booking.equipment.name, // ?? 'Unknown Equipment',
-                          style: const TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                            letterSpacing: 0.5,
-                          ),
+                          style: theme.textTheme.bodyMedium,
                         ),
                       ),
                       _StatusBadge(status: booking.status),
                     ],
                   ),
+
                   const SizedBox(height: 4),
+
                   Text(
                     "CAPACITY: 10 M3", // Hardcoded per your snippet
-                    style: TextStyle(
-                      color: Colors.white.withValues(alpha: 0.4),
-                      fontSize: 11,
-                      fontWeight: FontWeight.bold,
-                      letterSpacing: 1,
-                    ),
+                    style: theme.textTheme.labelMedium,
                   ),
+
                   const Padding(
                     padding: EdgeInsets.symmetric(vertical: 16),
-                    child: Divider(height: 1, thickness: 1, color: Colors.white10),
+                    child: Divider(
+                      height: 2,
+                      thickness: 1,
+                      color: Color.fromARGB(255, 194, 194, 194),
+                    ),
                   ),
-                  
+
                   // Meta Info Grid
                   _buildMetaRow(
-                    Icons.location_on_outlined, 
-                    "Satpayeva, Atyrau", 
-                    accentColor,
+                    context,
+                    Icons.location_on_outlined,
+                    "Satpayeva, Atyrau",
+                    theme.primaryColor,
                   ),
+
                   const SizedBox(height: 12),
+
                   _buildMetaRow(
+                    context,
                     Icons.calendar_today_outlined,
-                    booking.bookedOn != null 
-                        ? DateFormat('MMM dd, yyyy • hh:mm a').format(booking.bookedOn!)
+                    booking.bookedOn != null
+                        ? DateFormat(
+                            'MMM dd, yyyy • hh:mm a',
+                          ).format(booking.bookedOn!)
                         : "Date not set",
-                    Colors.orangeAccent,
+                    Colors.orange,
                   ),
                 ],
               ),
@@ -90,38 +94,32 @@ class BookingCard extends StatelessWidget {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
               decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.02),
-                border: Border(top: BorderSide(color: Colors.white.withValues(alpha: 0.05))),
+                color: Colors.white.withValues(alpha: 0.3),
+                border: Border(
+                  top: BorderSide(
+                    color: theme.colorScheme.outline.withValues(alpha: 0.45),
+                  ),
+                ),
               ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(
-                    "TOTAL PRICE",
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold, 
-                      color: Colors.white.withValues(alpha: 0.3),
-                      fontSize: 10,
-                      letterSpacing: 1.2,
-                    ),
-                  ),
+                  Text("TOTAL PRICE", style: theme.textTheme.bodyMedium),
                   RichText(
                     text: TextSpan(
                       children: [
                         TextSpan(
-                          text: "${booking.price} ₸ ", // Switched to Tenge symbol for consistency
-                          style: const TextStyle(
+                          text:
+                              "${booking.price} ₸ ", // Switched to Tenge symbol for consistency
+                          style: TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
-                            color: accentColor,
+                            color: theme.primaryColor,
                           ),
                         ),
                         TextSpan(
                           text: "/ ${booking.priceRate}",
-                          style: TextStyle(
-                            fontSize: 12, 
-                            color: Colors.white.withValues(alpha: 0.4),
-                          ),
+                          style: theme.textTheme.labelMedium,
                         ),
                       ],
                     ),
@@ -135,7 +133,14 @@ class BookingCard extends StatelessWidget {
     );
   }
 
-  Widget _buildMetaRow(IconData icon, String text, Color iconColor) {
+  Widget _buildMetaRow(
+    BuildContext context,
+    IconData icon,
+    String text,
+    Color iconColor,
+  ) {
+    final theme = Theme.of(context);
+
     return Row(
       children: [
         Container(
@@ -144,15 +149,10 @@ class BookingCard extends StatelessWidget {
             color: iconColor.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(8),
           ),
-          child: Icon(icon, size: 14, color: iconColor),
+          child: Icon(icon, size: 20, color: iconColor),
         ),
         const SizedBox(width: 12),
-        Expanded(
-          child: Text(
-            text,
-            style: const TextStyle(fontSize: 14, color: Colors.white70, fontWeight: FontWeight.w500),
-          ),
-        ),
+        Expanded(child: Text(text, style: theme.textTheme.bodyMedium)),
       ],
     );
   }
@@ -166,11 +166,20 @@ class _StatusBadge extends StatelessWidget {
   Widget build(BuildContext context) {
     Color baseColor;
     switch (status.toUpperCase()) {
-      case 'CREATED': baseColor = Colors.orange; break;
-      case 'CONFIRMED': baseColor = Colors.greenAccent; break;
-      case 'COMPLETED': baseColor = Color(0xFF4E73DF); break;
-      case 'CANCELLED': baseColor = Colors.redAccent; break;
-      default: baseColor = Colors.grey;
+      case 'CREATED':
+        baseColor = Colors.orange;
+        break;
+      case 'CONFIRMED':
+        baseColor = Colors.green;
+        break;
+      case 'COMPLETED':
+        baseColor = Colors.blue;
+        break;
+      case 'CANCELLED':
+        baseColor = Colors.red;
+        break;
+      default:
+        baseColor = Colors.grey;
     }
 
     return Container(
@@ -178,14 +187,14 @@ class _StatusBadge extends StatelessWidget {
       decoration: BoxDecoration(
         color: baseColor.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: baseColor.withValues(alpha: 0.3), width: 1),
+        border: Border.all(color: baseColor.withValues(alpha: 0.4), width: 1.5),
       ),
       child: Text(
         status.toUpperCase(),
         style: TextStyle(
           color: baseColor,
-          fontSize: 10,
-          fontWeight: FontWeight.bold,
+          fontSize: 12,
+          fontWeight: FontWeight.w600,
           letterSpacing: 1,
         ),
       ),

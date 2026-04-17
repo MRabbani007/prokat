@@ -107,19 +107,22 @@ class _UserProfileScreenState extends ConsumerState<UserProfileScreen> {
 
               InfoTile(
                 icon: Icons.email_outlined,
-                label: "Email Address",
-                value: username ?? "Add username",
+                label: "Username",
+                value: username ?? "Add Username",
                 onTap: () => showEditUsernameSheet(context, ref, username),
                 trailing: username == null
                     ? const Icon(Icons.add, color: Colors.white54)
                     : null,
               ),
 
-              const SizedBox(height: 20),
+              // const SizedBox(height: 20),
 
-              const BecomeOwnerCTA(),
+              Padding(
+                padding: const EdgeInsets.all(24),
+                child: const BecomeOwnerCTA(),
+              ),
 
-              const SizedBox(height: 20),
+              // const SizedBox(height: 20),
 
               SettingsLinkTile(
                 icon: Icons.favorite_outline,

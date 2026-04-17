@@ -5,11 +5,14 @@ import 'package:prokat/core/router/refresh_stream.dart';
 import 'package:prokat/features/appstartup/app_startup_provider.dart';
 import 'package:prokat/features/appstatic/screens/error_screen.dart';
 import 'package:prokat/features/appstatic/screens/help_screen.dart';
-import 'package:prokat/features/auth/providers/auth_provider.dart';
 import 'package:prokat/features/auth/screens/register_screen.dart';
+import 'package:prokat/features/bookings/screens/client_booking_details_screen.dart';
+import 'package:prokat/features/bookings/screens/client_bookings_history_screen.dart';
 import 'package:prokat/features/bookings/screens/create_booking_screen.dart';
-import 'package:prokat/features/bookings/screens/renter_bookings_screen.dart';
+import 'package:prokat/features/bookings/screens/client_bookings_screen.dart';
+import 'package:prokat/features/chat/screens/client_chat_info_screen.dart';
 import 'package:prokat/features/chat/screens/client_chat_list_screen.dart';
+import 'package:prokat/features/chat/screens/client_chat_screen.dart';
 import 'package:prokat/features/chat/screens/owner_chat_info_screen.dart';
 import 'package:prokat/features/chat/screens/owner_chat_list_screen.dart';
 import 'package:prokat/features/chat/screens/owner_chat_screen.dart';
@@ -60,18 +63,43 @@ GoRouter createRouter(WidgetRef ref) {
     /// 🔐 AUTH GUARD
     redirect: (context, state) {
       final startupState = ref.read(appStartupProvider);
+      final location = state.matchedLocation;
 
-      if (startupState == AppStartupState.loading) {
-        return AppRoutes.launch;
-      } else if (startupState == AppStartupState.error) {
-        return AppRoutes.error;
+      // 🚀 Handle startup routing FIRST
+      switch (startupState) {
+        case AppStartupState.loading:
+          return AppRoutes.launch;
+
+        case AppStartupState.error:
+          return AppRoutes.error;
+
+        case AppStartupState.otp:
+          return AppRoutes.login;
+
+        case AppStartupState.guest:
+          if (location == AppRoutes.launch) {
+            return AppRoutes.main;
+          }
+          break;
+
+        case AppStartupState.client:
+          if (location == AppRoutes.launch) {
+            return AppRoutes.dashboard;
+          }
+          break;
+
+        case AppStartupState.owner:
+          if (location == AppRoutes.launch) {
+            return AppRoutes.ownerDashboard;
+          }
+          break;
       }
 
-      final authState = ref.read(authProvider);
-      final isLoggedIn = authState.isAuthenticated;
-      final role = authState.session?.user?.role;
+      final isLoggedIn =
+          startupState == AppStartupState.client ||
+          startupState == AppStartupState.owner;
 
-      final location = state.matchedLocation;
+      final isOwner = startupState == AppStartupState.owner;
 
       /// 🔒 ROUTES THAT REQUIRE LOGIN
       final requiresAuth = <String>[
@@ -79,32 +107,28 @@ GoRouter createRouter(WidgetRef ref) {
         AppRoutes.settings,
         AppRoutes.dashboard,
         AppRoutes.favorites,
-      ].any((path) => location.contains(path));
+      ].any((path) => location == path || location.startsWith('$path/'));
 
       /// 🔒 BOOKING (nested route)
       final isBookingRoute = location.contains('/book');
 
       /// 🔒 OWNER ROUTES
       final isOwnerRoute = location.startsWith('/owner');
-      
+
       /// 🔐 USER AUTH GUARD
       if (!isLoggedIn && (requiresAuth || isBookingRoute || isOwnerRoute)) {
         return AppRoutes.login;
       }
 
       /// 🏗 OWNER ROLE GUARD
-      if (isOwnerRoute && role != 'OWNER') {
+      if (isOwnerRoute && !isOwner) {
         return AppRoutes.login;
       }
 
       /// 🚫 BLOCK AUTH SCREENS WHEN LOGGED IN
       if (isLoggedIn &&
           (location == AppRoutes.login || location == AppRoutes.register)) {
-        if (role == 'OWNER') {
-          return AppRoutes.ownerDashboard;
-        } else {
-          return AppRoutes.dashboard;
-        }
+        return isOwner ? AppRoutes.ownerDashboard : AppRoutes.dashboard;
       }
 
       return null;
@@ -138,7 +162,30 @@ GoRouter createRouter(WidgetRef ref) {
               ),
               GoRoute(
                 path: AppRoutes.main,
-                builder: (_, _) => const MainScreen(),
+                builder: (context, state) {
+                  final query = state.uri.queryParameters['q'] ?? '';
+                  final category = state.uri.queryParameters['category'] ?? '';
+
+                  final page =
+                      int.tryParse(state.uri.queryParameters['page'] ?? '1') ??
+                      1;
+                  final limit =
+                      int.tryParse(
+                        state.uri.queryParameters['limit'] ?? '10',
+                      ) ??
+                      10;
+
+                  final city =
+                      state.uri.queryParameters['city'] ?? 'All Locations';
+
+                  return MainScreen(
+                    query: query,
+                    category: category,
+                    city: city,
+                    page: page,
+                    limit: limit,
+                  );
+                },
               ),
               GoRoute(
                 path: AppRoutes.helpSupport,
@@ -237,8 +284,28 @@ GoRouter createRouter(WidgetRef ref) {
               ),
               GoRoute(
                 path: AppRoutes.clientOrders,
-                builder: (_, _) => const RenterBookingsScreen(),
+                builder: (_, _) => const ClientBookingsScreen(),
+                routes: [
+                  GoRoute(
+                    path: AppRoutes.clientOrdersHistory,
+                    builder: (_, _) {
+                      return const ClientBookingsHistoryScreen();
+                    },
+                  ),
+                  GoRoute(
+                    path: "/:id",
+                    builder: (context, state) {
+                      final bookingId =
+                          state.uri.queryParameters['bookingId'] ?? '';
+
+                      return ClientBookingDetailsScreen(bookingId: bookingId);
+                    },
+                  ),
+                ],
               ),
+              //
+              // CLIENT CHAT
+              //
               GoRoute(
                 path: AppRoutes.chat,
                 builder: (context, state) {
@@ -255,7 +322,17 @@ GoRouter createRouter(WidgetRef ref) {
                 routes: [
                   GoRoute(
                     path: "/:id",
-                    builder: (_, _) => const RenterBookingsScreen(),
+                    builder: (context, state) {
+                      final chatId = state.uri.queryParameters['chatId'] ?? '';
+
+                      return ClientChatScreen(chatId: chatId);
+                    },
+                    routes: [
+                      GoRoute(
+                        path: "/info",
+                        builder: (_, _) => ClientChatInfoScreen(),
+                      ),
+                    ],
                   ),
                 ],
               ),

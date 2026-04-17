@@ -31,10 +31,10 @@ class AuthNotifier extends StateNotifier<AuthState> {
     return null;
   }
 
-  Future<void> restoreOtpSession() async {
+  Future<bool> restoreOtpSession() async {
     final data = await storage.readOtpSession();
 
-    if (data == null) return;
+    if (data == null) return false;
 
     final isExpired =
         DateTime.now().difference(data.requestedAt) >
@@ -42,13 +42,15 @@ class AuthNotifier extends StateNotifier<AuthState> {
 
     if (isExpired) {
       await storage.clearOtpSession();
-      return;
+      return false;
     }
 
     state = state.copyWith(
       otpPhone: data.phone,
       otpRequestedAt: data.requestedAt,
     );
+
+    return true;
   }
 
   Future<void> clearOtpSession() async {

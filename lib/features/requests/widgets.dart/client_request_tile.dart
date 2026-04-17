@@ -5,21 +5,19 @@ import 'package:prokat/features/requests/models/request_model.dart';
 import 'package:prokat/features/requests/state/request_provider.dart';
 import 'package:prokat/features/requests/widgets.dart/request_status_badge.dart';
 
-class RequestTile extends ConsumerStatefulWidget {
+class ClientRequestTile extends ConsumerStatefulWidget {
   final RequestModel request;
 
-  const RequestTile({super.key, required this.request});
+  const ClientRequestTile({super.key, required this.request});
 
   @override
-  ConsumerState<RequestTile> createState() => _RequestTileState();
+  ConsumerState<ClientRequestTile> createState() => _ClientRequestTileState();
 }
 
-class _RequestTileState extends ConsumerState<RequestTile> {
+class _ClientRequestTileState extends ConsumerState<ClientRequestTile> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-
-    const accentColor = Color(0xFF4E73DF);
 
     final request = widget.request;
 
@@ -28,11 +26,13 @@ class _RequestTileState extends ConsumerState<RequestTile> {
       decoration: BoxDecoration(
         color: theme.cardColor,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: theme.colorScheme.outline),
+        border: Border.all(
+          color: (theme.colorScheme.outline).withValues(alpha: 0.3),
+        ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.1),
-            blurRadius: 10,
+            color: Colors.black.withValues(alpha: 0.3),
+            blurRadius: 8,
             offset: const Offset(0, 4),
           ),
         ],
@@ -52,11 +52,7 @@ class _RequestTileState extends ConsumerState<RequestTile> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        request.capacity.toUpperCase(),
-                        style: theme.textTheme.bodyLarge,
-                      ),
-                      Text(
-                        (request.category?.capacityUnit ?? "").toUpperCase(),
+                        request.category?.name ?? "",
                         style: theme.textTheme.bodyLarge,
                       ),
                       RequestStatusBadge(status: request.status),
@@ -64,6 +60,22 @@ class _RequestTileState extends ConsumerState<RequestTile> {
                   ),
 
                   const SizedBox(height: 16),
+
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        request.capacity.toUpperCase(),
+                        style: theme.textTheme.bodyLarge,
+                      ),
+                      Text(
+                        (request.category?.capacityUnit ?? "").toUpperCase(),
+                        style: theme.textTheme.bodyLarge,
+                      ),
+                    ],
+                  ),
+
+                  const SizedBox(height: 12),
 
                   /// 2. Info Grid (Date & Price)
                   Row(
@@ -98,10 +110,7 @@ class _RequestTileState extends ConsumerState<RequestTile> {
                       ),
                       child: Column(
                         children: [
-                          Text(
-                            "Comment:",
-                            style: theme.textTheme.labelMedium,
-                          ),
+                          Text("Comment:", style: theme.textTheme.labelMedium),
                           Text(
                             request.comment!,
                             style: theme.textTheme.bodyMedium,
@@ -119,9 +128,7 @@ class _RequestTileState extends ConsumerState<RequestTile> {
               Container(
                 decoration: BoxDecoration(
                   border: Border(
-                    top: BorderSide(
-                      color: theme.colorScheme.outlineVariant,
-                    ),
+                    top: BorderSide(color: theme.colorScheme.outlineVariant),
                   ),
                 ),
                 child: IntrinsicHeight(
@@ -130,22 +137,22 @@ class _RequestTileState extends ConsumerState<RequestTile> {
                       Expanded(
                         child: TextButton.icon(
                           onPressed: () async {
-                           final res = await ref
+                            final res = await ref
                                 .read(requestProvider.notifier)
                                 .cancelRequest(request.id);
 
-                                if(res == true){}
+                            if (res == true) {}
                           },
                           icon: const Icon(Icons.close_rounded, size: 18),
                           label: const Text("CANCEL REQUEST"),
                           style: TextButton.styleFrom(
                             foregroundColor: theme.colorScheme.error,
                             padding: const EdgeInsets.symmetric(vertical: 14),
-                            textStyle:  TextStyle(
+                            textStyle: TextStyle(
                               fontWeight: FontWeight.bold,
                               fontSize: 12,
                               letterSpacing: 1,
-                              color: theme.colorScheme.onErrorContainer
+                              color: theme.colorScheme.onErrorContainer,
                             ),
                           ),
                         ),
@@ -161,7 +168,7 @@ class _RequestTileState extends ConsumerState<RequestTile> {
   }
 
   Widget _buildInfoItem({
-   required BuildContext context,
+    required BuildContext context,
     required IconData icon,
     required String label,
     required String value,
@@ -173,10 +180,7 @@ class _RequestTileState extends ConsumerState<RequestTile> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            label,
-            style: theme.textTheme.labelMedium,
-          ),
+          Text(label, style: theme.textTheme.labelMedium),
           const SizedBox(height: 4),
           Row(
             children: [

@@ -6,7 +6,6 @@ import 'package:prokat/features/categories/providers/category_provider.dart';
 import 'package:prokat/features/equipment/providers/equipment_provider.dart';
 import 'package:prokat/features/user/widgets/browse_equipment_tile.dart';
 import 'package:prokat/features/user/widgets/user_dashboard_header.dart';
-import 'package:prokat/features/user/widgets/become_owner_cta.dart';
 
 class UserDashboardPage extends ConsumerStatefulWidget {
   const UserDashboardPage({super.key});

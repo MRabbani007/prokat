@@ -7,7 +7,7 @@ import 'package:prokat/features/locations/state/location_provider.dart';
 import 'package:prokat/features/requests/state/request_provider.dart';
 import 'package:prokat/features/user/state/user_profile_provider.dart';
 
-enum AppStartupState { loading, guest, renter, owner, error }
+enum AppStartupState { loading, guest, otp, client, owner, error }
 
 final appStartupProvider =
     StateNotifierProvider<AppStartupController, AppStartupState>((ref) {
@@ -21,18 +21,14 @@ class AppStartupController extends StateNotifier<AppStartupState> {
 
   AppStartupController(this.ref) : super(AppStartupState.loading) {
     Future.microtask(() async {
-      final authState = ref.read(authProvider);
+      // final authState = ref.read(authProvider);
 
+      // TODO: Remove Duplicate call
+      // if (authState.session != null) {
       // await init();
-
-      /// ✅ If already logged in → run init
-      if (authState.session != null) {
-        await init();
-      } else {
-        //   print("app startup session null session");
-        //   /// ✅ Otherwise don't run init at all
-        state = AppStartupState.guest;
-      }
+      // } else {
+      // state = AppStartupState.guest;
+      // }
     });
   }
 
@@ -88,7 +84,7 @@ class AppStartupController extends StateNotifier<AppStartupState> {
         ref.read(requestProvider.notifier).getUserRequests(),
       ]);
 
-      return AppStartupState.renter;
+      return AppStartupState.client;
     }
   }
 
@@ -98,6 +94,11 @@ class AppStartupController extends StateNotifier<AppStartupState> {
     _isInitializing = true;
 
     try {
+      final start = DateTime.now();
+
+      final elapsed = DateTime.now().difference(start);
+      const minDuration = Duration(milliseconds: 800);
+
       await ref.read(categoriesProvider.notifier).getCategories();
 
       final auth = ref.read(authProvider.notifier);
@@ -107,11 +108,18 @@ class AppStartupController extends StateNotifier<AppStartupState> {
 
       // If no session
       if (session == null) {
-        // set state as guest
-        state = AppStartupState.guest;
+        final otpSession = await auth.restoreOtpSession();
 
-        // load OTP session
-        await ref.read(authProvider.notifier).restoreOtpSession();
+        // check if there is OTP session
+        if (otpSession == true) {
+          state = AppStartupState.otp; // ✅ go to login/otp screen
+        } else {
+          state = AppStartupState.guest;
+        }
+
+        if (elapsed < minDuration) {
+          await Future.delayed(minDuration - elapsed);
+        }
 
         return;
       }
@@ -121,6 +129,11 @@ class AppStartupController extends StateNotifier<AppStartupState> {
 
       if (!isValid) {
         state = AppStartupState.guest;
+
+        if (elapsed < minDuration) {
+          await Future.delayed(minDuration - elapsed);
+        }
+
         return;
       }
 

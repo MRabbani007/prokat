@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:flutter/rendering.dart';
 import 'package:prokat/core/api/api_client.dart';
 import '../../../core/constants/api_routes.dart';
 import '../models/equipment_model.dart';
@@ -22,6 +23,7 @@ class EquipmentService {
         ApiRoutes.equipment,
         queryParameters: {
           if (query != null && query.isNotEmpty) 'query': query,
+          if (city != null && city.isNotEmpty) 'city': city,
           if (categoryId != null && categoryId.isNotEmpty)
             'categoryId': categoryId,
           'page': page,
@@ -134,14 +136,11 @@ class EquipmentService {
     String status,
   ) async {
     try {
-      final response = await _dio.patch(
+      await _dio.patch(
         '/equipment/$equipmentId/status',
         data: {"id": equipmentId, "isVisible": isVisible, "status": status},
       );
 
-      print(response.toString());
-
-      // return Equipment.fromJson(response.data);
       return true;
     } catch (e) {
       if (e is DioException) {

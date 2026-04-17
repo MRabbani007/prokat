@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:go_router/go_router.dart';
-import 'package:prokat/core/router/app_routes.dart';
 
 class LaunchScreen extends StatefulWidget {
   const LaunchScreen({super.key});
@@ -47,11 +45,11 @@ class _LaunchScreenState extends State<LaunchScreen>
 
     _controller.forward();
 
-    Future.delayed(const Duration(seconds: 3), () {
-      if (context.mounted) {
-        context.go(AppRoutes.dashboard);
-      }
-    });
+    // Future.delayed(const Duration(seconds: 3), () {
+    //   if (context.mounted) {
+    //     context.go(AppRoutes.dashboard);
+    //   }
+    // });
   }
 
   @override

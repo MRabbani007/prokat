@@ -31,13 +31,13 @@ class InfoTile extends StatelessWidget {
           color: theme.cardColor,
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
-            color: colorScheme.onSurface.withValues(alpha: 0.3),
+            color: colorScheme.outline.withValues(alpha: 0.3),
           ),
           // Optional: always-visible shadow
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.4),
-              blurRadius: 10,
+              color: Colors.black.withValues(alpha: 0.3),
+              blurRadius: 8,
               offset: const Offset(0, 4),
             ),
           ],

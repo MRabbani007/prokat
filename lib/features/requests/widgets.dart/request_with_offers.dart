@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:prokat/features/requests/widgets.dart/offer_tile.dart';
-import 'package:prokat/features/requests/widgets.dart/request_tile.dart';
+import 'package:prokat/features/requests/widgets.dart/client_request_tile.dart';
 
 class RequestWithOffers extends StatefulWidget {
   final dynamic request;
@@ -29,9 +29,7 @@ class _RequestWithOffersState extends State<RequestWithOffers> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         /// 🔹 MAIN REQUEST TILE
-        RequestTile(
-          request: widget.request,
-        ),
+        ClientRequestTile(request: widget.request),
 
         if (hasOffers) ...[
           const SizedBox(height: 8),

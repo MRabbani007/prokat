@@ -54,7 +54,7 @@ class _ClientBookingsSectionState extends ConsumerState<ClientBookingsSection> {
             ),
 
             IconButton(
-              onPressed: () => context.push(AppRoutes.clientOrdersHistory),
+              onPressed: () => context.push(AppRoutes.clientOrders),
               icon: Icon(
                 Icons.history_toggle_off_rounded,
                 color: theme.colorScheme.secondary,

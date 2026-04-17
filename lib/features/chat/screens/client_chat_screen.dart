@@ -3,15 +3,15 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:prokat/features/chat/state/chat_message_model.dart';
 import 'package:prokat/features/chat/state/chat_provider.dart';
 
-class ChatDetailScreen extends ConsumerStatefulWidget {
+class ClientChatScreen extends ConsumerStatefulWidget {
   final String chatId;
-  const ChatDetailScreen({super.key, required this.chatId});
+  const ClientChatScreen({super.key, required this.chatId});
 
   @override
-  ConsumerState<ChatDetailScreen> createState() => _ChatDetailScreenState();
+  ConsumerState<ClientChatScreen> createState() => _ClientChatScreenState();
 }
 
-class _ChatDetailScreenState extends ConsumerState<ChatDetailScreen> {
+class _ClientChatScreenState extends ConsumerState<ClientChatScreen> {
   final TextEditingController _controller = TextEditingController();
 
   void _sendMessage() {

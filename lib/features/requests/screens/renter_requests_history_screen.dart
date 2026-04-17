@@ -4,7 +4,7 @@ import 'package:prokat/core/widgets/page_header.dart';
 import 'package:prokat/features/requests/models/request_model.dart';
 import 'package:prokat/features/requests/state/request_provider.dart';
 import 'package:go_router/go_router.dart';
-import 'package:prokat/features/requests/widgets.dart/request_tile.dart';
+import 'package:prokat/features/requests/widgets.dart/client_request_tile.dart';
 
 class RenterRequestsHistoryScreen extends ConsumerWidget {
   const RenterRequestsHistoryScreen({super.key});
@@ -103,7 +103,7 @@ class RenterRequestsHistoryScreen extends ConsumerWidget {
           ...past.map(
             (r) => Padding(
               padding: const EdgeInsets.only(bottom: 12),
-              child: RequestTile(request: r),
+              child: ClientRequestTile(request: r),
             ),
           ),
         ],

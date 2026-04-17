@@ -60,7 +60,7 @@ class LogoutButton extends ConsumerWidget {
     final authState = ref.watch(authProvider);
 
     return BaseTile(
-      color: colorScheme.error.withValues(alpha: 0.2),
+      color: colorScheme.error.withValues(alpha: 0.3),
       onTap: authState.isLoading ? null : () => _confirmLogout(context, ref),
       child: Row(
         children: [

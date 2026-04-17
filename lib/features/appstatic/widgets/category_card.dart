@@ -3,12 +3,20 @@ import 'package:prokat/features/categories/models/category.dart';
 
 class CategoryCard extends StatelessWidget {
   final Category category;
+  final bool isSelected;
   final VoidCallback onTap;
 
-  const CategoryCard({super.key, required this.category, required this.onTap});
+  const CategoryCard({
+    super.key,
+    required this.category,
+    required this.onTap,
+    required this.isSelected,
+  });
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return GestureDetector(
       onTap: onTap,
       child: Column(
@@ -17,10 +25,15 @@ class CategoryCard extends StatelessWidget {
             child: Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: Colors.orange.withAlpha(8),
+                color: theme.scaffoldBackgroundColor,
+                border: Border.all(
+                  color: isSelected
+                      ? theme.colorScheme.primary
+                      : theme.colorScheme.outline.withValues(alpha: 0.4),
+                ),
                 borderRadius: BorderRadius.circular(16),
               ),
-              child: Image.asset(
+              child: Image.network(
                 height: 72, // 👈 image limit only
                 category.imageUrl ?? "",
                 fit: BoxFit.contain,
@@ -35,7 +48,16 @@ class CategoryCard extends StatelessWidget {
           const SizedBox(height: 8),
           Text(
             category.name,
-            style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
+            style: TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w600,
+              color: isSelected
+                  ? theme.colorScheme.primary
+                  : theme
+                        .textTheme
+                        .bodyMedium
+                        ?.color, // .withValues(alpha: 0.4),
+            ),
           ),
         ],
       ),
