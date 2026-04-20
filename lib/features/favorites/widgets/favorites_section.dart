@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:prokat/core/router/app_routes.dart';
 import 'package:prokat/core/widgets/app_link_button.dart';
-import 'package:prokat/features/equipment/providers/equipment_provider.dart';
 import 'package:prokat/features/favorites/state/favorites_provider.dart';
 import 'package:go_router/go_router.dart';
 import 'package:prokat/features/favorites/widgets/favorite_item_tile.dart';
@@ -14,11 +13,7 @@ class FavoritesSection extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     // Assuming favoriteProvider returns a list of Equipment objects
-    final favorites = ref.watch(favoriteProvider).favoritesIds;
-    final equipmentState = ref.watch(equipmentProvider);
-    final favoriteEquipment = equipmentState.renterEquipment
-        .where((item) => favorites?.contains(item.id) ?? false)
-        .toList();
+    final favorites = ref.watch(favoriteProvider).favorites;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -48,23 +43,22 @@ class FavoritesSection extends ConsumerWidget {
           _buildEmptyFavorites(theme)
         else
           SizedBox(
-            height: 200, // Adjust height based on your equipment tile design
+            height: 220, // Adjust height based on your equipment tile design
             child: ListView.builder(
               scrollDirection: Axis.horizontal,
-              itemCount: favoriteEquipment.length,
+              itemCount: favorites?.length,
               itemBuilder: (context, index) {
-                final item = favoriteEquipment[index];
-                return Padding(
-                  padding: const EdgeInsets.only(right: 12),
-                  child: FavoriteItemTile(
-                    equipment: item,
-                    onTap: () async {
-                      ref
-                          .read(favoriteProvider.notifier)
-                          .toggleFavorite(item.id);
-                    },
-                  ),
-                );
+                final item = favorites?[index];
+                if (item == null) {
+                  return null;
+                } else {
+                  return Padding(
+                    padding: const EdgeInsets.only(right: 12),
+                    child: FavoriteItemTile(
+                      equipment: item,
+                    ),
+                  );
+                }
               },
             ),
           ),

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:prokat/core/widgets/page_header.dart';
-import 'package:prokat/features/requests/models/request_model.dart';
+import 'package:prokat/features/auth/providers/auth_provider.dart';
 import 'package:prokat/features/requests/state/request_provider.dart';
 import 'package:go_router/go_router.dart';
 import 'package:prokat/features/requests/widgets.dart/client_request_tile.dart';
@@ -11,120 +10,116 @@ class RenterRequestsHistoryScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final theme = Theme.of(context);
+    final authSession = ref.watch(authProvider).session;
     final state = ref.watch(requestProvider);
-    const bgColor = Color(0xFF121417);
-    // const accentColor = Color(0xFF4E73DF);
 
     final past = state.requests
         .where((r) => ["ACCEPTED", "CANCELLED", "EXPIRED"].contains(r.status))
         .toList();
 
     return Scaffold(
-      backgroundColor: bgColor,
-      body: SafeArea(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Padding(
-              padding: const EdgeInsets.only(right: 12.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Expanded(child: PageHeader(title: "Request History")),
-                  // Small technical Archive button
-                  IconButton(
-                    onPressed: () => context.push('/requests'),
-                    icon: const Icon(
-                      Icons.history_toggle_off_rounded,
-                      color: Color(0x4DFFFFFF),
-                      size: 24,
-                    ),
-                    tooltip: "Requests History",
-                  ),
-                ],
+      backgroundColor: theme.scaffoldBackgroundColor,
+      body: CustomScrollView(
+        slivers: [
+          SliverAppBar(
+            automaticallyImplyLeading: false,
+            expandedHeight: 60,
+            floating: true,
+            pinned: true,
+            backgroundColor: theme.colorScheme.primary,
+            leading: IconButton(
+              icon: Icon(
+                Icons.arrow_back_ios_new_rounded,
+                size: 20,
+                color: theme.colorScheme.onPrimary,
+              ),
+              onPressed: () => context.pop(),
+            ),
+            title: Text(
+              "Requests History", // Changed title to differentiate from Active
+              style: theme.textTheme.titleLarge?.copyWith(
+                color: theme.colorScheme.onPrimary,
               ),
             ),
-
-            Expanded(child: _buildContent(context, ref, state, [], past)),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildContent(
-    BuildContext context,
-    WidgetRef ref,
-    state,
-    List<RequestModel> active,
-    List<RequestModel> past,
-  ) {
-    if (state.isLoading) {
-      return const Center(
-        child: CircularProgressIndicator(color: Color(0xFF4E73DF)),
-      );
-    }
-
-    if (state.error != null) {
-      return Center(
-        child: Text(
-          "Error: ${state.error}",
-          style: const TextStyle(color: Colors.redAccent),
-        ),
-      );
-    }
-
-    if (state.requests.isEmpty) {
-      return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              Icons.description_outlined,
-              size: 64,
-              color: Colors.white.withValues(alpha: 0.1),
-            ),
-            const SizedBox(height: 16),
-            Text(
-              "No requests found",
-              style: TextStyle(color: Colors.white.withValues(alpha: 0.3)),
-            ),
-          ],
-        ),
-      );
-    }
-
-    return ListView(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-      children: [
-        if (past.isNotEmpty) ...[
-          _SectionLabel(label: "PAST REQUESTS"),
-          const SizedBox(height: 12),
-          ...past.map(
-            (r) => Padding(
-              padding: const EdgeInsets.only(bottom: 12),
-              child: ClientRequestTile(request: r),
-            ),
+            actions: [
+              IconButton(
+                onPressed: () => authSession == null ? null : context.pop(),
+                icon: Icon(
+                  Icons.list, // Icon changed to represent "Active List"
+                  color: theme.colorScheme.onPrimary,
+                  size: 24,
+                ),
+                tooltip: "Active Requests",
+              ),
+            ],
+            actionsPadding: EdgeInsets.only(right: 12),
           ),
+
+          // Logic-based Sliver sections
+          if (state.isLoading)
+            const SliverFillRemaining(
+              child: Center(
+                child: CircularProgressIndicator(color: Color(0xFF4E73DF)),
+              ),
+            )
+          else if (state.error != null)
+            SliverFillRemaining(
+              child: Center(
+                child: Text(
+                  "Error: ${state.error}",
+                  style: const TextStyle(color: Colors.redAccent),
+                ),
+              ),
+            )
+          else if (past.isEmpty)
+            SliverFillRemaining(
+              hasScrollBody: false,
+              child: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.history_rounded,
+                      size: 64,
+                      color: Colors.grey.withValues(alpha: 0.7),
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      "No history found",
+                      style: TextStyle(
+                        color: Colors.grey.withValues(alpha: 0.7),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            )
+          else ...[
+            // Header for the list
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(24, 24, 24, 12),
+                child: Text(
+                  "PAST REQUESTS",
+                  style: theme.textTheme.labelMedium,
+                ),
+              ),
+            ),
+            // The History List
+            SliverPadding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              sliver: SliverList(
+                delegate: SliverChildBuilderDelegate((context, index) {
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: 12),
+                    child: ClientRequestTile(request: past[index]),
+                  );
+                }, childCount: past.length),
+              ),
+            ),
+          ],
         ],
-      ],
-    );
-  }
-}
-
-class _SectionLabel extends StatelessWidget {
-  final String label;
-  const _SectionLabel({required this.label});
-
-  @override
-  Widget build(BuildContext context) {
-    return Text(
-      label,
-      style: TextStyle(
-        color: Colors.white.withValues(alpha: 0.3),
-        fontSize: 11,
-        fontWeight: FontWeight.bold,
-        letterSpacing: 1.5,
       ),
     );
   }

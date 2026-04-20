@@ -109,66 +109,6 @@ class OwnerProfileScreen extends ConsumerWidget {
                   Padding(
                     padding: const EdgeInsets.only(bottom: 12),
                     child: Text(
-                      "Balance",
-                      style: const TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black87,
-                      ),
-                    ),
-                  ),
-
-                  Row(
-                    children: [
-                      _buildStatCard(
-                        context,
-                        "Online Time",
-                        "2 Weeks",
-                        const Color.fromARGB(255, 255, 0, 0),
-                        AppRoutes.ownerPayment,
-                      ),
-                    ],
-                  ),
-
-                  const SizedBox(height: 24),
-
-                  Padding(
-                    padding: const EdgeInsets.only(bottom: 12),
-                    child: Text(
-                      "Performance",
-                      style: const TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black87,
-                      ),
-                    ),
-                  ),
-
-                  Row(
-                    children: [
-                      _buildStatCard(
-                        context,
-                        "Total Assets",
-                        "24",
-                        Colors.blue,
-                        AppRoutes.ownerEquiment,
-                      ),
-                      const SizedBox(width: 12),
-                      _buildStatCard(
-                        context,
-                        "Active Rents",
-                        "08",
-                        Colors.orange,
-                        AppRoutes.ownerBookings,
-                      ),
-                    ],
-                  ),
-
-                  const SizedBox(height: 24),
-
-                  Padding(
-                    padding: const EdgeInsets.only(bottom: 12),
-                    child: Text(
                       "Account",
                       style: const TextStyle(
                         fontSize: 18,
@@ -222,48 +162,6 @@ class OwnerProfileScreen extends ConsumerWidget {
             ),
           ),
         ],
-      ),
-    );
-  }
-
-  Widget _buildStatCard(
-    BuildContext context,
-    String label,
-    String value,
-    Color color,
-    String url,
-  ) {
-    return Expanded(
-      child: GestureDetector(
-        onTap: () => context.push(url),
-        child: BaseTile(
-          padding: const EdgeInsets.all(0),
-          color: color.withValues(alpha: 0.15),
-          child: Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: color.withValues(alpha: 0.15),
-              borderRadius: BorderRadius.circular(20),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  label,
-                  style: TextStyle(color: color, fontWeight: FontWeight.w600),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  value,
-                  style: const TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
       ),
     );
   }

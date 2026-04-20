@@ -63,17 +63,15 @@ class CategorySelectionSheet extends ConsumerWidget {
                       size: 20,
                     ),
                   ),
-                  title: Text(
-                    category.name,
-                    style: theme.textTheme.bodyLarge,
-                  ),
+                  title: Text(category.name, style: theme.textTheme.bodyLarge),
                   onTap: () {
-                    if (service == "request") {
+                    if (service == "create_request") {
                       // Update the Request Notifier
                       ref
                           .read(requestProvider.notifier)
                           .selectCategory(category);
-                    } else if (service == "equipment") {
+                    } else if (service == "create_equipment" ||
+                        service == "edit_equipment") {
                       // Update the Equipment Notifier
                       ref
                           .read(equipmentProvider.notifier)

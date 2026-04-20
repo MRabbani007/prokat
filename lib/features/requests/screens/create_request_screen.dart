@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:prokat/core/widgets/industrial_text_field.dart';
-import 'package:prokat/core/widgets/page_header.dart';
 import 'package:prokat/features/categories/providers/category_provider.dart';
 import 'package:prokat/features/equipment/widgets/owner/category_selector_tile.dart';
 import 'package:prokat/features/locations/state/location_provider.dart';
@@ -70,6 +69,9 @@ class _CreateRequestScreenState extends ConsumerState<CreateRequestScreen> {
           .firstOrNull;
 
       if (profileCategoryId != null && foundCategory != null) {
+        print("category update");
+        print(profileCategoryId.toString());
+        print(foundCategory.name);
         ref.read(requestProvider.notifier).selectCategory(foundCategory);
       }
     });
@@ -77,172 +79,178 @@ class _CreateRequestScreenState extends ConsumerState<CreateRequestScreen> {
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
       body: SafeArea(
-        child: ListView(
-          padding: EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-          children: [
-            const PageHeader(title: "New Request"),
-
-            CategorySelectorTile(mode: "create_request"),
-
-            const SizedBox(height: 24),
-
-            Padding(
-              padding: const EdgeInsets.only(bottom: 12, left: 4),
-              child: Text(
-                "Delivery Location",
-                style: theme.textTheme.bodyMedium,
+        child: CustomScrollView(
+          slivers: [
+            SliverAppBar(
+              automaticallyImplyLeading: false,
+              expandedHeight: 60, // Adjust height as needed
+              floating: true, // AppBar reappears immediately when scrolling up
+              pinned: true,
+              backgroundColor: theme.colorScheme.primary,
+              leading: IconButton(
+                icon: Icon(
+                  Icons.arrow_back_ios_new_rounded,
+                  size: 20,
+                  color: theme.colorScheme.onPrimary,
+                ),
+                onPressed: () => context.pop(),
+              ),
+              title: Text(
+                "New Request",
+                style: theme.textTheme.titleLarge?.copyWith(
+                  color: theme.colorScheme.onPrimary,
+                ),
               ),
             ),
 
-            AddressPickerCard(
-              selectedAddress: locationState.selectedAddress,
-              onTap: () => _openAddressSheet(context),
-            ),
+            SliverPadding(
+              padding: const EdgeInsets.all(24.0),
+              sliver: SliverToBoxAdapter(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    CategorySelectorTile(mode: "create_request"),
+                    const SizedBox(height: 24),
 
-            const SizedBox(height: 24),
+                    Text(
+                      "Delivery Location",
+                      style: theme.textTheme.bodyMedium,
+                    ),
 
-            Padding(
-              padding: const EdgeInsets.only(bottom: 12, left: 4),
-              child: Text("Equipment Specs", style: theme.textTheme.bodyMedium),
-            ),
+                    const SizedBox(height: 12),
+                    AddressPickerCard(
+                      selectedAddress: locationState.selectedAddress,
+                      onTap: () => _openAddressSheet(context),
+                    ),
 
-            IndustrialTextField(
-              controller: capacityController,
-              label: "Required Capacity",
-              hint: "e.g. 10 Kub",
-              icon: Icons.high_quality_rounded,
-              keyboardType: TextInputType.text,
-              onChanged: (value) {
-                ref
-                    .read(requestProvider.notifier)
-                    .setCapacity(value.toString());
-              },
-            ),
+                    const SizedBox(height: 24),
 
-            IndustrialTextField(
-              controller: rateController,
-              label: "Offered Rate",
-              hint: "Price you're willing to pay",
-              icon: Icons.payments_outlined,
-              keyboardType: TextInputType.number,
-              onChanged: (value) {
-                final rate = int.tryParse(value);
+                    Text("Equipment Specs", style: theme.textTheme.bodyMedium),
+                    const SizedBox(height: 12),
+                    IndustrialTextField(
+                      controller: capacityController,
+                      label: "Required Capacity",
+                      hint: "e.g. 10 Kub",
+                      icon: Icons.high_quality_rounded,
+                      onChanged: (value) =>
+                          ref.read(requestProvider.notifier).setCapacity(value),
+                    ),
+                    IndustrialTextField(
+                      controller: rateController,
+                      label: "Offered Rate",
+                      hint: "Price you're willing to pay",
+                      icon: Icons.payments_outlined,
+                      keyboardType: TextInputType.number,
+                      onChanged: (value) {
+                        final rate = int.tryParse(value);
+                        if (rate != null)
+                          ref
+                              .read(requestProvider.notifier)
+                              .setOfferedRate(rate);
+                      },
+                    ),
+                    IndustrialTextField(
+                      controller: commentController,
+                      label: "Comments",
+                      hint: "Additional details...",
+                      icon: Icons.chat_bubble_outline_rounded,
+                      maxLines: 3,
+                      onChanged: (value) =>
+                          ref.read(requestProvider.notifier).setComment(value),
+                    ),
 
-                if (rate != null) {
-                  ref.read(requestProvider.notifier).setOfferedRate(rate);
-                }
-              },
-            ),
+                    const SizedBox(height: 24),
 
-            IndustrialTextField(
-              controller: commentController,
-              label: "Comments",
-              hint: "Additional details...",
-              icon: Icons.chat_bubble_outline_rounded,
-              maxLines: 3,
-              onChanged: (value) {
-                ref.read(requestProvider.notifier).setComment(value);
-              },
-            ),
-
-            const SizedBox(height: 24),
-
-            Padding(
-              padding: const EdgeInsets.only(bottom: 12, left: 4),
-              child: Text("Date & Time", style: theme.textTheme.bodyMedium),
-            ),
-
-            Row(
-              children: [
-                Expanded(
-                  child: _DateTimeButton(
-                    icon: Icons.calendar_today_rounded,
-                    label: requestState.selectedDate == null
-                        ? "Select Date"
-                        : DateFormat(
-                            'MMM dd, yyyy',
-                          ).format(requestState.selectedDate!),
-                    onTap: () async {
-                      final date = await showDatePicker(
-                        context: context,
-                        initialDate: DateTime.now(),
-                        firstDate: DateTime.now(),
-                        lastDate: DateTime.now().add(const Duration(days: 365)),
-                      );
-                      if (date != null) requestNotifier.setDate(date);
-                    },
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: _DateTimeButton(
-                    icon: Icons.access_time_rounded,
-                    label: requestState.selectedTime == null
-                        ? "Select Time"
-                        : TimeOfDay.fromDateTime(
-                            requestState.selectedTime!,
-                          ).format(context),
-                    onTap: () async {
-                      final time = await showTimePicker(
-                        context: context,
-                        initialTime: TimeOfDay.now(),
-                      );
-                      if (time != null) {
-                        final now = DateTime.now();
-                        requestNotifier.setTime(
-                          DateTime(
-                            now.year,
-                            now.month,
-                            now.day,
-                            time.hour,
-                            time.minute,
+                    Text("Date & Time", style: theme.textTheme.bodyMedium),
+                    const SizedBox(height: 12),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: _DateTimeButton(
+                            icon: Icons.calendar_today_rounded,
+                            label: requestState.selectedDate == null
+                                ? "Select Date"
+                                : DateFormat(
+                                    'MMM dd, yyyy',
+                                  ).format(requestState.selectedDate!),
+                            onTap: () async {
+                              final date = await showDatePicker(
+                                context: context,
+                                initialDate: DateTime.now(),
+                                firstDate: DateTime.now(),
+                                lastDate: DateTime.now().add(
+                                  const Duration(days: 365),
+                                ),
+                              );
+                              if (date != null) requestNotifier.setDate(date);
+                            },
                           ),
-                        );
-                      }
-                    },
-                  ),
-                ),
-              ],
-            ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: _DateTimeButton(
+                            icon: Icons.access_time_rounded,
+                            label: requestState.selectedTime == null
+                                ? "Select Time"
+                                : TimeOfDay.fromDateTime(
+                                    requestState.selectedTime!,
+                                  ).format(context),
+                            onTap: () async {
+                              final time = await showTimePicker(
+                                context: context,
+                                initialTime: TimeOfDay.now(),
+                              );
+                              if (time != null) {
+                                final now = DateTime.now();
+                                requestNotifier.setTime(
+                                  DateTime(
+                                    now.year,
+                                    now.month,
+                                    now.day,
+                                    time.hour,
+                                    time.minute,
+                                  ),
+                                );
+                              }
+                            },
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 40),
 
-            const SizedBox(height: 30),
-
-            // Submit Button
-            SizedBox(
-              width: double.infinity,
-              height: 58,
-              child: ElevatedButton(
-                onPressed: () async {
-                  final res = await requestNotifier.createRequest();
-
-                  if (context.mounted && res == true) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text("Request created")),
-                    );
-
-                    context.pop();
-                  } else if (context.mounted) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text("Something went wrong!")),
-                    );
-                  }
-                },
-                style: ElevatedButton.styleFrom(
-                  disabledBackgroundColor: Colors.white.withValues(alpha: 0.05),
-                  disabledForegroundColor: Colors.white.withValues(alpha: 0.2),
-                  backgroundColor: theme.colorScheme.primary,
-                  foregroundColor: Colors.white,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  elevation: 6,
-                ),
-                child: const Text(
-                  "SUBMIT REQUEST",
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    letterSpacing: 1.2,
-                  ),
+                    // Submit Button
+                    SizedBox(
+                      width: double.infinity,
+                      height: 58,
+                      child: ElevatedButton(
+                        onPressed: () async {
+                          final res = await requestNotifier.createRequest();
+                          if (context.mounted && res == true) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text("Request created")),
+                            );
+                            context.pop();
+                          }
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: theme.colorScheme.primary,
+                          foregroundColor: Colors.white,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                          elevation: 0, // Flat design looks better in slivers
+                        ),
+                        child: const Text(
+                          "SUBMIT REQUEST",
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            letterSpacing: 1.2,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ),

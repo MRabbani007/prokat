@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:prokat/core/router/app_routes.dart';
 import 'package:prokat/features/equipment/providers/equipment_provider.dart';
 import 'package:prokat/features/equipment/widgets/owner/owner_equipment_card.dart';
 import 'package:shimmer/shimmer.dart';
@@ -46,34 +47,35 @@ class _OwnerEquipmentListScreenState
             floating: true,
             pinned: true,
             elevation: 0,
-            scrolledUnderElevation: 2, 
-            backgroundColor: theme.colorScheme.surface,
+            scrolledUnderElevation: 2,
+            backgroundColor: theme.colorScheme.primary,
             leading: IconButton(
-              icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 20),
+              icon: Icon(
+                Icons.arrow_back_ios_new_rounded,
+                size: 20,
+                color: theme.colorScheme.onPrimary,
+              ),
               onPressed: () => context.pop(),
             ),
             title: Text(
               "My Equipment",
               style: theme.textTheme.titleLarge?.copyWith(
-                fontWeight: FontWeight.bold,
+                color: theme.colorScheme.onPrimary,
               ),
             ),
             centerTitle: true,
             actions: [
-              Padding(
-                padding: const EdgeInsets.only(right: 16),
-                child: IconButton.filled(
-                  // filled variant uses primary by default
-                  onPressed: () => context.push('/owner/equipment/create'),
-                  icon: const Icon(Icons.add, size: 24),
-                  style: IconButton.styleFrom(
-                    backgroundColor: theme.colorScheme.primary,
-                    foregroundColor: theme.colorScheme.onPrimary,
-                    shape: CircleBorder(),
-                  ),
+              IconButton(
+                onPressed: () => context.push(AppRoutes.ownerEquimentCreate),
+                icon: Icon(
+                  Icons.add,
+                  color: theme.colorScheme.onPrimary,
+                  size: 24,
                 ),
+                tooltip: "Add Equipment",
               ),
             ],
+            actionsPadding: EdgeInsets.only(right: 12),
           ),
 
           // 2. Stats and Add Button Section

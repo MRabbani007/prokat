@@ -1,5 +1,4 @@
 import 'package:dio/dio.dart';
-import 'package:flutter/rendering.dart';
 import 'package:prokat/core/api/api_client.dart';
 import '../../../core/constants/api_routes.dart';
 import '../models/equipment_model.dart';
@@ -51,6 +50,7 @@ class EquipmentService {
 
       return parsed;
     } catch (e) {
+      
       throw Exception(e);
     }
   }

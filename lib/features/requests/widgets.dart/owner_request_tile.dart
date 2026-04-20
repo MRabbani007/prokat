@@ -140,7 +140,35 @@ class OwnerRequestTile extends ConsumerWidget {
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    _buildEnhancedImage(request.category?.imageUrl),
+                    Container(
+                      decoration: BoxDecoration(
+                        border: Border.all(
+                          color: theme.colorScheme.outline.withValues(
+                            alpha: 0.3,
+                          ),
+                        ),
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(16),
+                        child: SizedBox(
+                          width: 110,
+                          height: 64,
+                          child: Image.network(
+                            request.category?.imageUrl ?? "",
+                            fit: BoxFit.cover,
+                            errorBuilder: (_, _, _) => Container(
+                              color: Colors.grey[200],
+                              child: const Icon(
+                                Icons.category_outlined,
+                                color: Colors.grey,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+
                     const SizedBox(width: 16),
                     Expanded(
                       child: Column(
@@ -262,32 +290,6 @@ class OwnerRequestTile extends ConsumerWidget {
                   ],
                 ),
               ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildEnhancedImage(String? url) {
-    return Container(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(color: Colors.black.withValues(alpha: 0.3), blurRadius: 8),
-        ],
-      ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(16),
-        child: SizedBox(
-          width: 110,
-          height: 64,
-          child: Image.network(
-            url ?? "",
-            fit: BoxFit.cover,
-            errorBuilder: (_, _, _) => Container(
-              color: Colors.grey[200],
-              child: const Icon(Icons.category_outlined, color: Colors.grey),
             ),
           ),
         ),

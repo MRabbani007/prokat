@@ -23,7 +23,9 @@ const kazakhstanCities = [
 
 class CityPickerSheet extends ConsumerWidget {
   final String? mode;
-  const CityPickerSheet({super.key, this.mode});
+  final ScrollController scrollController;
+
+  const CityPickerSheet({super.key, this.mode, required this.scrollController});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -43,6 +45,7 @@ class CityPickerSheet extends ConsumerWidget {
             // City list
             Flexible(
               child: ListView.separated(
+                controller: scrollController,
                 shrinkWrap: true,
                 itemCount: kazakhstanCities.length,
                 separatorBuilder: (_, _) => const Divider(),

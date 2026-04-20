@@ -68,12 +68,11 @@ class UserCategorySelector extends ConsumerWidget {
                       color: isSelected
                           ? accent.withValues(alpha: 0.3)
                           : theme.colorScheme.outline.withValues(alpha: 0.3),
-                      width: isSelected ? 2 : 1.5,
                     ),
                     boxShadow: [
                       BoxShadow(
                         color: Colors.black.withValues(alpha: 0.3),
-                        blurRadius: 10,
+                        blurRadius: 8,
                         offset: const Offset(0, 4),
                       ),
                     ],

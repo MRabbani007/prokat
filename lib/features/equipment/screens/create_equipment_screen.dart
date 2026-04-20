@@ -73,18 +73,19 @@ class _CreateEquipmentScreenState extends ConsumerState<CreateEquipmentScreen> {
             pinned: true,
             elevation: 0,
             scrolledUnderElevation: 2,
-            backgroundColor: theme.colorScheme.surface,
+            backgroundColor: theme.colorScheme.primary,
             leading: IconButton(
               icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 20),
               onPressed: () => context.pop(),
+              color: theme.colorScheme.onPrimary,
             ),
             title: Text(
               "Add Equipment",
               style: theme.textTheme.titleLarge?.copyWith(
-                fontWeight: FontWeight.bold,
+                color: theme.colorScheme.onPrimary,
               ),
             ),
-            centerTitle: true,
+            centerTitle: false,
           ),
 
           SliverPadding(

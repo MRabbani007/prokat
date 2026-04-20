@@ -23,7 +23,17 @@ class UserLocationTile extends ConsumerWidget {
           shape: const RoundedRectangleBorder(
             borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
           ),
-          builder: (context) => CityPickerSheet(),
+          builder: (context) {
+            return DraggableScrollableSheet(
+              initialChildSize: 0.7, // Opens at 70% height
+              maxChildSize: 0.9, // Can be dragged up to 90%
+              minChildSize: 0.4, // Can be dragged down to 40%
+              expand: false,
+              builder: (context, scrollController) {
+                return CityPickerSheet(scrollController: scrollController);
+              },
+            );
+          },
         );
       },
       child: BaseTile(
@@ -71,4 +81,3 @@ class UserLocationTile extends ConsumerWidget {
     );
   }
 }
-

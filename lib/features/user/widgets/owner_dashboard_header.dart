@@ -31,10 +31,7 @@ class _OwnerDashboardHeaderState extends ConsumerState<OwnerDashboardHeader> {
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [
-            theme.primaryColor,
-            theme.primaryColor.withValues(alpha: 0.7),
-          ],
+          colors: [theme.primaryColor, theme.primaryColorDark],
         ),
         border: Border(bottom: BorderSide(color: colorScheme.outlineVariant)),
       ),
@@ -127,28 +124,17 @@ class _OwnerDashboardHeaderState extends ConsumerState<OwnerDashboardHeader> {
           ),
 
           // Chat Button
-          Container(
-            // Adjust margin for external "breathing room" or use Padding
-            margin: const EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              shape:
-                  BoxShape.circle, // Keeps the shadow circular like the button
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.4),
-                  blurRadius: 10,
-                  offset: const Offset(0, 4),
-                ),
-              ],
+          IconButton(
+            // Adds internal padding between the icon and the button edge
+            padding: const EdgeInsets.all(12),
+            icon: Icon(
+              LucideIcons.messageSquare,
+              size: 24,
+              color: theme.colorScheme.onPrimary,
             ),
-            child: IconButton.filledTonal(
-              // Adds internal padding between the icon and the button edge
-              padding: const EdgeInsets.all(12),
-              icon: const Icon(LucideIcons.messageSquare, size: 20),
-              onPressed: () {
-                context.push(AppRoutes.ownerChatList);
-              },
-            ),
+            onPressed: () {
+              context.push(AppRoutes.ownerChatList);
+            },
           ),
         ],
       ),

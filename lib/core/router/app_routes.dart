@@ -20,8 +20,11 @@ class AppRoutes {
   static const String searchMap = '/search/map';
   static const String equipmentId = '/equipment/:id';
   static const String booking = '/equipment/:id/book';
+
   static const String clientRequests = '/requests';
   static const String createRequest = '/requests/create';
+  static const String clientRequestHistory = '/requests/history';
+
   static const String clientOrders = '/orders';
   static const String clientOrdersHistory = '/history';
   static const String favorites = '/favorites';

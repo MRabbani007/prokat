@@ -254,7 +254,7 @@ class ClientEquipmentCard extends ConsumerWidget {
                       child: ElevatedButton(
                         onPressed: onTap,
                         style: ElevatedButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(vertical: 14),
+                          padding: const EdgeInsets.symmetric(vertical: 20),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(14),
                           ),

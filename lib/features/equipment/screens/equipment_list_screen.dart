@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:prokat/core/router/app_routes.dart';
+import 'package:prokat/features/appstatic/widgets/search_box.dart';
 import 'package:prokat/features/bookings/state/booking_provider.dart';
 import 'package:prokat/features/equipment/providers/equipment_provider.dart';
 import 'package:prokat/features/favorites/state/favorites_provider.dart';
 import 'package:prokat/features/favorites/widgets/favorites_section.dart';
 import 'package:prokat/features/locations/state/location_provider.dart';
+import 'package:prokat/features/user/widgets/city_picker_sheet.dart';
 import 'package:prokat/features/user/widgets/user_category_selector.dart';
 import 'package:prokat/features/equipment/widgets/list/client_equipment_card.dart';
-import 'package:prokat/features/user/widgets/user_location_tile.dart';
 
 class EquipmentListScreen extends ConsumerStatefulWidget {
   final String? query, category, city;
@@ -31,9 +31,6 @@ class EquipmentListScreen extends ConsumerStatefulWidget {
 
 class _EquipmentListScreenState extends ConsumerState<EquipmentListScreen> {
   bool _isSearchVisible = false;
-  final bgColor = const Color(0xFF121417);
-  final cardColor = const Color(0xFF1E2125);
-  final accentColor = const Color(0xFF4E73DF);
 
   @override
   void initState() {
@@ -62,6 +59,9 @@ class _EquipmentListScreenState extends ConsumerState<EquipmentListScreen> {
     final items = ref.watch(equipmentProvider).renterEquipment;
     final bookingNotifier = ref.read(bookingProvider.notifier);
 
+    final locationState = ref.watch(locationProvider);
+    final selectedCity = locationState.city;
+
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
       body: SafeArea(
@@ -82,13 +82,62 @@ class _EquipmentListScreenState extends ConsumerState<EquipmentListScreen> {
                 onPressed: () => context.pop(),
               ),
               title: Text(
-                "Browse Equipment",
+                "Search",
                 style: theme.textTheme.titleLarge?.copyWith(
                   color: theme.colorScheme.onPrimary,
                 ),
               ),
               centerTitle: false,
               actions: [
+                TextButton.icon(
+                  onPressed: () {
+                    showModalBottomSheet(
+                      context: context,
+                      isScrollControlled:
+                          true, // Recommended if CityPickerSheet has a list
+                      backgroundColor: Colors.transparent,
+                      shape: const RoundedRectangleBorder(
+                        borderRadius: BorderRadius.vertical(
+                          top: Radius.circular(20),
+                        ),
+                      ),
+                      builder: (context) {
+                        return DraggableScrollableSheet(
+                          initialChildSize: 0.7, // Opens at 70% height
+                          maxChildSize: 0.9, // Can be dragged up to 90%
+                          minChildSize: 0.4, // Can be dragged down to 40%
+                          expand: false,
+                          builder: (context, scrollController) {
+                            return Container(
+                              decoration: BoxDecoration(
+                                color: Theme.of(context).cardColor,
+                                borderRadius: const BorderRadius.vertical(
+                                  top: Radius.circular(20),
+                                ),
+                              ),
+                              child: CityPickerSheet(
+                                // IMPORTANT: Pass this controller to your ListView/GridView
+                                scrollController: scrollController,
+                              ),
+                            );
+                          },
+                        );
+                      },
+                    );
+                  },
+                  icon: Icon(
+                    Icons.location_on_outlined,
+                    size: 20,
+                    color: theme.colorScheme.onPrimary,
+                  ),
+                  label: Text(
+                    selectedCity ?? "Select City",
+                  ), // Replace with a dynamic state variable
+                  style: TextButton.styleFrom(
+                    foregroundColor: theme.colorScheme.onPrimary,
+                  ),
+                ),
+                const SizedBox(width: 8), // Padding from the screen edge
                 IconButton(
                   onPressed: () =>
                       setState(() => _isSearchVisible = !_isSearchVisible),
@@ -99,16 +148,17 @@ class _EquipmentListScreenState extends ConsumerState<EquipmentListScreen> {
                   ),
                   tooltip: "Search",
                 ),
-                IconButton(
-                  onPressed: () => context.push(AppRoutes.searchMap),
-                  icon: Icon(
-                    Icons.map,
-                    color: theme.colorScheme.onPrimary,
-                    size: 24,
-                  ),
-                  tooltip: "View on Map",
-                ),
+                // IconButton(
+                //   onPressed: () => context.push(AppRoutes.searchMap),
+                //   icon: Icon(
+                //     Icons.map,
+                //     color: theme.colorScheme.onPrimary,
+                //     size: 24,
+                //   ),
+                //   tooltip: "View on Map",
+                // ),
               ],
+              actionsPadding: EdgeInsets.only(right: 12),
             ),
 
             SliverToBoxAdapter(
@@ -120,64 +170,17 @@ class _EquipmentListScreenState extends ConsumerState<EquipmentListScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    UserLocationTile(),
+                    // UserLocationTile(),
+                    SearchBox(),
 
                     const SizedBox(height: 24),
-
-                    /// Animated Search Bar
-                    AnimatedVisibility(
-                      visible: _isSearchVisible,
-                      child: Padding(
-                        padding: const EdgeInsets.only(top: 16),
-                        child: TextField(
-                          style: const TextStyle(color: Colors.white),
-                          decoration: InputDecoration(
-                            hintText: "SEARCH FLEET...",
-                            hintStyle: TextStyle(
-                              color: Colors.white.withValues(alpha: 0.2),
-                              fontSize: 12,
-                              letterSpacing: 1,
-                            ),
-                            prefixIcon: Icon(
-                              Icons.search_rounded,
-                              color: accentColor,
-                              size: 20,
-                            ),
-                            filled: true,
-                            fillColor: Colors.white.withValues(alpha: 0.03),
-                            contentPadding: const EdgeInsets.symmetric(
-                              horizontal: 16,
-                              vertical: 12,
-                            ),
-                            enabledBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(14),
-                              borderSide: BorderSide(
-                                color: Colors.white.withValues(alpha: 0.08),
-                              ),
-                            ),
-                            focusedBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(14),
-                              borderSide: const BorderSide(
-                                color: Color(0xFF4E73DF),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-
-                    const SizedBox(height: 12),
-
-                    FavoritesSection(),
-
-                    const SizedBox(height: 12),
 
                     const UserCategorySelector(),
 
                     const SizedBox(height: 12),
 
                     Text(
-                      "Browse Equipment",
+                      "Search",
                       style: theme.textTheme.titleLarge?.copyWith(
                         fontWeight: FontWeight.w800,
                         letterSpacing: -0.5,
@@ -193,10 +196,7 @@ class _EquipmentListScreenState extends ConsumerState<EquipmentListScreen> {
               delegate: SliverChildBuilderDelegate((context, index) {
                 final equipment = items[index];
                 return Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 24,
-                    vertical: 12,
-                  ),
+                  padding: const EdgeInsets.fromLTRB(24, 0, 24, 12),
                   child: ClientEquipmentCard(
                     equipment: equipment,
                     onTap: () {
@@ -206,6 +206,11 @@ class _EquipmentListScreenState extends ConsumerState<EquipmentListScreen> {
                   ),
                 );
               }, childCount: items.length),
+            ),
+
+            SliverPadding(
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
+              sliver: SliverToBoxAdapter(child: FavoritesSection()),
             ),
 
             // 3. Bottom padding

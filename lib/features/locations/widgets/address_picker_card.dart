@@ -23,12 +23,12 @@ class AddressPickerCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
             color: theme.colorScheme.outline.withValues(
-              alpha: 0.6,
+              alpha: 0.3,
             ), 
           ),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.4),
+              color: Colors.black.withValues(alpha: 0.3),
               blurRadius: 8,
               offset: const Offset(0, 4),
             ),

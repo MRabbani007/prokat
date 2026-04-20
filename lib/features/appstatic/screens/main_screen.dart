@@ -47,6 +47,7 @@ class MainScreen extends ConsumerStatefulWidget {
     this.query,
     this.category,
     this.city,
+
     this.page,
     this.limit,
   });
@@ -130,7 +131,6 @@ class _MainScreenState extends ConsumerState<MainScreen> {
     final categoriesState = ref.watch(categoriesProvider);
     final equipmentState = ref.watch(equipmentProvider);
 
-    // final query = widget.query ?? '';
     final selectedCity = widget.city ?? "";
     final selectedCategory = widget.category ?? "";
     // final page = widget.page ?? 1;
@@ -197,7 +197,9 @@ class _MainScreenState extends ConsumerState<MainScreen> {
 
                     // LANGUAGE BUTTON
                     GestureDetector(
-                      onTap: () {}, // Trigger your dropdown here
+                      onTap: () => _showLanguagePicker(
+                        context,
+                      ), // Trigger your dropdown here
                       child: Container(
                         padding: const EdgeInsets.symmetric(
                           horizontal: 14,
@@ -241,7 +243,7 @@ class _MainScreenState extends ConsumerState<MainScreen> {
                         top: Radius.circular(20),
                       ),
                     ),
-                    builder: (_) => CityPickerSheet(
+                    builder: (_) => _CityPickerSheet(
                       selected: selectedCity,
                       onSelect: (city) {
                         // setState(() => _selectedCity = city);
@@ -298,7 +300,7 @@ class _MainScreenState extends ConsumerState<MainScreen> {
 
             SliverToBoxAdapter(
               child: Padding(
-                padding: const EdgeInsets.symmetric(vertical: 14),
+                padding: const EdgeInsets.symmetric(vertical: 0),
                 child: _SectionHeader(title: 'Services', onSeeAll: () {}),
               ),
             ),
@@ -336,7 +338,7 @@ class _MainScreenState extends ConsumerState<MainScreen> {
 
             SliverToBoxAdapter(
               child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 24),
+                padding: const EdgeInsets.symmetric(horizontal: 0),
                 child: Column(
                   children: [
                     const SizedBox(height: 20),
@@ -345,6 +347,7 @@ class _MainScreenState extends ConsumerState<MainScreen> {
 
                     const SizedBox(height: 14),
 
+                    // Text("Search: $currentQuery"),
                     _FilterPills(
                       selected: _selectedFilter,
                       onSelect: (f) => setState(() => _selectedFilter = f),
@@ -402,7 +405,7 @@ class _HeroBanner extends StatelessWidget {
             "KAZAKHSTAN'S #1 RENTAL PLATFORM",
             style: TextStyle(
               fontSize: 11,
-              color: Colors.white.withOpacity(0.7),
+              color: Colors.white.withValues(alpha: 0.7),
               letterSpacing: 0.08 * 11,
             ),
           ),
@@ -422,10 +425,10 @@ class _HeroBanner extends StatelessWidget {
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
               decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.15),
+                color: Colors.white.withValues(alpha: 0.15),
                 borderRadius: BorderRadius.circular(10),
                 border: Border.all(
-                  color: Colors.white.withOpacity(0.25),
+                  color: Colors.white.withValues(alpha: 0.25),
                   width: 0.5,
                 ),
               ),
@@ -435,11 +438,11 @@ class _HeroBanner extends StatelessWidget {
                   Icon(
                     Icons.location_on_outlined,
                     size: 14,
-                    color: Colors.white.withOpacity(0.85),
+                    color: Colors.white.withValues(alpha: 0.85),
                   ),
                   const SizedBox(width: 6),
                   Text(
-                    city,
+                    city.isNotEmpty ? city : "All Locations",
                     style: const TextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.w500,
@@ -450,7 +453,7 @@ class _HeroBanner extends StatelessWidget {
                   Icon(
                     Icons.keyboard_arrow_down,
                     size: 14,
-                    color: Colors.white.withOpacity(0.7),
+                    color: Colors.white.withValues(alpha: 0.7),
                   ),
                 ],
               ),
@@ -515,13 +518,13 @@ class _FilterPills extends StatelessWidget {
         scrollDirection: Axis.horizontal,
         padding: const EdgeInsets.symmetric(horizontal: 20),
         itemCount: kFilters.length,
-        separatorBuilder: (_, __) => const SizedBox(width: 8),
+        separatorBuilder: (_, _) => const SizedBox(width: 8),
         itemBuilder: (_, i) {
           final active = kFilters[i] == selected;
           return GestureDetector(
             onTap: () => onSelect(kFilters[i]),
             child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+              padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 6),
               decoration: BoxDecoration(
                 color: active ? const Color(0xFFEFF6FF) : Colors.white,
                 borderRadius: BorderRadius.circular(20),
@@ -550,12 +553,11 @@ class _FilterPills extends StatelessWidget {
 
 // ─── City Picker Bottom Sheet ─────────────────────────────────────────────────
 
-class CityPickerSheet extends StatelessWidget {
+class _CityPickerSheet extends StatelessWidget {
   final String selected;
   final ValueChanged<String> onSelect;
 
-  const CityPickerSheet({
-    super.key,
+  const _CityPickerSheet({
     required this.selected,
     required this.onSelect,
   });
@@ -606,6 +608,95 @@ class CityPickerSheet extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+}
+
+void _showLanguagePicker(BuildContext context) {
+  showModalBottomSheet(
+    context: context,
+    shape: const RoundedRectangleBorder(
+      borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+    ),
+    builder: (context) {
+      final theme = Theme.of(context);
+
+      return Padding(
+        padding: const EdgeInsets.only(bottom: 24, top: 12),
+        child: Column(
+          mainAxisSize: MainAxisSize.min, // Sheet takes only needed height
+          children: [
+            // Handle for visual cue
+            Container(
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                color: theme.colorScheme.onSurfaceVariant.withOpacity(0.4),
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+            const SizedBox(height: 20),
+            Text(
+              "Select Language",
+              style: theme.textTheme.titleLarge?.copyWith(
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 16),
+            _LanguageTile(title: "Қазақша", code: "KZ", isSelected: false),
+            _LanguageTile(title: "Русский", code: "RU", isSelected: false),
+            _LanguageTile(title: "English", code: "EN", isSelected: true),
+          ],
+        ),
+      );
+    },
+  );
+}
+
+class _LanguageTile extends StatelessWidget {
+  final String title;
+  final String code;
+  final bool isSelected;
+
+  const _LanguageTile({
+    required this.title,
+    required this.code,
+    required this.isSelected,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return ListTile(
+      leading: CircleAvatar(
+        radius: 14,
+        backgroundColor: isSelected
+            ? theme.colorScheme.primary
+            : theme.colorScheme.surfaceVariant,
+        child: Text(
+          code,
+          style: TextStyle(
+            fontSize: 10,
+            color: isSelected
+                ? theme.colorScheme.onPrimary
+                : theme.colorScheme.onSurfaceVariant,
+          ),
+        ),
+      ),
+      title: Text(
+        title,
+        style: TextStyle(
+          fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+        ),
+      ),
+      trailing: isSelected
+          ? Icon(Icons.check_circle, color: theme.colorScheme.primary)
+          : null,
+      onTap: () {
+        // 1. Update your locale state here (e.g., ref.read(localeProvider.notifier).update(...))
+        // 2. Close the sheet
+        Navigator.pop(context);
+      },
     );
   }
 }

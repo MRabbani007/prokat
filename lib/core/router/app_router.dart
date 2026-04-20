@@ -163,7 +163,7 @@ GoRouter createRouter(WidgetRef ref) {
               GoRoute(
                 path: AppRoutes.main,
                 builder: (context, state) {
-                  final query = state.uri.queryParameters['q'] ?? '';
+                  final query = state.uri.queryParameters['query'] ?? '';
                   final category = state.uri.queryParameters['category'] ?? '';
 
                   final page =
@@ -176,7 +176,7 @@ GoRouter createRouter(WidgetRef ref) {
                       10;
 
                   final city =
-                      state.uri.queryParameters['city'] ?? 'All Locations';
+                      state.uri.queryParameters['city'] ?? '';
 
                   return MainScreen(
                     query: query,
@@ -194,7 +194,7 @@ GoRouter createRouter(WidgetRef ref) {
               GoRoute(
                 path: AppRoutes.searchList,
                 builder: (context, state) {
-                  final query = state.uri.queryParameters['q'] ?? '';
+                  final query = state.uri.queryParameters['query'] ?? '';
                   final category = state.uri.queryParameters['category'] ?? '';
 
                   final page =
@@ -207,7 +207,7 @@ GoRouter createRouter(WidgetRef ref) {
                       10;
 
                   final city =
-                      state.uri.queryParameters['city'] ?? 'All Locations';
+                      state.uri.queryParameters['city'] ?? '';
 
                   return EquipmentListScreen(
                     query: query,

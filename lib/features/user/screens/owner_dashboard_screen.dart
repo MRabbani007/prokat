@@ -8,6 +8,7 @@ import 'package:prokat/features/equipment/providers/equipment_provider.dart';
 import 'package:go_router/go_router.dart';
 import 'package:prokat/features/requests/state/request_provider.dart';
 import 'package:prokat/features/requests/widgets.dart/owner_booking_skeleton.dart';
+import 'package:prokat/features/user/widgets/balance_tile.dart';
 import 'package:prokat/features/user/widgets/owner_dashboard_header.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:prokat/features/user/widgets/rent_an_equipment_tile.dart';
@@ -35,11 +36,16 @@ class _OwnerDashboardScreenState extends ConsumerState<OwnerDashboardScreen> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-    final requests = ref.watch(requestProvider).ownerRequests;
+    final activeRequests = ref
+        .watch(requestProvider)
+        .ownerRequests
+        .where((r) => ["CREATED", "VIEWED"].contains(r.status))
+        .toList();
+
     final equipment = ref.watch(equipmentProvider).ownerEquipment;
 
-    final hasRequests = requests.isNotEmpty;
-    final count = requests.length;
+    final hasRequests = activeRequests.isNotEmpty;
+    final count = activeRequests.length;
 
     final equipmentCount = equipment.length;
     final hasEquipment = equipmentCount > 0;
@@ -59,7 +65,7 @@ class _OwnerDashboardScreenState extends ConsumerState<OwnerDashboardScreen> {
           // 1. Header with Profile, Rating, and Chat
           SliverAppBar(
             automaticallyImplyLeading: false,
-            expandedHeight: 160,
+            expandedHeight: 120,
             floating: false,
             pinned: true,
             flexibleSpace: FlexibleSpaceBar(background: OwnerDashboardHeader()),
@@ -69,6 +75,72 @@ class _OwnerDashboardScreenState extends ConsumerState<OwnerDashboardScreen> {
             padding: const EdgeInsets.all(16),
             sliver: SliverList(
               delegate: SliverChildListDelegate([
+                // Padding(
+                //   padding: const EdgeInsets.only(bottom: 12),
+                //   child: Text(
+                //     "Balance",
+                //     style: const TextStyle(
+                //       fontSize: 18,
+                //       fontWeight: FontWeight.bold,
+                //       color: Colors.black87,
+                //     ),
+                //   ),
+                // ),
+
+                // Row(
+                //   children: [
+                //     _buildStatCard(
+                //       context,
+                //       "Online Time",
+                //       "142 Min",
+                //       const Color.fromARGB(255, 255, 0, 0),
+                //       AppRoutes.ownerPayment,
+                //     ),
+                //   ],
+                // ),
+                BalanceTile(
+                  minutes: 100,
+                  burnRate: "min/hr",
+                  progress: 0.15,
+                  onTopUp: () {},
+                ),
+
+                const SizedBox(height: 24),
+
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 12),
+                  child: Text(
+                    "Performance",
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black87,
+                    ),
+                  ),
+                ),
+
+                Row(
+                  children: [
+                    _buildStatCard(
+                      context,
+                      "Total Assets",
+                      "24",
+                      Colors.blue,
+                      AppRoutes.ownerEquiment,
+                    ),
+                    const SizedBox(width: 12),
+                    _buildStatCard(
+                      context,
+                      "Active Rents",
+                      "08",
+                      Colors.orange,
+                      AppRoutes.ownerBookings,
+                    ),
+                  ],
+                ),
+
+                const SizedBox(height: 12),
+
                 // 2. Client Requests Tile (High Priority)
                 _buildActionTile(
                   context,
@@ -257,4 +329,46 @@ class _OwnerDashboardScreenState extends ConsumerState<OwnerDashboardScreen> {
       ),
     );
   }
+}
+
+Widget _buildStatCard(
+  BuildContext context,
+  String label,
+  String value,
+  Color color,
+  String url,
+) {
+  return Expanded(
+    child: GestureDetector(
+      onTap: () => context.push(url),
+      child: BaseTile(
+        padding: const EdgeInsets.all(0),
+        color: color.withValues(alpha: 0.15),
+        child: Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: color.withValues(alpha: 0.15),
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                label,
+                style: TextStyle(color: color, fontWeight: FontWeight.w600),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                value,
+                style: const TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    ),
+  );
 }

@@ -24,7 +24,7 @@ class RequestService {
   Future<List<RequestModel>> getOwnerRequests() async {
     try {
       final res = await _dio.get('/requests/owner');
-      
+
       return (res.data['data'] as List)
           .map((e) => RequestModel.fromJson(e))
           .toList();

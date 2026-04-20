@@ -11,9 +11,13 @@ class FavoriteNotifier extends StateNotifier<FavoritesState> {
     try {
       state = state.copyWith(isLoading: true);
 
-      final favoritesIds = await service.getFavorites();
+      final results = await service.getFavorites();
 
-      state = state.copyWith(isLoading: false, favoritesIds: favoritesIds);
+      state = state.copyWith(
+        isLoading: false,
+        favoritesIds: results.ids,
+        favorites: results.equipment,
+      );
 
       return true;
     } catch (e) {
@@ -43,7 +47,7 @@ class FavoriteNotifier extends StateNotifier<FavoritesState> {
       }
 
       state = state.copyWith(favoritesIds: updated);
-      print(updated.toString());
+      
       final res = await service.toggleFavorite(equipmentId);
 
       state = state.copyWith(isLoading: false);

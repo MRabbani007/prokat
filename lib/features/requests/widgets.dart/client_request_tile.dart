@@ -15,6 +15,56 @@ class ClientRequestTile extends ConsumerStatefulWidget {
 }
 
 class _ClientRequestTileState extends ConsumerState<ClientRequestTile> {
+  void _showCancelConfirmation(
+    BuildContext context,
+    WidgetRef ref,
+    String requestId,
+  ) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text("Cancel Request?"),
+        content: const Text(
+          "Are you sure you want to cancel this request? This action cannot be undone.",
+        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(
+              "NO",
+              style: TextStyle(color: Theme.of(context).colorScheme.primary),
+            ),
+          ),
+          TextButton(
+            onPressed: () async {
+              Navigator.pop(context); // Close dialog first
+
+              final res = await ref
+                  .read(requestProvider.notifier)
+                  .cancelRequest(requestId);
+
+              if (res == true && context.mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text("Request cancelled successfully"),
+                  ),
+                );
+              }
+            },
+            child: const Text(
+              "YES, CANCEL",
+              style: TextStyle(
+                color: Colors.redAccent,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -136,13 +186,15 @@ class _ClientRequestTileState extends ConsumerState<ClientRequestTile> {
                     children: [
                       Expanded(
                         child: TextButton.icon(
-                          onPressed: () async {
-                            final res = await ref
-                                .read(requestProvider.notifier)
-                                .cancelRequest(request.id);
+                          onPressed: () =>
+                              _showCancelConfirmation(context, ref, request.id),
+                          // () async {
+                          //   final res = await ref
+                          //       .read(requestProvider.notifier)
+                          //       .cancelRequest(request.id);
 
-                            if (res == true) {}
-                          },
+                          //   if (res == true) {}
+                          // },
                           icon: const Icon(Icons.close_rounded, size: 18),
                           label: const Text("CANCEL REQUEST"),
                           style: TextButton.styleFrom(

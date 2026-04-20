@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:prokat/core/widgets/page_header.dart';
+import 'package:prokat/core/router/app_routes.dart';
 import 'package:prokat/features/auth/providers/auth_provider.dart';
 import 'package:prokat/features/offers/providers/offers_provider.dart';
 import 'package:prokat/features/requests/state/request_provider.dart';
@@ -33,8 +33,6 @@ class _RenterRequestsScreenState extends ConsumerState<RenterRequestsScreen> {
     final authSession = ref.watch(authProvider).session;
     final state = ref.watch(requestProvider);
     final offersState = ref.watch(offersProvider);
-    const bgColor = Color(0xFF121417);
-    const accentColor = Color(0xFF4E73DF);
 
     final active = state.requests
         .where((r) => ["CREATED", "VIEWED"].contains(r.status))
@@ -59,161 +57,160 @@ class _RenterRequestsScreenState extends ConsumerState<RenterRequestsScreen> {
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
       body: SafeArea(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Padding(
-              padding: const EdgeInsets.only(right: 12.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  const Expanded(child: PageHeader(title: "My Requests")),
-                  // Small technical Archive button
-                  IconButton(
-                    onPressed: () => authSession == null
-                        ? null
-                        : context.push('/requests/history'),
-                    icon: const Icon(
-                      Icons.history_toggle_off_rounded,
-                      color: Color(0x4DFFFFFF),
-                      size: 24,
-                    ),
-                    tooltip: "Requests History",
+        child: CustomScrollView(
+          slivers: [
+            SliverAppBar(
+              automaticallyImplyLeading: false,
+              expandedHeight: 60, // Adjust height as needed
+              floating: true, // AppBar reappears immediately when scrolling up
+              pinned: true,
+              backgroundColor: theme.colorScheme.primary,
+              leading: IconButton(
+                icon: Icon(
+                  Icons.arrow_back_ios_new_rounded,
+                  size: 20,
+                  color: theme.colorScheme.onPrimary,
+                ),
+                onPressed: () => context.pop(),
+              ),
+              title: Text(
+                "My Requests",
+                style: theme.textTheme.titleLarge?.copyWith(
+                  color: theme.colorScheme.onPrimary,
+                ),
+              ),
+              actions: [
+                IconButton(
+                  onPressed: () => authSession == null
+                      ? null
+                      : context.push(AppRoutes.createRequest),
+                  icon: Icon(
+                    Icons.add,
+                    color: theme.colorScheme.onPrimary,
+                    size: 24,
                   ),
-                ],
+                  tooltip: "Create Request",
+                ),
+                IconButton(
+                  onPressed: () => authSession == null
+                      ? null
+                      : context.push(AppRoutes.clientRequestHistory),
+                  icon: Icon(
+                    Icons.history_toggle_off_rounded,
+                    color: theme.colorScheme.onPrimary.withValues(alpha: 0.7),
+                    size: 24,
+                  ),
+                  tooltip: "Requests History",
+                ),
+              ],
+              actionsPadding: EdgeInsets.only(right: 12),
+            ),
+
+            if (authSession == null)
+              _buildCenteredFallback(
+                icon: Icons.login_outlined,
+                message: "Login to create and view requests",
+              )
+            else if (state.isLoading)
+              const SliverFillRemaining(
+                child: Center(child: CircularProgressIndicator()),
+              )
+            else if (state.error != null)
+              _buildCenteredFallback(
+                icon: Icons.error_outline,
+                message: "Error: ${state.error}",
+              )
+            else if (active.isEmpty)
+              _buildCenteredFallback(
+                icon: Icons.description_outlined,
+                message: "No requests found",
+              )
+            else
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(24, 24, 24, 12),
+                  child: Text(
+                    "ACTIVE REQUESTS",
+                    style: theme.textTheme.labelMedium,
+                  ),
+                ),
+              ),
+
+            SliverPadding(
+              padding: const EdgeInsets.symmetric(horizontal: 24),
+              sliver: SliverList(
+                delegate: SliverChildBuilderDelegate((context, index) {
+                  final r = active[index];
+                  final requestOffers = offersByRequest[r.id] ?? [];
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: 12),
+                    child: RequestWithOffers(
+                      request: r,
+                      offers: requestOffers,
+                      onCancel: () => ref
+                          .read(requestProvider.notifier)
+                          .cancelRequest(r.id),
+                    ),
+                  );
+                }, childCount: active.length),
               ),
             ),
 
-            authSession == null
-                ? Expanded(
-                    child: Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(
-                            Icons.login_outlined,
-                            size: 64,
-                            color: Colors.white.withValues(alpha: 0.2),
-                          ),
-                          const SizedBox(height: 16),
-                          Text(
-                            "Login to create and view requests",
-                            style: TextStyle(
-                              color: Colors.white.withValues(alpha: 0.70),
-                            ),
-                          ),
-                        ],
+            SliverPadding(
+              padding: const EdgeInsets.fromLTRB(20, 16, 20, 12),
+              sliver: SliverToBoxAdapter(
+                // Add this wrapper
+                child: SizedBox(
+                  width: double.infinity,
+                  height: 56,
+                  child: ElevatedButton.icon(
+                    onPressed: () => authSession == null
+                        ? null
+                        : context.push(AppRoutes.createRequest),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: theme.primaryColor,
+                      foregroundColor: theme.colorScheme.onPrimary,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      elevation: 0,
+                    ),
+                    icon: const Icon(
+                      Icons.add,
+                      size: 26,
+                    ),
+                    label: const Text(
+                      "CREATE A NEW REQUEST",
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        letterSpacing: 1.1,
                       ),
                     ),
-                  )
-                : Expanded(
-                    child: state.isLoading
-                        ? const Center(
-                            child: CircularProgressIndicator(
-                              color: Color(0xFF4E73DF),
-                            ),
-                          )
-                        : state.error != null
-                        ? Center(
-                            child: Text(
-                              "Error: ${state.error}",
-                              style: const TextStyle(color: Colors.redAccent),
-                            ),
-                          )
-                        : state.requests.isEmpty
-                        ? Center(
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Icon(
-                                  Icons.description_outlined,
-                                  size: 64,
-                                  color: Colors.white.withValues(alpha: 0.1),
-                                ),
-                                const SizedBox(height: 16),
-                                Text(
-                                  "No requests found",
-                                  style: TextStyle(
-                                    color: Colors.white.withValues(alpha: 0.90),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          )
-                        : ListView(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 20,
-                              vertical: 10,
-                            ),
-                            children: [
-                              if (active.isNotEmpty) ...[
-                                Text(
-                                  "ACTIVE REQUESTS",
-                                  style: TextStyle(
-                                    color: Colors.white.withValues(alpha: 0.3),
-                                    fontSize: 11,
-                                    fontWeight: FontWeight.bold,
-                                    letterSpacing: 1.5,
-                                  ),
-                                ),
-
-                                const SizedBox(height: 12),
-                                ...active.map((r) {
-                                  final requestOffers =
-                                      offersByRequest[r.id] ?? [];
-
-                                  return Padding(
-                                    padding: const EdgeInsets.only(bottom: 12),
-                                    child: RequestWithOffers(
-                                      request: r,
-                                      offers: requestOffers,
-                                      onCancel: () => ref
-                                          .read(requestProvider.notifier)
-                                          .cancelRequest(r.id),
-                                    ),
-                                  );
-                                }),
-                                const SizedBox(height: 24),
-                              ],
-                            ],
-                          ),
-                  ),
-
-            /// ➕ CREATE REQUEST FOOTER
-            Container(
-              padding: const EdgeInsets.fromLTRB(20, 16, 20, 12),
-              decoration: BoxDecoration(
-                color: bgColor,
-                border: Border(
-                  top: BorderSide(color: Colors.white.withValues(alpha: 0.05)),
-                ),
-              ),
-              child: SizedBox(
-                width: double.infinity,
-                height: 56,
-                child: ElevatedButton.icon(
-                  onPressed: () => authSession == null
-                      ? null
-                      : context.push('/requests/create'),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: accentColor,
-                    foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                    elevation: 0,
-                  ),
-                  icon: const Icon(Icons.add_circle_outline_rounded, size: 20),
-                  label: const Text(
-                    "CREATE NEW REQUEST",
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      letterSpacing: 1.1,
-                    ),
                   ),
                 ),
               ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCenteredFallback({
+    required IconData icon,
+    required String message,
+  }) {
+    return SliverFillRemaining(
+      hasScrollBody: false, // Prevents bounce if content is small
+      child: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(icon, size: 64, color: Colors.white.withValues(alpha: 0.2)),
+            const SizedBox(height: 16),
+            Text(
+              message,
+              style: TextStyle(color: Colors.white.withValues(alpha: 0.7)),
             ),
           ],
         ),

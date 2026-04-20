@@ -46,15 +46,12 @@ class _OwnerEquipmentDetailScreenState
         context: context,
         isScrollControlled: true,
         backgroundColor: Colors.transparent,
-        builder: (context) =>
-            const CategorySelectionSheet(service: "equipment"),
+        builder: (context) => CategorySelectionSheet(service: widget.mode),
       );
 
       if (widget.mode == "create_equipment" ||
           widget.mode == "create_request") {
         if (picked != null) {
-          print(picked.toJson());
-          print(widget.mode);
           ref.read(equipmentProvider.notifier).selectCategory(picked);
         }
 
@@ -94,15 +91,15 @@ class _OwnerEquipmentDetailScreenState
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         decoration: BoxDecoration(
-          color: theme.colorScheme.surfaceContainerHighest,
-          borderRadius: BorderRadius.circular(24),
+          color: theme.cardColor,
+          borderRadius: BorderRadius.circular(20),
           border: Border.all(
-            color: theme.colorScheme.onSurface.withValues(alpha: 0.08),
+            color: theme.colorScheme.outline.withValues(alpha: 0.3),
           ),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.2),
-              blurRadius: 4,
+              color: Colors.black.withValues(alpha: 0.3),
+              blurRadius: 8,
               offset: const Offset(0, 4),
             ),
           ],
@@ -115,7 +112,7 @@ class _OwnerEquipmentDetailScreenState
               decoration: BoxDecoration(
                 color: isSelected
                     ? theme.colorScheme.primary.withValues(alpha: 0.6)
-                    : theme.colorScheme.primary.withValues(alpha: 0.3),
+                    : theme.colorScheme.primary.withValues(alpha: 0.2),
                 shape: BoxShape.circle,
               ),
               child: Icon(
@@ -124,7 +121,7 @@ class _OwnerEquipmentDetailScreenState
                     : Icons.category_outlined,
                 color: hasCategory
                     ? theme.colorScheme.primary
-                    : theme.colorScheme.secondary.withValues(alpha: 0.5),
+                    : theme.colorScheme.secondary.withValues(alpha: 0.3),
                 size: 24,
               ),
             ),
@@ -134,8 +131,8 @@ class _OwnerEquipmentDetailScreenState
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text("Service", style: theme.textTheme.labelLarge),
-                  const SizedBox(height: 2),
+                  // Text("Service", style: theme.textTheme.labelLarge),
+                  // const SizedBox(height: 2),
                   Text(
                     hasCategory ? categoryName : "Select Service",
                     style: theme.textTheme.bodyLarge,

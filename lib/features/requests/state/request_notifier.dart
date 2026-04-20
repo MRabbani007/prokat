@@ -50,6 +50,7 @@ class RequestNotifier extends StateNotifier<RequestState> {
 
       state = state.copyWith(isLoading: false, requests: data);
     } catch (e) {
+      print(e);
       state = state.copyWith(
         isLoading: false,
         requests: [],
@@ -64,8 +65,10 @@ class RequestNotifier extends StateNotifier<RequestState> {
 
       final data = await service.getOwnerRequests();
 
-      state = state.copyWith(isLoading: false, requests: data);
+      state = state.copyWith(isLoading: false, ownerRequests: data);
+      
     } catch (e) {
+      print(e);
       state = state.copyWith(
         isLoading: false,
         requests: [],
