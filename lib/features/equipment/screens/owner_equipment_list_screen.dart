@@ -35,11 +35,10 @@ class _OwnerEquipmentListScreenState
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
     final state = ref.watch(equipmentProvider);
 
     return Scaffold(
-      backgroundColor: colorScheme.surface,
+        backgroundColor: theme.scaffoldBackgroundColor,
       body: CustomScrollView(
         slivers: [
           // 1. App Bar with Back Button

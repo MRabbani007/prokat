@@ -65,6 +65,7 @@ dependencies:
   flutter_chat_ui: ^2.11.1
   flutter_hooks: ^0.21.3+1
   hooks_riverpod: ^2.6.1
+  url_launcher: ^6.3.2
 
 dev_dependencies:
   flutter_test:

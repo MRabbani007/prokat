@@ -17,4 +17,24 @@ equipment used as in booking,
 complete job without delays
 responding to call
 
-Icon libraries:
+
+enum WorkStatus {
+  idle,
+  onMyWay,
+  onSite,
+  started,
+  completed,
+
+  // failure cases
+  clientNoShow,
+  wrongAddress,
+  notAccessible,
+  placeNotReady,
+  missingTools,
+  stopped,
+  postponed,
+  cancelled,
+}
+
+
+I am withdrawing money from "frozen account" with circular 158, I want to get the bank card to withdraw 200$, can i send an email to request issuing the card and delivering to branch

@@ -12,7 +12,7 @@ class _LaunchScreenState extends State<LaunchScreen>
     with SingleTickerProviderStateMixin {
   late final AnimationController _controller;
   late final Animation<double> _fadeAnimation;
-  late final Animation<double> _scaleAnimation;
+  // late final Animation<double> _scaleAnimation;
 
   @override
   void initState() {
@@ -39,9 +39,9 @@ class _LaunchScreenState extends State<LaunchScreen>
       curve: const Interval(0.0, 0.8, curve: Curves.easeIn),
     );
 
-    _scaleAnimation = Tween<double>(begin: 0.85, end: 1.0).animate(
-      CurvedAnimation(parent: _controller, curve: const _OutProposedCurve()),
-    );
+    // _scaleAnimation = Tween<double>(begin: 0.85, end: 1.0).animate(
+    //   CurvedAnimation(parent: _controller, curve: const _OutProposedCurve()),
+    // );
 
     _controller.forward();
 
@@ -61,115 +61,138 @@ class _LaunchScreenState extends State<LaunchScreen>
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
+    final accentColor = const Color(0xFF00489B);
     final textTheme = theme.textTheme;
 
     return Scaffold(
-      // Ensure the scaffold extends behind system cutouts
       extendBody: true,
       extendBodyBehindAppBar: true,
       backgroundColor: theme.scaffoldBackgroundColor,
       body: Stack(
         alignment: Alignment.center,
         children: [
-          /// 1. Background Glows (Layered for depth)
-          // Primary top-right glow
-          Positioned(
-            top: -150,
-            right: -100,
-            child: _BackgroundGlow(
-              color: colorScheme.primary.withValues(alpha: 0.15),
-              size: 500,
-            ),
-          ),
-          // Subtle bottom-left glow for balance
-          Positioned(
-            bottom: -100,
-            left: -100,
-            child: _BackgroundGlow(
-              color: colorScheme.primary.withValues(alpha: 0.05),
-              size: 400,
+          /// 1. Subtle Industrial Grid Pattern (Fills the "Empty" space)
+          Opacity(
+            opacity: 0.03,
+            child: CustomPaint(
+              size: Size.infinite,
+              painter: _GridPainter(accentColor),
             ),
           ),
 
-          /// 2. Branding (Centered)
+          /// 2. Layered Background Glows
+          Positioned(
+            top: -150,
+            right: -150,
+            child: _BackgroundGlow(
+              color: accentColor.withValues(alpha: 0.15),
+              size: 600,
+            ),
+          ),
+
+          /// 3. Main Content
           Center(
             child: FadeTransition(
               opacity: _fadeAnimation,
-              child: ScaleTransition(
-                scale: _scaleAnimation,
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(28),
-                      decoration: BoxDecoration(
-                        color: colorScheme.primary.withValues(alpha: 0.12),
-                        borderRadius: BorderRadius.circular(36),
-                        border: Border.all(
-                          color: colorScheme.primary.withValues(alpha: 0.25),
-                          width: 1.5,
-                        ),
-                        boxShadow: [
-                          BoxShadow(
-                            color: colorScheme.primary.withValues(alpha: 0.15),
-                            blurRadius: 40,
-                            offset: const Offset(0, 10),
-                          ),
-                        ],
-                      ),
-                      child: Icon(
-                        Icons.precision_manufacturing_rounded,
-                        size: 72, // Slightly larger for "heavy" impact
-                        color: colorScheme.primary,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // Icon with "Glass" effect
+                  Container(
+                    padding: const EdgeInsets.all(32),
+                    decoration: BoxDecoration(
+                      color: accentColor.withValues(alpha: 0.05),
+                      borderRadius: BorderRadius.circular(40),
+                      border: Border.all(
+                        color: accentColor.withValues(alpha: 0.2),
+                        width: 1.5,
                       ),
                     ),
-                    const SizedBox(height: 48),
-                    Text(
-                      'PROKAT',
+                    child: Icon(
+                      Icons.precision_manufacturing_rounded,
+                      size: 80,
+                      color: accentColor,
+                    ),
+                  ),
+                  const SizedBox(height: 40),
+
+                  // Branding
+                  RichText(
+                    text: TextSpan(
                       style: textTheme.displayLarge?.copyWith(
-                        fontWeight: FontWeight.w900, // Black weight
-                        letterSpacing: 8,
+                        fontWeight: FontWeight.w900,
+                        color: theme.colorScheme.onSurface,
                         fontFamily: 'Oswald',
-                        color: colorScheme.onSurface,
+                        letterSpacing: 6,
                       ),
+                      children: [
+                        const TextSpan(text: 'PRO'),
+                        TextSpan(
+                          text: 'KAT',
+                          style: TextStyle(color: accentColor),
+                        ),
+                      ],
                     ),
-                    const SizedBox(height: 12),
-                    Text(
-                      'HEAVY EQUIPMENT RENTALS',
-                      style: textTheme.bodySmall?.copyWith(
-                        fontWeight: FontWeight.w800,
-                        letterSpacing: 4,
-                        color: colorScheme.onSurface.withValues(alpha: 0.5),
-                      ),
+                  ),
+
+                  // Subtle divider line to break the "emptiness"
+                  Container(
+                    margin: const EdgeInsets.symmetric(vertical: 16),
+                    width: 40,
+                    height: 3,
+                    decoration: BoxDecoration(
+                      color: accentColor,
+                      borderRadius: BorderRadius.circular(2),
                     ),
-                  ],
-                ),
+                  ),
+
+                  Text(
+                    'HEAVY EQUIPMENT RENTALS',
+                    style: textTheme.bodySmall?.copyWith(
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: 3,
+                      color: theme.colorScheme.onSurface.withValues(alpha: 0.4),
+                    ),
+                  ),
+                ],
               ),
             ),
           ),
 
-          /// 3. Loader
+          /// 4. Bottom "Status" Area
           Positioned(
-            bottom: 80,
+            bottom: 60,
+            left: 40,
+            right: 40,
             child: Column(
               children: [
-                SizedBox(
-                  width: 40,
-                  height: 40,
-                  child: CircularProgressIndicator(
-                    strokeWidth: 2,
-                    color: colorScheme.primary.withValues(alpha: 0.5),
-                    backgroundColor: colorScheme.onSurface.withValues(alpha: 0.05),
+                // Linear progress feels more "industrial" than circular
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(8),
+                  child: LinearProgressIndicator(
+                    valueColor: AlwaysStoppedAnimation<Color>(accentColor),
+                    backgroundColor: accentColor.withValues(alpha: 0.1),
+                    minHeight: 4,
                   ),
                 ),
-                const SizedBox(height: 24),
-                Text(
-                  'LOADING',
-                  style: textTheme.labelLarge?.copyWith(
-                    letterSpacing: 2,
-                    fontWeight: FontWeight.bold,
-                  ),
+                const SizedBox(height: 16),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      'INITIALIZING SYSTEMS...',
+                      style: textTheme.labelSmall?.copyWith(
+                        letterSpacing: 1.5,
+                        color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
+                      ),
+                    ),
+                    Text(
+                      'v1.0.4', // Small detail makes it feel "real"
+                      style: textTheme.labelMedium?.copyWith(
+                        color: theme.colorScheme.onSurface.withValues(alpha: 0.4),
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
@@ -180,15 +203,38 @@ class _LaunchScreenState extends State<LaunchScreen>
   }
 }
 
-/// Custom curve for a "heavy / industrial" feel
-class _OutProposedCurve extends Curve {
-  const _OutProposedCurve();
+// Painter for the background grid
+class _GridPainter extends CustomPainter {
+  final Color color;
+  _GridPainter(this.color);
 
   @override
-  double transformInternal(double t) {
-    return 1.0 - (1.0 - t) * (1.0 - t) * (1.0 - t);
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = color
+      ..strokeWidth = 1.0;
+
+    for (double i = 0; i < size.width; i += 40) {
+      canvas.drawLine(Offset(i, 0), Offset(i, size.height), paint);
+    }
+    for (double i = 0; i < size.height; i += 40) {
+      canvas.drawLine(Offset(0, i), Offset(size.width, i), paint);
+    }
   }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
+
+/// Custom curve for a "heavy / industrial" feel
+// class _OutProposedCurve extends Curve {
+//   const _OutProposedCurve();
+
+//   @override
+//   double transformInternal(double t) {
+//     return 1.0 - (1.0 - t) * (1.0 - t) * (1.0 - t);
+//   }
+// }
 
 class _BackgroundGlow extends StatelessWidget {
   final Color color;

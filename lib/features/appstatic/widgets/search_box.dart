@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 class SearchBox extends StatefulWidget {
-  const SearchBox({super.key});
+  final String? placeholder;
+
+  const SearchBox({super.key, this.placeholder});
 
   @override
   State<SearchBox> createState() => _SearchBoxState();
@@ -67,11 +69,11 @@ class _SearchBoxState extends State<SearchBox> {
         controller: _searchController,
         onSubmitted: (value) => _updateFilters({"query": value}),
         decoration: InputDecoration(
-          hintText: 'Search equipment...',
+          hintText: widget.placeholder ?? 'Search equipment...',
           hintStyle: theme.textTheme.bodyMedium?.copyWith(
             color: theme.colorScheme.onSurfaceVariant,
           ),
-          icon: Icon(Icons.search, size: 20, color: theme.colorScheme.primary),
+          icon: Icon(Icons.tune_rounded, size: 20, color: theme.colorScheme.primary),
           suffixIcon: IconButton(
             icon: const Icon(Icons.arrow_forward),
             onPressed: () => _updateFilters({"query": _searchController.text}),

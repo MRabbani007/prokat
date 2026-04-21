@@ -232,7 +232,7 @@ class OwnerRequestTile extends ConsumerWidget {
                       children: [
                         Text("Offered Rate", style: theme.textTheme.labelSmall),
                         Text(
-                          formatKZT(request.offeredRate),
+                          formatPrice(request.offeredRate),
                           style: theme.textTheme.titleLarge?.copyWith(
                             color: colorScheme.primary,
                             fontWeight: FontWeight.bold,

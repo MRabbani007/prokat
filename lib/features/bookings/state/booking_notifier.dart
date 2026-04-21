@@ -109,59 +109,25 @@ class BookingNotifier extends StateNotifier<BookingState> {
   /// -------------------------
   /// UPDATE BOOKING
   /// -------------------------
-
-  Future<void> updateBooking(String id, Map<String, dynamic> data) async {
+  Future<bool> updateBookingStatus({
+    required String id,
+    String? status,
+    String? workStatus,
+  }) async {
     try {
       state = state.copyWith(isLoading: true);
 
-      final updated = await api.updateBooking(id, data);
+      print(id);
 
-      final updatedList = state.bookings.map((b) {
-        return b.id == id && updated != null ? updated : b;
-      }).toList();
-
-      state = state.copyWith(
-        isLoading: false,
-        bookings: updatedList,
-        currentBooking: state.currentBooking?.id == id
-            ? updated
-            : state.currentBooking,
+      final updated = await api.updateBookingStatus(
+        id: id,
+        status: status,
+        workStatus: workStatus,
       );
-    } catch (e) {
-      state = state.copyWith(isLoading: false, error: e.toString());
-    }
-  }
 
-  Future<bool> updateBookingStatus(
-    String id,
-    String bookingStatus,
-    String? comment,
-  ) async {
-    try {
-      state = state.copyWith(isLoading: true);
+      state = state.copyWith(isLoading: updated);
 
-      // final updated = await api.updateBooking(id, data);
-
-      state = state.copyWith(isLoading: false);
-
-      return true;
-    } catch (e) {
-      state = state.copyWith(isLoading: false, error: e.toString());
-
-      return false;
-    }
-  }
-
-  Future<bool> updateWorkStatus(
-    String id,
-    String workStatus,
-  ) async {
-    try {
-      state = state.copyWith(isLoading: true);
-
-      // final updated = await api.updateBooking(id, data);
-
-      state = state.copyWith(isLoading: false);
+      await getOwnerBookings();
 
       return true;
     } catch (e) {

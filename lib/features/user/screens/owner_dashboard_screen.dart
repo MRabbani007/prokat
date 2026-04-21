@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:prokat/core/router/app_routes.dart';
 import 'package:prokat/core/widgets/base_tile.dart';
+import 'package:prokat/features/bookings/models/booking_status.dart';
 import 'package:prokat/features/bookings/state/booking_provider.dart';
-import 'package:prokat/features/bookings/widgets/owner_booking_card.dart';
+import 'package:prokat/features/bookings/widgets/owner_booking_tile.dart';
 import 'package:prokat/features/equipment/providers/equipment_provider.dart';
 import 'package:go_router/go_router.dart';
 import 'package:prokat/features/requests/state/request_provider.dart';
@@ -56,8 +57,14 @@ class _OwnerDashboardScreenState extends ConsumerState<OwnerDashboardScreen> {
     //     .where((b) => b.status == "CREATED")
     //     .toList();
     final upcomingJobs = state.ownerBookings
-        .where((b) => b.status == "CONFIRMED")
+        .where((b) => b.status.toLowerCase() == BookingStatus.confirmed.name)
         .toList();
+
+    final pendingJobs = state.ownerBookings
+        .where((b) => b.status.toLowerCase() == BookingStatus.created.name)
+        .toList();
+
+    final activeOrdersCount = upcomingJobs.length + pendingJobs.length;
 
     return Scaffold(
       body: CustomScrollView(
@@ -72,7 +79,7 @@ class _OwnerDashboardScreenState extends ConsumerState<OwnerDashboardScreen> {
           ),
 
           SliverPadding(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.all(24),
             sliver: SliverList(
               delegate: SliverChildListDelegate([
                 // Padding(
@@ -107,39 +114,42 @@ class _OwnerDashboardScreenState extends ConsumerState<OwnerDashboardScreen> {
 
                 const SizedBox(height: 24),
 
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 12),
-                  child: Text(
-                    "Performance",
-                    style: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black87,
-                    ),
-                  ),
-                ),
-
+                // Padding(
+                //   padding: const EdgeInsets.only(bottom: 12),
+                //   child: Text(
+                //     "Performance",
+                //     style: const TextStyle(
+                //       fontSize: 18,
+                //       fontWeight: FontWeight.bold,
+                //       color: Colors.black87,
+                //     ),
+                //   ),
+                // ),
                 Row(
                   children: [
                     _buildStatCard(
                       context,
-                      "Total Assets",
-                      "24",
+                      "Fleet",
+                      "$equipmentCount",
                       Colors.blue,
                       AppRoutes.ownerEquiment,
                     ),
-                    const SizedBox(width: 12),
+
+                    const SizedBox(width: 24),
+
                     _buildStatCard(
                       context,
-                      "Active Rents",
-                      "08",
+                      "Active Orders",
+                      activeOrdersCount == 1
+                          ? "1 Order"
+                          : "$activeOrdersCount Orders",
                       Colors.orange,
                       AppRoutes.ownerBookings,
                     ),
                   ],
                 ),
 
-                const SizedBox(height: 12),
+                const SizedBox(height: 24),
 
                 // 2. Client Requests Tile (High Priority)
                 _buildActionTile(
@@ -155,7 +165,8 @@ class _OwnerDashboardScreenState extends ConsumerState<OwnerDashboardScreen> {
                       {context.push(AppRoutes.ownerRequests)},
                   },
                 ),
-                const SizedBox(height: 16),
+
+                const SizedBox(height: 24),
 
                 // 3. Manage Equipment Tile
                 _buildActionTile(
@@ -172,7 +183,7 @@ class _OwnerDashboardScreenState extends ConsumerState<OwnerDashboardScreen> {
                   },
                 ),
 
-                const SizedBox(height: 16),
+                const SizedBox(height: 24),
 
                 RentAnEquipmentTile(),
               ]),
@@ -182,54 +193,45 @@ class _OwnerDashboardScreenState extends ConsumerState<OwnerDashboardScreen> {
           // 4. Active Orders Section
           SliverToBoxAdapter(
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    'Active Orders',
-                    style: theme.textTheme.titleLarge?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
+              padding: const EdgeInsets.only(left: 24, right: 24, bottom: 24),
+              child: BaseTile(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Active Orders',
+                            style: theme.textTheme.titleLarge?.copyWith(
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
 
-                  Container(
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle, // Circular shadow base
-                      color: theme
-                          .cardColor, // Solid base to block background colors
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withValues(
-                            alpha: 0.2,
-                          ), // Matches chat button depth
-                          blurRadius: 8,
-                          offset: const Offset(0, 3),
-                        ),
-                      ],
+                          Text(
+                            '${pendingJobs.length} new order - ${upcomingJobs.length} confirmed order',
+                            style: theme.textTheme.labelMedium?.copyWith(
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
-                    child: IconButton.filledTonal(
-                      padding: const EdgeInsets.all(
-                        10,
-                      ), // Padding for the tap target
+
+                    IconButton(
+                      onPressed: () => context.push(AppRoutes.ownerBookings),
                       icon: const Icon(
-                        LucideIcons
-                            .history, // "Similar but different" to the chat icon
-                        size: 20,
-                      ),
-                      onPressed: () {
-                        if (context.mounted) {
-                          context.push(AppRoutes.ownerBookingsHistory);
-                        }
-                      },
-                      style: IconButton.styleFrom(
-                        // Optional: use a different tonal color if you want to distinguish it
-                        backgroundColor: theme.colorScheme.secondaryContainer
-                            .withValues(alpha: 0.5),
-                      ),
+                        Icons.arrow_forward_ios,
+                        size: 18,
+                      ), // Smaller chevron for a cleaner look
+                      visualDensity: VisualDensity
+                          .compact, // Reduces padding around the icon
+                      color: theme.primaryColor, // Or any color from your theme
+                      tooltip: 'View All',
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ),
@@ -249,28 +251,18 @@ class _OwnerDashboardScreenState extends ConsumerState<OwnerDashboardScreen> {
             )
           else
             SliverPadding(
-              padding: const EdgeInsets.fromLTRB(16, 0, 16, 20),
+              padding: const EdgeInsets.fromLTRB(24, 0, 24, 48),
               sliver: SliverList(
                 delegate: SliverChildBuilderDelegate((context, index) {
                   final booking = upcomingJobs[index];
 
                   return Padding(
                     padding: const EdgeInsets.only(bottom: 12),
-                    child: OwnerBookingCard(booking: booking),
+                    child: OwnerBookingTile(booking: booking),
                   );
                 }, childCount: upcomingJobs.length),
               ),
             ),
-
-          SliverToBoxAdapter(
-            child: ElevatedButton(
-              onPressed: () => context.push(AppRoutes.ownerBookings),
-              style: ElevatedButton.styleFrom(
-                minimumSize: const Size(double.infinity, 50),
-              ),
-              child: const Text("View All"),
-            ),
-          ),
         ],
       ),
     );

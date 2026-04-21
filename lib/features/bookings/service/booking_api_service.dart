@@ -58,21 +58,30 @@ class BookingApiService {
     }
   }
 
-  Future<BookingModel?> updateBooking(
-    String id,
-    Map<String, dynamic> data,
-  ) async {
+  Future<bool> updateBookingStatus({
+    required String id,
+    String? status,
+    String? workStatus,
+  }) async {
     try {
       print("updating");
-      final res = await _dio.patch("/bookings/$id/status", data: data);
+      final res = await _dio.patch(
+        "/bookings/$id/status",
+        data: {
+          "id": id,
+          if (status != null) "status": status,
+          if (workStatus != null) "workStatus": workStatus,
+        },
+      );
 
       if (res.statusCode == 200 || res.statusCode == 201) {
-        return BookingModel.fromJson(res.data["data"]);
+        return true;
+        // return BookingModel.fromJson(res.data["data"]);
       }
 
-      return null;
+      return false;
     } catch (e) {
-      return null;
+      rethrow;
     }
   }
 }

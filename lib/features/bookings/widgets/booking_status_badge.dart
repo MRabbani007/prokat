@@ -2,30 +2,26 @@ import 'package:flutter/material.dart';
 
 class BookingStatusBadge extends StatelessWidget {
   final String status;
-  
-  const BookingStatusBadge({
-    super.key, 
-    required this.status,
-  });
+
+  const BookingStatusBadge({super.key, required this.status});
 
   @override
   Widget build(BuildContext context) {
-    final colors = Theme.of(context).colorScheme;
     final theme = Theme.of(context);
 
     Color statusColor;
     switch (status.toUpperCase()) {
       case 'CREATED':
-        statusColor = colors.tertiary;
+        statusColor = Colors.orange;
         break;
       case 'CONFIRMED':
-        statusColor = colors.primary;
+        statusColor = Colors.blue;
         break;
       case 'COMPLETED':
-        statusColor = colors.secondary;
+        statusColor = Colors.green;
         break;
       default:
-        statusColor = colors.outline;
+        statusColor = Colors.grey;
     }
 
     return Container(
@@ -35,7 +31,7 @@ class BookingStatusBadge extends StatelessWidget {
         borderRadius: BorderRadius.circular(8),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.4),
+            color: Colors.black.withValues(alpha: 0.2),
             blurRadius: 6,
             offset: const Offset(0, 4),
           ),
@@ -48,7 +44,7 @@ class BookingStatusBadge extends StatelessWidget {
           color: statusColor.withValues(alpha: 0.12),
           borderRadius: BorderRadius.circular(8),
           border: Border.all(
-            color: statusColor.withValues(alpha: 0.25),
+            color: statusColor.withValues(alpha: 0.2),
             width: 1,
           ),
         ),

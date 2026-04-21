@@ -3,28 +3,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:prokat/core/router/app_routes.dart';
 import 'package:prokat/features/bookings/models/booking_model.dart';
-import 'package:prokat/features/bookings/models/work_status.dart';
 import 'package:prokat/features/bookings/state/booking_provider.dart';
 import 'package:prokat/features/bookings/widgets/booking_status_badge.dart';
 import 'package:go_router/go_router.dart';
+import 'package:prokat/features/bookings/widgets/booking_status_sheet.dart';
 
-// enum WorkStatus {
-//   idle,
-//   onMyWay,
-//   onSite,
-//   started,
-//   completed,
-
-//   // failure cases
-//   clientNoShow,
-//   wrongAddress,
-//   notAccessible,
-//   placeNotReady,
-//   missingTools,
-//   stopped,
-//   postponed,
-//   cancelled,
-// }
+// TODO: Delete / Replaced with owner booking tile
 
 class OwnerBookingCard extends ConsumerWidget {
   final BookingModel booking;
@@ -51,12 +35,12 @@ class OwnerBookingCard extends ConsumerWidget {
         color: colors.surface,
         borderRadius: BorderRadius.circular(28),
         border: Border.all(
-          color: theme.colorScheme.outlineVariant.withValues(alpha: 0.8),
+          color: theme.colorScheme.outlineVariant.withValues(alpha: 0.3),
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.5),
-            blurRadius: 8,
+            color: Colors.black.withValues(alpha: 0.2),
+            blurRadius: 6,
             offset: const Offset(0, 4),
           ),
         ],
@@ -117,7 +101,7 @@ class OwnerBookingCard extends ConsumerWidget {
           Divider(
             height: 1,
             thickness: 1,
-            color: colors.outline.withValues(alpha: 0.1),
+            color: colors.outline.withValues(alpha: 0.4),
           ),
 
           /// BODY
@@ -148,37 +132,44 @@ class OwnerBookingCard extends ConsumerWidget {
 
                     const SizedBox(width: 12),
 
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          booking.equipment.name.toUpperCase(),
-                          style: theme.textTheme.titleSmall?.copyWith(
-                            fontWeight: FontWeight.w800,
-                            letterSpacing: 0.5,
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.only(top: 8.0),
+                            child: Text(
+                              booking.equipment.name.toUpperCase(),
+                              style: theme.textTheme.titleSmall?.copyWith(
+                                fontWeight: FontWeight.w800,
+                                letterSpacing: 0.5,
+                              ),
+                            ),
                           ),
-                        ),
-                        const SizedBox(height: 16),
 
-                        _TechMetaRow(
-                          Icons.calendar_today_rounded,
-                          null,
-                          // "SCHEDULED",
-                          booking.bookedOn != null
-                              ? DateFormat(
-                                  'dd MMM yyyy • HH:mm',
-                                ).format(booking.bookedOn!)
-                              : "PENDING",
-                        ),
-                        const SizedBox(height: 12),
+                          const SizedBox(height: 10),
 
-                        _TechMetaRow(
-                          Icons.location_on_rounded,
-                          null,
+                          // "Date / Time",
+                          _TechMetaRow(
+                            Icons.calendar_today_rounded,
+                            null,
+                            booking.bookedOn != null
+                                ? DateFormat(
+                                    'dd MMM yyyy • HH:mm',
+                                  ).format(booking.bookedOn!)
+                                : "PENDING",
+                          ),
+
+                          const SizedBox(height: 10),
+
                           // "Address",
-                          booking.location.street,
-                        ),
-                      ],
+                          _TechMetaRow(
+                            Icons.location_on_rounded,
+                            null,
+                            booking.location.street,
+                          ),
+                        ],
+                      ),
                     ),
                   ],
                 ),
@@ -215,6 +206,8 @@ class OwnerBookingCard extends ConsumerWidget {
                         ),
                       ],
                     ),
+
+                    Text(booking.comment ?? ""),
                   ],
                 ),
               ],
@@ -246,7 +239,7 @@ class OwnerBookingCard extends ConsumerWidget {
                   },
                 ),
 
-                const SizedBox(width: 8),
+                const SizedBox(width: 12),
 
                 // 💬 Chat
                 _ActionButton(
@@ -257,15 +250,23 @@ class OwnerBookingCard extends ConsumerWidget {
                   },
                 ),
 
-                const SizedBox(width: 8),
+                const SizedBox(width: 12),
 
                 // 🟢 Start (Primary)
                 Expanded(
                   child: _PrimaryActionButton(
                     label: "Start",
-                    onPressed: () {
-                      _openWorkFlowSheet(context, ref, booking);
-                    },
+                    onPressed: () => showModalBottomSheet(
+                      context: context,
+                      isScrollControlled: true,
+                      backgroundColor: theme.colorScheme.surface,
+                      shape: const RoundedRectangleBorder(
+                        borderRadius: BorderRadius.vertical(
+                          top: Radius.circular(20),
+                        ),
+                      ),
+                      builder: (_) => BookingStatusSheet(booking: booking),
+                    ),
                   ),
                 ),
               ],
@@ -290,33 +291,38 @@ class _TechMetaRow extends StatelessWidget {
     final colors = theme.colorScheme;
 
     return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Icon(icon, size: 24, color: colors.primary),
 
         const SizedBox(width: 12),
 
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            if (label != null)
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize:
+                MainAxisSize.min, // Constrains column to its content size
+            children: [
+              if (label != null)
+                Text(
+                  label ?? "",
+                  style: theme.textTheme.labelSmall?.copyWith(
+                    color: colors.onSurface.withValues(alpha: 0.6),
+                    letterSpacing: 1,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
               Text(
-                label ?? "",
-                style: theme.textTheme.labelSmall?.copyWith(
-                  color: colors.onSurface.withValues(alpha: 0.6),
-                  letterSpacing: 1,
-                  fontWeight: FontWeight.bold,
+                value,
+                overflow: TextOverflow.ellipsis,
+                maxLines: 1, // Keeps it to one line with dots at the end
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  color: colors.onSurface.withValues(alpha: 0.8),
+                  fontWeight: FontWeight.w500,
                 ),
               ),
-
-            Text(
-              value,
-              style: theme.textTheme.bodyMedium?.copyWith(
-                color: colors.onSurface.withValues(alpha: 0.8),
-                fontWeight: FontWeight.w500, 
-                    overflow: TextOverflow.ellipsis,
-              ),
-            ),
-          ],
+            ],
+          ),
         ),
       ],
     );
@@ -338,9 +344,9 @@ class _PrimaryActionButton extends StatelessWidget {
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: theme.colorScheme.primary.withValues(alpha: 0.4),
-            blurRadius: 12,
-            offset: const Offset(0, 6),
+            color: Colors.black.withValues(alpha: 0.2),
+            blurRadius: 6,
+            offset: const Offset(0, 4),
           ),
         ],
       ),
@@ -387,14 +393,14 @@ class _ActionButton extends StatelessWidget {
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: color.withValues(alpha: 0.35),
-            blurRadius: 10,
+            color: Colors.black.withValues(alpha: 0.1),
+            blurRadius: 6,
             offset: const Offset(0, 4),
           ),
         ],
       ),
       child: Material(
-        color: theme.colorScheme.surfaceContainerHighest,
+        color: theme.cardColor,
         borderRadius: BorderRadius.circular(12),
         child: InkWell(
           onTap: onPressed,
@@ -402,7 +408,7 @@ class _ActionButton extends StatelessWidget {
           child: SizedBox(
             height: 48,
             width: 48,
-            child: Icon(icon, color: color, size: 20),
+            child: Icon(icon, color: color, size: 26),
           ),
         ),
       ),
@@ -455,9 +461,9 @@ Future<void> _handleCancel(
 
   if (difference < cancelWindowMinutes) {
     final res = await notifier.updateBookingStatus(
-      booking.id,
-      "CANCELLED",
-      "cancelled in $difference minutes",
+      id: booking.id,
+      status: "CANCELLED",
+      workStatus: "cancelled in $difference minutes",
     );
 
     if (res == true) {
@@ -597,9 +603,9 @@ class _CancelReasonSheetState extends ConsumerState<_CancelReasonSheet> {
                   ? null
                   : () async {
                       final res = await notifier.updateBookingStatus(
-                        widget.booking.id,
-                        "CANCELLED",
-                        selectedReason,
+                        id: widget.booking.id,
+                        status: "CANCELLED",
+                        workStatus: selectedReason,
                       );
 
                       if (res == true) {
@@ -623,146 +629,6 @@ class _CancelReasonSheetState extends ConsumerState<_CancelReasonSheet> {
             child: const Text("Go Back"),
           ),
         ],
-      ),
-    );
-  }
-}
-
-void _openWorkFlowSheet(
-  BuildContext context,
-  WidgetRef ref,
-  BookingModel booking,
-) {
-  final theme = Theme.of(context);
-
-  showModalBottomSheet(
-    context: context,
-    isScrollControlled: true,
-    backgroundColor: theme.colorScheme.surface,
-    shape: const RoundedRectangleBorder(
-      borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-    ),
-    builder: (_) => WorkStatusSheet(booking: booking),
-  );
-}
-
-class WorkStatusSheet extends ConsumerWidget {
-  final BookingModel booking;
-
-  const WorkStatusSheet({super.key, required this.booking});
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final theme = Theme.of(context);
-    final notifier = ref.read(bookingProvider.notifier);
-
-    final currentStatus = booking.workStatus; //booking.workStatus;
-    final isStarted = currentStatus.level >= WorkStatus.started.level;
-
-    final availableStatuses = isStarted
-        ? [WorkStatus.stopped, WorkStatus.completed, WorkStatus.cancelled]
-        : [
-            WorkStatus.onMyWay,
-            WorkStatus.onSite,
-            WorkStatus.started,
-            WorkStatus.postponed,
-          ];
-
-    final validStatuses = availableStatuses
-        .where((s) => canTransition(currentStatus, s))
-        .toList();
-
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 20, 16, 32),
-      child: SingleChildScrollView(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            // Handle
-            Container(
-              width: 40,
-              height: 4,
-              margin: const EdgeInsets.only(bottom: 16),
-              decoration: BoxDecoration(
-                color: theme.colorScheme.onSurface.withValues(alpha: 0.2),
-                borderRadius: BorderRadius.circular(2),
-              ),
-            ),
-
-            Text("Update Work Status", style: theme.textTheme.titleMedium),
-
-            const SizedBox(height: 16),
-
-            ...validStatuses.map((status) {
-              return _StatusTile(
-                status: status,
-                isCurrent: status == currentStatus,
-                isDanger:
-                    status == WorkStatus.cancelled ||
-                    status == WorkStatus.stopped,
-                onTap: () async {
-                  // Update backend & send notification to client
-                  await notifier.updateWorkStatus(booking.id, status.name);
-
-                  // 3. Close sheet
-                  Navigator.pop(context);
-                },
-              );
-            }),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _StatusTile extends StatelessWidget {
-  final WorkStatus status;
-  final VoidCallback onTap;
-  final bool isDanger;
-  final bool isCurrent;
-
-  const _StatusTile({
-    required this.status,
-    required this.onTap,
-    this.isDanger = false,
-    this.isCurrent = false,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
-    final color = isDanger
-        ? theme.colorScheme.error
-        : theme.colorScheme.primary;
-
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        margin: const EdgeInsets.only(bottom: 10),
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
-        decoration: BoxDecoration(
-          color: theme.colorScheme.surfaceContainerHighest,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(
-            color: isCurrent
-                ? color.withValues(alpha: 0.3)
-                : color.withValues(alpha: 0.7),
-          ),
-        ),
-        child: Row(
-          children: [
-            Expanded(
-              child: Text(status.label, style: theme.textTheme.bodyMedium),
-            ),
-            Icon(
-              Icons.arrow_forward_ios,
-              size: 14,
-              color: color.withValues(alpha: 0.6),
-            ),
-          ],
-        ),
       ),
     );
   }

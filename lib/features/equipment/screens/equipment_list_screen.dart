@@ -137,17 +137,17 @@ class _EquipmentListScreenState extends ConsumerState<EquipmentListScreen> {
                     foregroundColor: theme.colorScheme.onPrimary,
                   ),
                 ),
-                const SizedBox(width: 8), // Padding from the screen edge
-                IconButton(
-                  onPressed: () =>
-                      setState(() => _isSearchVisible = !_isSearchVisible),
-                  icon: Icon(
-                    Icons.search_rounded,
-                    color: theme.colorScheme.onPrimary,
-                    size: 24,
-                  ),
-                  tooltip: "Search",
-                ),
+                // const SizedBox(width: 8), // Padding from the screen edge
+                // IconButton(
+                //   onPressed: () =>
+                //       setState(() => _isSearchVisible = !_isSearchVisible),
+                //   icon: Icon(
+                //     Icons.search_rounded,
+                //     color: theme.colorScheme.onPrimary,
+                //     size: 24,
+                //   ),
+                //   tooltip: "Search",
+                // ),
                 // IconButton(
                 //   onPressed: () => context.push(AppRoutes.searchMap),
                 //   icon: Icon(

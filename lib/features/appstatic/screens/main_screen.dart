@@ -133,20 +133,6 @@ class _MainScreenState extends ConsumerState<MainScreen> {
 
     final selectedCity = widget.city ?? "";
     final selectedCategory = widget.category ?? "";
-    // final page = widget.page ?? 1;
-
-    // final filterKey = '$query-$selectedCity-$selectedCategory-$page';
-
-    // ref.listen(Provider((ref) => filterKey), (previous, next) {
-    //   ref
-    //       .read(equipmentProvider.notifier)
-    //       .getRenterEquipment(
-    //         city: selectedCity,
-    //         categoryId: selectedCategory,
-    //         query: query,
-    //         page: page,
-    //       );
-    // });
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
@@ -174,7 +160,7 @@ class _MainScreenState extends ConsumerState<MainScreen> {
                   children: [
                     // LOGO
                     GestureDetector(
-                      onTap: () => context.push("/main"),
+                      onTap: () {},
                       child: RichText(
                         softWrap: false,
                         text: TextSpan(
