@@ -123,14 +123,18 @@ class EquipmentNotifier extends StateNotifier<EquipmentState> {
     try {
       final updated = await api.updateEquipment(id, data);
 
-      final updatedList = state.ownerEquipment.map((e) {
-        if (e.id == id) {
-          return updated;
-        }
-        return e;
-      }).toList();
+      if (updated != null) {
+        await getOwnerEquipment();
+      }
 
-      state = state.copyWith(ownerEquipment: updatedList);
+      // final updatedList = state.ownerEquipment.map((e) {
+      //   if (e.id == id) {
+      //     return updated;
+      //   }
+      //   return e;
+      // }).toList();
+
+      // state = state.copyWith(ownerEquipment: updatedList);
 
       return true;
     } catch (e) {
@@ -147,17 +151,21 @@ class EquipmentNotifier extends StateNotifier<EquipmentState> {
     try {
       final updated = await api.updateEquipmentLocation(id, data);
 
-      final updatedList = state.ownerEquipment.map((e) {
-        if (e.id == id) {
-          return updated;
-        }
-        return e;
-      }).toList();
+      // final updatedList = state.ownerEquipment.map((e) {
+      //   if (e.id == id) {
+      //     return updated;
+      //   }
+      //   return e;
+      // }).toList();
 
-      state = state.copyWith(
-        ownerEquipment: updatedList,
-        editEquipment: updated,
-      );
+      // state = state.copyWith(
+      //   ownerEquipment: updatedList,
+      //   editEquipment: updated,
+      // );
+
+      if (updated != null) {
+        await getOwnerEquipment();
+      }
 
       return true;
     } catch (e) {

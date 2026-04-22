@@ -21,7 +21,6 @@ class PricingSection extends StatelessWidget {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
 
-    final cardColor = colorScheme.surfaceContainerHighest;
     final ghostGray = colorScheme.onSurface.withValues(alpha: 0.6);
     final accent = colorScheme.primary;
     final warning = colorScheme.tertiary;
@@ -29,55 +28,39 @@ class PricingSection extends StatelessWidget {
     final bool canAddMore = prices.length < maxRates;
 
     return Container(
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: cardColor,
-        borderRadius: BorderRadius.circular(24),
-        border: Border.all(
-          color: colorScheme.onSurface.withValues(alpha: 0.08),
-        ),
+        color: theme.cardColor,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: colorScheme.outline.withValues(alpha: 0.4)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           /// HEADER
-          Padding(
-            padding: const EdgeInsets.fromLTRB(20, 12, 12, 4),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  "PRICES",
-                  style: theme.textTheme.labelMedium?.copyWith(
-                    color: ghostGray,
-                    fontWeight: FontWeight.bold,
-                    letterSpacing: 1.5,
-                  ),
-                ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text("PRICES", style: theme.textTheme.titleLarge),
 
-                if (canAddMore)
-                  IconButton(
-                    onPressed: onAdd,
-                    icon: Icon(Icons.add_box_rounded, color: accent, size: 24),
-                  )
-                else
-                  Padding(
-                    padding: const EdgeInsets.all(12),
-                    child: Icon(
-                      Icons.lock_clock_outlined,
-                      color: ghostGray,
-                      size: 18,
-                    ),
-                  ),
-              ],
-            ),
+              if (canAddMore)
+                IconButton(
+                  onPressed: onAdd,
+                  icon: Icon(Icons.add, color: accent, size: 24),
+                )
+              else
+                Icon(Icons.lock, color: Colors.grey, size: 18),
+            ],
           ),
+
+          SizedBox(height: 12),
 
           /// EMPTY STATE
           if (prices.isEmpty)
             Padding(
               padding: const EdgeInsets.fromLTRB(20, 10, 20, 20),
               child: Text(
-                "NO ACTIVE TARIFFS CONFIGURED",
+                "No Prices Listed",
                 style: theme.textTheme.labelSmall?.copyWith(
                   color: warning,
                   fontWeight: FontWeight.bold,
@@ -85,15 +68,10 @@ class PricingSection extends StatelessWidget {
               ),
             )
           else
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8),
-              child: Column(
-                children: prices
-                    .map(
-                      (p) => PriceEntryTile(price: p, onEdit: () => onEdit(p)),
-                    )
-                    .toList(),
-              ),
+            Column(
+              children: prices
+                  .map((p) => PriceEntryTile(price: p, onEdit: () => onEdit(p)))
+                  .toList(),
             ),
 
           /// FOOTER (MAX REACHED)
@@ -108,7 +86,7 @@ class PricingSection extends StatelessWidget {
                 ),
               ),
               child: Text(
-                "MAXIMUM RATE CAPACITY REACHED",
+                "All Rating Options Listed",
                 textAlign: TextAlign.center,
                 style: theme.textTheme.labelSmall?.copyWith(
                   color: ghostGray,

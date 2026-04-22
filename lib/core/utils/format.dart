@@ -20,12 +20,34 @@ String formatRequestTime(String date) {
 //   return "₸ ${formatter.format(amount).replaceAll(",", ",")}";
 // }
 
-String formatDate(DateTime date) {
-  return DateFormat("d MMM yyyy").format(date);
+String formatDate({
+  DateTime? date,
+  String? format = 'MMM dd',
+  String? presetStyle,
+}) {
+  if (presetStyle != null && presetStyle.isNotEmpty) {
+    if (presetStyle == "short") {
+      return DateFormat('MMM dd').format(date ?? DateTime.now());
+    }
+    return DateFormat(presetStyle).format(date ?? DateTime.now());
+  } else if (format != null && format.isNotEmpty) {
+    return DateFormat(format).format(date ?? DateTime.now());
+  } else {
+    return DateFormat("d MMM yyyy").format(date ?? DateTime.now());
+  }
 }
 
 String formatTime(BuildContext context, DateTime date) {
   return TimeOfDay.fromDateTime(date).format(context);
+}
+
+String formatDateTime(dynamic date, dynamic time) {
+  final dateStr = DateFormat('MMM dd').format(date);
+  if (time != null) {
+    final timeStr = DateFormat('HH:mm').format(time!);
+    return "$dateStr • $timeStr";
+  }
+  return dateStr;
 }
 
 String formatPhoneNumber(String phoneNumber) {
@@ -67,7 +89,7 @@ String getPriceRate(dynamic priceRate) {
       ? "/ Trip"
       : temp == "PER_CUBIC_METER"
       ? "/ M3"
-      : temp == "PER HOUR"
+      : temp == "PER_HOUR"
       ? "/ Hour"
       : temp;
 }
@@ -90,6 +112,27 @@ String getBookingStatus(dynamic status) {
       return "Canceled";
     case "COMPLETED":
       return "Completed";
+    default:
+      return "";
+  }
+}
+
+String getRequestStatus(dynamic status) {
+  final temp = status.toString().trim().toUpperCase();
+
+  switch (temp) {
+    case "DRAFT":
+      return "Draft";
+    case "CREATED":
+      return "Request Sent";
+    case "RESPONDED":
+      return "Offers Sent";
+    case "ACCEPTED":
+      return "Booking Created";
+    case "CANCELLED":
+      return "Canceled";
+    case "EXPIRED":
+      return "Expired";
     default:
       return "";
   }
@@ -143,5 +186,63 @@ int getRemainingMinutes(dynamic createdAt, {int totalDuration = 60}) {
   } catch (e) {
     // 5. Catch-all for any unexpected errors (e.g., out-of-range dates)
     return 0;
+  }
+}
+
+Map<String, String>? getBookingMessage(dynamic bookedOn, dynamic bookedAt) {
+  try {
+    if (bookedOn == null) return null;
+
+    DateTime? target = DateTime.now();
+
+    // 2. Determine input type and parse accordingly
+    if (bookedAt is DateTime) {
+      target = bookedAt;
+    } else if (bookedAt is String) {
+      // Node/Prisma ISO 8601 strings are handled natively by tryParse
+      target =
+          DateTime.tryParse(bookedAt)?.toLocal() ??
+          DateTime.now(); // Safely attempts to parse ISO8601
+    }
+
+    final DateTime now = DateTime.now();
+
+    final Duration diff = target.difference(now);
+
+    final bool isOverdue = diff.isNegative;
+    final Duration absDiff = diff.abs();
+
+    String status;
+    String message;
+
+    if (isOverdue) {
+      status = 'overdue';
+      if (absDiff.inHours < 24) {
+        message = 'overdue by ${absDiff.inHours} hours';
+      } else {
+        message = 'overdue by ${absDiff.inDays} days';
+      }
+    } else {
+      status = 'upcoming';
+      // Checking if it's the same calendar day for "due today"
+      final bool isSameDay =
+          target.year == now.year &&
+          target.month == now.month &&
+          target.day == now.day;
+
+      if (isSameDay) {
+        message = 'due today';
+      } else if (absDiff.inHours < 24) {
+        message = 'due in ${absDiff.inHours} hours';
+      } else if (absDiff.inDays == 1) {
+        message = 'planned tomorrow';
+      } else {
+        message = 'planned in ${absDiff.inDays} days';
+      }
+    }
+
+    return {'status': status, 'message': message};
+  } catch (e) {
+    return null; // Returns null on any parsing or logic error
   }
 }

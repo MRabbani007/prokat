@@ -20,8 +20,8 @@ class AdaptiveFooterCard extends StatelessWidget {
       ),
       child: Material(
         elevation: 8,
-        shadowColor: theme.colorScheme.primary.withOpacity(0.3),
-        borderRadius: BorderRadius.circular(isExpanded ? 28 : 50),
+        shadowColor: theme.colorScheme.primary.withValues(alpha: 0.3),
+        borderRadius: BorderRadius.circular(isExpanded ? 20 : 20),
         color: theme.colorScheme.primary,
         child: InkWell(
           onTap: () => context.push(AppRoutes.searchList),

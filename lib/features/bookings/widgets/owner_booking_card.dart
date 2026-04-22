@@ -246,7 +246,7 @@ class OwnerBookingCard extends ConsumerWidget {
                   icon: Icons.chat_bubble_outline_rounded,
                   color: theme.colorScheme.secondary,
                   onPressed: () {
-                    context.push("${AppRoutes.ownerChatList}/${booking.id}");
+                    context.push("${AppRoutes.ownerChat}/${booking.id}");
                   },
                 ),
 

@@ -39,12 +39,22 @@ class _ClientRequestsSectionState extends ConsumerState<ClientRequestsSection> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          "My Requests",
-          style: theme.textTheme.titleLarge?.copyWith(
-            fontWeight: FontWeight.w800,
-            letterSpacing: -0.5,
-          ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              "My Requests",
+              style: theme.textTheme.titleLarge?.copyWith(
+                fontWeight: FontWeight.w800,
+                letterSpacing: -0.5,
+              ),
+            ),
+
+            AppLinkButton(
+              label: "View Requests",
+              onTap: () => context.push(AppRoutes.clientRequests),
+            ),
+          ],
         ),
 
         SizedBox(height: 12),
@@ -53,18 +63,6 @@ class _ClientRequestsSectionState extends ConsumerState<ClientRequestsSection> {
           CreateRequestTile()
         else
           ClientRequestTile(request: activeRequests[0]),
-
-        SizedBox(height: 12),
-
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            AppLinkButton(
-              label: "View Requests",
-              onTap: () => context.push(AppRoutes.clientRequests),
-            ),
-          ],
-        ),
       ],
     );
   }

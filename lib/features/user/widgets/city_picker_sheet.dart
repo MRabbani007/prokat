@@ -1,25 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:prokat/core/constants/cities.dart';
 import 'package:prokat/features/locations/state/location_provider.dart';
 import 'package:prokat/features/user/state/user_profile_provider.dart';
-
-const kazakhstanCities = [
-  'Almaty',
-  'Astana',
-  'Shymkent',
-  'Atyrau',
-  'Aktobe',
-  'Karaganda',
-  'Taraz',
-  'Pavlodar',
-  'Ust-Kamenogorsk',
-  'Semey',
-  'Kostanay',
-  'Kyzylorda',
-  'Uralsk',
-  'Petropavl',
-  'Turkistan',
-];
 
 class CityPickerSheet extends ConsumerWidget {
   final String? mode;
@@ -47,10 +30,10 @@ class CityPickerSheet extends ConsumerWidget {
               child: ListView.separated(
                 controller: scrollController,
                 shrinkWrap: true,
-                itemCount: kazakhstanCities.length,
+                itemCount: cities.length,
                 separatorBuilder: (_, _) => const Divider(),
                 itemBuilder: (context, index) {
-                  final city = kazakhstanCities[index];
+                  final city = cities[index];
 
                   return ListTile(
                     leading: const Icon(Icons.location_city),

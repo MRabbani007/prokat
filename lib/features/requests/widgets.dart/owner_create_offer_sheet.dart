@@ -154,7 +154,7 @@ void openResponseSheet(BuildContext context, RequestModel request) {
                             },
                             child: Text(
                               offersState.selectedDate != null
-                                  ? formatDate(offersState.selectedDate!)
+                                  ? formatDate(date: offersState.selectedDate!)
                                   : "Select date",
                               style: const TextStyle(
                                 fontWeight: FontWeight.bold,

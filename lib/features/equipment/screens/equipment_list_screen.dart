@@ -30,7 +30,7 @@ class EquipmentListScreen extends ConsumerStatefulWidget {
 }
 
 class _EquipmentListScreenState extends ConsumerState<EquipmentListScreen> {
-  bool _isSearchVisible = false;
+  // bool _isSearchVisible = false;
 
   @override
   void initState() {

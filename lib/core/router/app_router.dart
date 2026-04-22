@@ -27,7 +27,6 @@ import 'package:prokat/features/map/screens/map_renter_pin_address_screen.dart';
 import 'package:prokat/features/owner/addresses/screens/owner_address_create_screen.dart';
 import 'package:prokat/features/owner/addresses/screens/owner_address_edit_screen.dart';
 import 'package:prokat/features/owner/addresses/screens/owner_addresses_screen.dart';
-import 'package:prokat/features/owner/addresses/screens/owner_select_address_screen.dart';
 import 'package:prokat/features/bookings/screens/owner_bookings_history_screen.dart';
 import 'package:prokat/features/bookings/screens/owner_bookings_screen.dart';
 import 'package:prokat/features/equipment/screens/owner_equipment_detail_screen.dart';
@@ -82,15 +81,15 @@ GoRouter createRouter(WidgetRef ref) {
           }
           break;
 
-        case AppStartupState.client:
-          if (location == AppRoutes.launch) {
-            return AppRoutes.dashboard;
-          }
-          break;
-
         case AppStartupState.owner:
           if (location == AppRoutes.launch) {
             return AppRoutes.ownerDashboard;
+          }
+          break;
+
+        case AppStartupState.client:
+          if (location == AppRoutes.launch) {
+            return AppRoutes.dashboard;
           }
           break;
       }
@@ -175,8 +174,7 @@ GoRouter createRouter(WidgetRef ref) {
                       ) ??
                       10;
 
-                  final city =
-                      state.uri.queryParameters['city'] ?? '';
+                  final city = state.uri.queryParameters['city'] ?? '';
 
                   return MainScreen(
                     query: query,
@@ -206,8 +204,7 @@ GoRouter createRouter(WidgetRef ref) {
                       ) ??
                       10;
 
-                  final city =
-                      state.uri.queryParameters['city'] ?? '';
+                  final city = state.uri.queryParameters['city'] ?? '';
 
                   return EquipmentListScreen(
                     query: query,
@@ -364,20 +361,25 @@ GoRouter createRouter(WidgetRef ref) {
                 path: AppRoutes.ownerDashboard,
                 builder: (_, _) => const OwnerDashboardScreen(),
               ),
+              //
+              // Owner Equipment
+              //
               GoRoute(
                 path: AppRoutes.ownerEquiment,
                 builder: (_, _) => const OwnerEquipmentListScreen(),
-              ),
-              GoRoute(
-                path: AppRoutes.ownerEquimentCreate,
-                builder: (_, _) => const CreateEquipmentScreen(),
-              ),
-              GoRoute(
-                path: AppRoutes.ownerEquimentId,
-                builder: (context, state) {
-                  final id = state.pathParameters['id']!;
-                  return OwnerEquipmentDetailScreen(equipmentId: id);
-                },
+                routes: [
+                  GoRoute(
+                    path: AppRoutes.createEquipment,
+                    builder: (_, _) => const CreateEquipmentScreen(),
+                  ),
+                  GoRoute(
+                    path: AppRoutes.editEquipment,
+                    builder: (context, state) {
+                      final id = state.pathParameters['id']!;
+                      return OwnerEquipmentDetailScreen(equipmentId: id);
+                    },
+                  ),
+                ],
               ),
               //
               // Owner Addresses
@@ -387,33 +389,39 @@ GoRouter createRouter(WidgetRef ref) {
                 builder: (context, state) {
                   return OwnerAddressesScreen();
                 },
+                routes: [
+                  GoRoute(
+                    path: AppRoutes.pinToMap,
+                    builder: (context, state) {
+                      // Owner creates location for equipment, pass id to map screen
+                      final equipmentId =
+                          state.uri.queryParameters['equipmentId'] ?? "";
+                      return MapOwnerPinLocationScreen(
+                        equipmentId: equipmentId,
+                      );
+                    },
+                  ),
+                  GoRoute(
+                    path: AppRoutes.createAddress,
+                    builder: (context, state) {
+                      return OwnerAddressCreateScreen();
+                    },
+                  ),
+                  GoRoute(
+                    path: AppRoutes.editAddress,
+                    builder: (context, state) {
+                      final id = state.pathParameters['id']!;
+                      return OwnerAddressEditScreen(id: id);
+                    },
+                  ),
+                ],
               ),
+              //
+              // Owner Requests
+              //
               GoRoute(
-                path: AppRoutes.ownerAddressMap,
-                builder: (context, state) {
-                  final equipmentId =
-                      state.uri.queryParameters['equipmentId'] ?? "";
-                  return MapOwnerPinLocationScreen(equipmentId: equipmentId);
-                },
-              ),
-              GoRoute(
-                path: AppRoutes.ownerAddressCreate,
-                builder: (context, state) {
-                  return OwnerAddressCreateScreen();
-                },
-              ),
-              GoRoute(
-                path: AppRoutes.ownerAddressSelect,
-                builder: (context, state) {
-                  return OwnerSelectAddressScreen();
-                },
-              ),
-              GoRoute(
-                path: AppRoutes.ownerAddressEdit,
-                builder: (context, state) {
-                  final id = state.pathParameters['id']!;
-                  return OwnerAddressEditScreen(id: id);
-                },
+                path: AppRoutes.ownerRequests,
+                builder: (_, _) => const OwnerRequestsScreen(),
               ),
               //
               // Owner Bookings
@@ -431,14 +439,7 @@ GoRouter createRouter(WidgetRef ref) {
                 ],
               ),
               //
-              // Owner Bookings
-              //
-              GoRoute(
-                path: AppRoutes.ownerRequests,
-                builder: (_, _) => const OwnerRequestsScreen(),
-              ),
-              //
-              // Owner Profile
+              // Owner Profile & Settings
               //
               GoRoute(
                 path: AppRoutes.ownerProfile,
@@ -448,6 +449,9 @@ GoRouter createRouter(WidgetRef ref) {
                 path: AppRoutes.ownerSettings,
                 builder: (_, _) => const OwnerSettingsScreen(),
               ),
+              //
+              // Owner Registration and Payment
+              //
               GoRoute(
                 path: AppRoutes.ownerRegistration,
                 builder: (_, _) => const OwnerRegistrationScreen(),
@@ -460,20 +464,18 @@ GoRouter createRouter(WidgetRef ref) {
               // Owner Chat
               //
               GoRoute(
-                path: AppRoutes.ownerChatList, // Full path: /owner/chat/list
+                path: AppRoutes.ownerChat,
                 builder: (context, state) => const OwnerChatListScreen(),
                 routes: [
                   GoRoute(
-                    path:
-                        AppRoutes.chatDetail, // Full path: /owner/chat/list/:id
+                    path: AppRoutes.chatDetail,
                     builder: (context, state) {
                       final id = state.pathParameters['id']!;
                       return OwnerChatScreen(chatId: id); //
                     },
                     routes: [
                       GoRoute(
-                        path: AppRoutes
-                            .chatInfo, // Full path: /owner/chat/list/:id/info
+                        path: AppRoutes.chatInfo,
                         builder: (context, state) =>
                             const OwnerChatInfoScreen(),
                       ),

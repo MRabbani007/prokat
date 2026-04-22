@@ -97,15 +97,19 @@ class AppTheme {
         labelLarge: TextStyle(
           color: lightTextSecondary,
           fontSize: 16,
-          fontWeight: FontWeight.w600,
+          fontWeight: FontWeight.w800,
         ),
         labelMedium: TextStyle(
           color: lightTextSecondary,
           fontSize: 14,
-          fontWeight: FontWeight.w600,
+          fontWeight: FontWeight.w800,
           letterSpacing: 1.2,
         ),
-        labelSmall: TextStyle(color: lightTextDisabled, fontSize: 10),
+        labelSmall: TextStyle(
+          color: lightTextSecondary,
+          fontWeight: FontWeight.w600,
+          fontSize: 12,
+        ),
       ),
     );
   }

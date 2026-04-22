@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:prokat/core/widgets/base_tile.dart';
+import 'package:prokat/features/appstartup/app_startup_provider.dart';
 import '../../auth/providers/auth_provider.dart';
 
 class LogoutButton extends ConsumerWidget {
@@ -48,9 +49,13 @@ class LogoutButton extends ConsumerWidget {
 
     await ref.read(authProvider.notifier).logout();
 
-    if (context.mounted) {
-      context.go('/login');
-    }
+    print("after logout notifier");
+
+    await ref.read(appStartupProvider.notifier).init();
+
+    print("after app startup ");
+
+    context.go('/login');
   }
 
   @override

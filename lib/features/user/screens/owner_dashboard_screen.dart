@@ -130,7 +130,7 @@ class _OwnerDashboardScreenState extends ConsumerState<OwnerDashboardScreen> {
                     _buildStatCard(
                       context,
                       "Fleet",
-                      "$equipmentCount",
+                      equipmentCount.toString().padLeft(2, '0'),
                       Colors.blue,
                       AppRoutes.ownerEquiment,
                     ),
@@ -140,9 +140,11 @@ class _OwnerDashboardScreenState extends ConsumerState<OwnerDashboardScreen> {
                     _buildStatCard(
                       context,
                       "Active Orders",
-                      activeOrdersCount == 1
-                          ? "1 Order"
-                          : "$activeOrdersCount Orders",
+                      activeOrdersCount == 0
+                          ? "No Orders"
+                          : activeOrdersCount == 1
+                          ? "01 Order"
+                          : "${activeOrdersCount.toString().padLeft(2, '0')} Orders",
                       Colors.orange,
                       AppRoutes.ownerBookings,
                     ),
@@ -210,7 +212,7 @@ class _OwnerDashboardScreenState extends ConsumerState<OwnerDashboardScreen> {
                           ),
 
                           Text(
-                            '${pendingJobs.length} new order - ${upcomingJobs.length} confirmed order',
+                            '${pendingJobs.isEmpty ? 0 : pendingJobs.length.toString().padLeft(2, '0')} new order - ${upcomingJobs.isEmpty ? 0 : upcomingJobs.length.toString().padLeft(2, '0')} confirmed order',
                             style: theme.textTheme.labelMedium?.copyWith(
                               fontWeight: FontWeight.bold,
                             ),

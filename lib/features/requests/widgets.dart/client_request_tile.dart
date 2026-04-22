@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
+import 'package:prokat/core/utils/format.dart';
+import 'package:prokat/features/bookings/widgets/owner_booking_tile.dart';
+import 'package:prokat/features/bookings/widgets/show_location_sheet.dart';
 import 'package:prokat/features/requests/models/request_model.dart';
 import 'package:prokat/features/requests/state/request_provider.dart';
 import 'package:prokat/features/requests/widgets.dart/request_status_badge.dart';
@@ -15,253 +18,252 @@ class ClientRequestTile extends ConsumerStatefulWidget {
 }
 
 class _ClientRequestTileState extends ConsumerState<ClientRequestTile> {
-  void _showCancelConfirmation(
-    BuildContext context,
-    WidgetRef ref,
-    String requestId,
-  ) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text("Cancel Request?"),
-        content: const Text(
-          "Are you sure you want to cancel this request? This action cannot be undone.",
-        ),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text(
-              "NO",
-              style: TextStyle(color: Theme.of(context).colorScheme.primary),
-            ),
-          ),
-          TextButton(
-            onPressed: () async {
-              Navigator.pop(context); // Close dialog first
-
-              final res = await ref
-                  .read(requestProvider.notifier)
-                  .cancelRequest(requestId);
-
-              if (res == true && context.mounted) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text("Request cancelled successfully"),
-                  ),
-                );
-              }
-            },
-            child: const Text(
-              "YES, CANCEL",
-              style: TextStyle(
-                color: Colors.redAccent,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
     final request = widget.request;
 
+    final displayMessage = "";
+
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
         color: theme.cardColor,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(
-          color: (theme.colorScheme.outline).withValues(alpha: 0.3),
-        ),
+        border: Border.all(color: theme.colorScheme.secondary, width: 2),
+        borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.3),
-            blurRadius: 8,
-            offset: const Offset(0, 4),
+            blurRadius: 4,
+            offset: const Offset(0, 6),
           ),
         ],
       ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  /// 1. Top Row: Capacity & Status
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        request.category?.name ?? "",
-                        style: theme.textTheme.bodyLarge,
-                      ),
-                      RequestStatusBadge(status: request.status),
-                    ],
-                  ),
-
-                  const SizedBox(height: 16),
-
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        request.capacity.toUpperCase(),
-                        style: theme.textTheme.bodyLarge,
-                      ),
-                      Text(
-                        (request.category?.capacityUnit ?? "").toUpperCase(),
-                        style: theme.textTheme.bodyLarge,
-                      ),
-                    ],
-                  ),
-
-                  const SizedBox(height: 12),
-
-                  /// 2. Info Grid (Date & Price)
-                  Row(
-                    children: [
-                      _buildInfoItem(
-                        context: context,
-                        icon: Icons.calendar_today_rounded,
-                        label: "SCHEDULED FOR",
-                        value: _formatDateTime(request),
-                      ),
-                      const SizedBox(width: 24),
-                      _buildInfoItem(
-                        context: context,
-                        icon: Icons.payments_outlined,
-                        label: "OFFERED RATE",
-                        value: "${request.offeredRate} ₸",
-                        valueColor: theme.primaryColor,
-                      ),
-                    ],
-                  ),
-
-                  /// 3. Comment Section
-                  if (request.comment != null &&
-                      request.comment!.isNotEmpty) ...[
-                    const SizedBox(height: 16),
-                    Container(
-                      width: double.infinity,
-                      padding: const EdgeInsets.all(12),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.03),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Column(
-                        children: [
-                          Text("Comment:", style: theme.textTheme.labelMedium),
-                          Text(
-                            request.comment!,
-                            style: theme.textTheme.bodyMedium,
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ],
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Tile Header
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+            decoration: BoxDecoration(
+              color: theme.colorScheme.secondary,
+              borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(13),
+                topRight: Radius.circular(13),
               ),
             ),
-
-            /// 4. Action Bar (Conditional)
-            if (request.status == "CREATED")
-              Container(
-                decoration: BoxDecoration(
-                  border: Border(
-                    top: BorderSide(color: theme.colorScheme.outlineVariant),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  getRequestStatus(request.status),
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w700,
+                    color: theme.colorScheme.onPrimary,
+                    letterSpacing: 0.5,
                   ),
                 ),
-                child: IntrinsicHeight(
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: TextButton.icon(
-                          onPressed: () =>
-                              _showCancelConfirmation(context, ref, request.id),
-                          // () async {
-                          //   final res = await ref
-                          //       .read(requestProvider.notifier)
-                          //       .cancelRequest(request.id);
+                Text(
+                  displayMessage,
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                    color: theme.colorScheme.onPrimary,
+                  ),
+                ),
+              ],
+            ),
+          ),
 
-                          //   if (res == true) {}
-                          // },
-                          icon: const Icon(Icons.close_rounded, size: 18),
-                          label: const Text("CANCEL REQUEST"),
-                          style: TextButton.styleFrom(
-                            foregroundColor: theme.colorScheme.error,
-                            padding: const EdgeInsets.symmetric(vertical: 14),
-                            textStyle: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 12,
-                              letterSpacing: 1,
-                              color: theme.colorScheme.onErrorContainer,
+          Padding(
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                /// 1. Top Row: Capacity & Status
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    SizedBox(
+                      width: 130, // Fixed width
+                      child: AspectRatio(
+                        aspectRatio: 16 / 9,
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(8),
+                          child: Image.network(
+                            request.category?.imageUrl ?? "",
+                            fit: BoxFit.contain,
+                            errorBuilder: (c, e, s) => Container(
+                              color: Colors.grey[200],
+                              child: const Icon(Icons.image),
                             ),
                           ),
                         ),
                       ),
-                    ],
-                  ),
-                ),
-              ),
-          ],
-        ),
-      ),
-    );
-  }
+                    ),
 
-  Widget _buildInfoItem({
-    required BuildContext context,
-    required IconData icon,
-    required String label,
-    required String value,
-    Color? valueColor,
-  }) {
-    final theme = Theme.of(context);
+                    const SizedBox(width: 12),
 
-    return Expanded(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(label, style: theme.textTheme.labelMedium),
-          const SizedBox(height: 4),
-          Row(
-            children: [
-              Icon(
-                icon,
-                size: 14,
-                color: valueColor ?? Colors.white.withValues(alpha: 0.5),
-              ),
-              const SizedBox(width: 6),
-              Expanded(
-                child: Text(
-                  value,
-                  style: theme.textTheme.bodyLarge,
-                  overflow: TextOverflow.ellipsis,
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            request.category?.name.toUpperCase() ?? "",
+                            style: theme.textTheme.titleSmall?.copyWith(
+                              fontWeight: FontWeight.w800,
+                              letterSpacing: 0.5,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+
+                    RequestStatusBadge(status: request.status),
+                  ],
                 ),
-              ),
-            ],
+
+                const SizedBox(height: 16),
+
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(
+                      child: InfoTile(
+                        label: 'Location',
+                        value: request.location.street,
+                        onTap: () =>
+                            showLocationSheet(context, request.location),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: InfoTile(
+                        label: 'Date & time',
+                        value: request.requiredOn != null
+                            ? DateFormat(
+                                'dd MMM yyyy • HH:mm',
+                              ).format(request.requiredOn!)
+                            : "PENDING",
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(
+                      child: InfoTile(
+                        label: 'Capacity',
+                        value:
+                            "${request.capacity} ${request.category?.capacityUnit}",
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: InfoTile(
+                        label: 'Offered rate',
+                        value: formatPrice(request.offeredRate),
+                        isHighlighted: true,
+                      ),
+                    ),
+                  ],
+                ),
+
+                const SizedBox(height: 16),
+
+                // Comment Tile (Full Width - No Expanded wrapper)
+                if (request.comment != null && request.comment!.isNotEmpty)
+                  InfoTile(label: 'Comment', value: request.comment!),
+
+                const SizedBox(height: 16),
+
+                Row(
+                  children: [
+                    Expanded(
+                      child: OutlinedButton(
+                        onPressed: () =>
+                            _showCancelConfirmation(context, ref, request.id),
+                        style: OutlinedButton.styleFrom(
+                          side: BorderSide(
+                            color: theme.colorScheme.error,
+                            width: 1,
+                          ),
+                          padding: const EdgeInsets.symmetric(vertical: 20),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                        ),
+                        child: Text(
+                          "Cancel Request",
+                          style: TextStyle(
+                            color: theme.colorScheme.error,
+                            fontWeight: FontWeight.w600,
+                            fontSize: 14,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
         ],
       ),
     );
   }
+}
 
-  String _formatDateTime(RequestModel r) {
-    final dateStr = DateFormat('MMM dd').format(r.requiredOn!);
-    if (r.requiredAt != null) {
-      final timeStr = DateFormat('HH:mm').format(r.requiredAt!);
-      return "$dateStr • $timeStr";
-    }
-    return dateStr;
-  }
+void _showCancelConfirmation(
+  BuildContext context,
+  WidgetRef ref,
+  String requestId,
+) {
+  showDialog(
+    context: context,
+    builder: (context) => AlertDialog(
+      title: const Text("Cancel Request?"),
+      content: const Text(
+        "Are you sure you want to cancel this request? This action cannot be undone.",
+      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: Text(
+            "NO",
+            style: TextStyle(color: Theme.of(context).colorScheme.primary),
+          ),
+        ),
+        TextButton(
+          onPressed: () async {
+            Navigator.pop(context); // Close dialog first
+
+            final res = await ref
+                .read(requestProvider.notifier)
+                .cancelRequest(requestId);
+
+            if (res == true && context.mounted) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text("Request cancelled successfully")),
+              );
+            }
+          },
+          child: const Text(
+            "YES, CANCEL",
+            style: TextStyle(
+              color: Colors.redAccent,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ),
+      ],
+    ),
+  );
 }

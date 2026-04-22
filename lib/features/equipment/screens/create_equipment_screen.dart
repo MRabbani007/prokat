@@ -104,8 +104,8 @@ class _CreateEquipmentScreenState extends ConsumerState<CreateEquipmentScreen> {
                     /// 2. Form card
                     Container(
                       decoration: BoxDecoration(
-                        color: theme.colorScheme.surfaceContainerHighest,
-                        borderRadius: BorderRadius.circular(28),
+                        color: theme.cardColor,
+                        borderRadius: BorderRadius.circular(20),
                         border: Border.all(
                           color: colorScheme.outline.withValues(alpha: 0.2),
                         ),
@@ -126,7 +126,7 @@ class _CreateEquipmentScreenState extends ConsumerState<CreateEquipmentScreen> {
                             validator: (v) => v!.isEmpty ? "REQUIRED" : null,
                           ),
                           InputField(
-                            label: "MODEL NUMBER",
+                            label: "MODEL",
                             controller: _model,
                             hint: "e.g. KAMAZ-65115",
                           ),

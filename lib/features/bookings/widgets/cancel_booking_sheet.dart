@@ -6,8 +6,9 @@ import 'package:prokat/features/bookings/state/booking_provider.dart';
 
 class CancelBookingSheet extends ConsumerStatefulWidget {
   final BookingModel booking;
+  final String? useCase;
 
-  const CancelBookingSheet({super.key, required this.booking});
+  const CancelBookingSheet({super.key, required this.booking, this.useCase});
 
   @override
   ConsumerState<CancelBookingSheet> createState() => CancelBookingSheetState();
@@ -16,7 +17,7 @@ class CancelBookingSheet extends ConsumerStatefulWidget {
 class CancelBookingSheetState extends ConsumerState<CancelBookingSheet> {
   String? selectedReason;
 
-  final reasons = [
+  final ownerCancelReasons = [
     "Client did not respond",
     "Equipment unavailable",
     "Pricing issue",
@@ -24,10 +25,29 @@ class CancelBookingSheetState extends ConsumerState<CancelBookingSheet> {
     "Other",
   ];
 
+  final clientCancelReasons = [
+    "Did not show up",
+    "Changed my mind",
+    "Equipment not suitable",
+    "Other",
+  ];
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final notifier = ref.read(bookingProvider.notifier);
+
+    final sheetTitle = widget.useCase == "owner"
+        ? widget.booking.status.toUpperCase() == "CREATED"
+              ? "Reject Order"
+              : "Cancel Order"
+        : widget.useCase == "client"
+        ? ""
+        : "";
+
+    final reasons = widget.useCase == "owner"
+        ? ownerCancelReasons
+        : clientCancelReasons;
 
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 20, 16, 32),
@@ -45,12 +65,7 @@ class CancelBookingSheetState extends ConsumerState<CancelBookingSheet> {
             ),
           ),
 
-          Text(
-            widget.booking.status.toUpperCase() == "CREATED"
-                ? "Reject Order"
-                : "Cancel Order",
-            style: theme.textTheme.titleMedium,
-          ),
+          Text(sheetTitle, style: theme.textTheme.titleMedium),
 
           const SizedBox(height: 16),
 
@@ -130,8 +145,8 @@ class CancelBookingSheetState extends ConsumerState<CancelBookingSheet> {
                         },
                   child: Text(
                     widget.booking.status.toUpperCase() == "CREATED"
-                        ? "Reject"
-                        : "Cancel",
+                        ? "Reject Order"
+                        : "Cancel Order",
                   ),
                 ),
               ),

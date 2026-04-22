@@ -22,6 +22,7 @@ class EditEquipmentDetailsForm extends StatefulWidget {
 class _EditEquipmentDetailsFormState extends State<EditEquipmentDetailsForm> {
   late TextEditingController _nameController;
   late TextEditingController _modelController;
+  late TextEditingController _plateNumberController;
   late TextEditingController _capacityController;
   late TextEditingController _commentController;
   late TextEditingController _rentConditionController;
@@ -36,6 +37,9 @@ class _EditEquipmentDetailsFormState extends State<EditEquipmentDetailsForm> {
 
     _nameController = TextEditingController(text: widget.equipment.name);
     _modelController = TextEditingController(text: widget.equipment.model);
+    _plateNumberController = TextEditingController(
+      text: widget.equipment.plateNumber,
+    );
     _capacityController = TextEditingController(
       text: widget.equipment.capacity.toString(),
     );
@@ -118,81 +122,78 @@ class _EditEquipmentDetailsFormState extends State<EditEquipmentDetailsForm> {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
 
-    final cardColor = colorScheme.surfaceContainerHighest;
-    final ghostGray = colorScheme.onSurface.withValues(alpha: 0.6);
     final accent = colorScheme.primary;
 
     return Container(
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: cardColor,
-        borderRadius: BorderRadius.circular(24),
-        border: Border.all(
-          color: colorScheme.onSurface.withValues(alpha: 0.08),
-        ),
+        color: theme.cardColor,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: colorScheme.outline.withValues(alpha: 0.4)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          /// HEADER
-          Padding(
-            padding: const EdgeInsets.fromLTRB(20, 12, 12, 4),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  "INFORMATION",
-                  style: theme.textTheme.labelMedium?.copyWith(
-                    color: ghostGray,
-                    fontWeight: FontWeight.bold,
-                    letterSpacing: 1.5,
-                  ),
-                ),
-      
-                _isDirty
-                    ? TextButton.icon(
-                        onPressed: _isSaving ? null : _handleSave,
-                        icon: _isSaving
-                            ? SizedBox(
-                                width: 14,
-                                height: 14,
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2,
-                                  color: colorScheme.onPrimary,
-                                ),
-                              )
-                            : const Icon(Icons.save_rounded, size: 16),
-                        label: const Text("Save"),
-                        style: TextButton.styleFrom(
-                          foregroundColor: colorScheme.onPrimary,
-                          backgroundColor: accent,
-                          padding: const EdgeInsets.symmetric(horizontal: 16),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                        ),
-                      )
-                    : Padding(
-                        padding: const EdgeInsets.all(12),
-                        child: Icon(
-                          Icons.lock_outline_rounded,
-                          color: ghostGray,
-                          size: 18,
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text("INFORMATION", style: theme.textTheme.titleLarge),
+
+              _isDirty
+                  ? TextButton.icon(
+                      onPressed: _isSaving ? null : _handleSave,
+                      icon: _isSaving
+                          ? SizedBox(
+                              width: 14,
+                              height: 14,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                color: colorScheme.onPrimary,
+                              ),
+                            )
+                          : const Icon(Icons.save_rounded, size: 16),
+                      label: const Text("Save"),
+                      style: TextButton.styleFrom(
+                        foregroundColor: colorScheme.onPrimary,
+                        backgroundColor: accent,
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
                         ),
                       ),
-              ],
-            ),
+                    )
+                  : Padding(
+                      padding: const EdgeInsets.all(12),
+                      child: Icon(
+                        Icons.lock_outline_rounded,
+                        color: colorScheme.onSurface.withValues(alpha: 0.6),
+                        size: 18,
+                      ),
+                    ),
+            ],
           ),
-      
+
+          SizedBox(height: 12),
           _ThemedInputField(
             label: "Name",
             controller: _nameController,
             onChanged: _onChanged,
           ),
+
+          SizedBox(height: 12),
+
           _ThemedInputField(
             label: "Model",
             controller: _modelController,
             onChanged: _onChanged,
           ),
+          SizedBox(height: 12),
+          _ThemedInputField(
+            label: "Plate Number",
+            controller: _plateNumberController,
+            onChanged: _onChanged,
+          ),
+          SizedBox(height: 12),
           _ThemedInputField(
             label: "Capacity",
             controller: _capacityController,
@@ -200,18 +201,22 @@ class _EditEquipmentDetailsFormState extends State<EditEquipmentDetailsForm> {
             isNumeric: true,
             suffixText: _selectedCategory?.capacityUnit,
           ),
+          SizedBox(height: 12),
           _ThemedInputField(
             label: "Rent Condition",
             controller: _rentConditionController,
             onChanged: _onChanged,
+            hintText: "Full load only...",
           ),
+          SizedBox(height: 12),
           _ThemedInputField(
             label: "Comments",
             controller: _commentController,
             onChanged: _onChanged,
             isLast: true,
+            hintText: "15M Hose",
           ),
-      
+
           const SizedBox(height: 16),
         ],
       ),
@@ -221,6 +226,7 @@ class _EditEquipmentDetailsFormState extends State<EditEquipmentDetailsForm> {
 
 class _ThemedInputField extends StatelessWidget {
   final String label;
+  final String? hintText;
   final TextEditingController controller;
   final VoidCallback onChanged;
   final bool isNumeric;
@@ -229,6 +235,7 @@ class _ThemedInputField extends StatelessWidget {
 
   const _ThemedInputField({
     required this.label,
+    this.hintText,
     required this.controller,
     required this.onChanged,
     this.isNumeric = false,
@@ -245,30 +252,21 @@ class _ThemedInputField extends StatelessWidget {
     final accent = colorScheme.primary;
 
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 20),
-      padding: const EdgeInsets.symmetric(vertical: 12),
+      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 12),
       decoration: BoxDecoration(
-        border: isLast
-            ? null
-            : Border(
-                bottom: BorderSide(
-                  color: colorScheme.onSurface.withValues(alpha: 0.05),
-                ),
-              ),
+        color: Colors.grey[100],
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: colorScheme.outline.withValues(alpha: 0.25)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
             label.toUpperCase(),
-            style: theme.textTheme.labelSmall?.copyWith(
-              color: ghostGray,
-              fontWeight: FontWeight.bold,
-              letterSpacing: 1.2,
+            style: theme.textTheme.labelMedium?.copyWith(
+              color: theme.primaryColor,
             ),
           ),
-          const SizedBox(height: 4),
-
           Row(
             children: [
               Expanded(
@@ -287,6 +285,7 @@ class _ThemedInputField extends StatelessWidget {
                     isDense: true,
                     contentPadding: const EdgeInsets.symmetric(vertical: 8),
                     border: InputBorder.none,
+                    hintText: hintText,
                     hintStyle: TextStyle(
                       color: ghostGray.withValues(alpha: 0.4),
                     ),

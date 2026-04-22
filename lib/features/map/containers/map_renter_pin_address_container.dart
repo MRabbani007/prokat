@@ -86,9 +86,6 @@ class _MapRenterPinAddressContainerState
 
       if (!mounted) return;
 
-      // if (created == true) {
-      //   context.push('/equipment/$equipmentId/book');
-      // }
       if (created == true) {
         context.pop(location); // return to booking screen
       }

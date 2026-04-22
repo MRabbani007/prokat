@@ -17,9 +17,9 @@ class DeleteEquipmentSection extends StatelessWidget {
       margin: const EdgeInsets.only(top: 12, bottom: 40),
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        color: colorScheme.surfaceContainerHighest,
-        borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: danger.withValues(alpha: 0.2)),
+        color: colorScheme.surfaceContainer,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: colorScheme.outline.withValues(alpha: 0.4)),
       ),
       child: Column(
         children: [
@@ -27,7 +27,7 @@ class DeleteEquipmentSection extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(Icons.warning_amber_rounded, color: danger, size: 18),
+              Icon(Icons.warning_amber_rounded, color: danger, size: 30),
               const SizedBox(width: 8),
               Text(
                 "DANGER ZONE",
@@ -60,7 +60,7 @@ class DeleteEquipmentSection extends StatelessWidget {
             height: 54,
             child: OutlinedButton.icon(
               onPressed: onDelete,
-              icon: const Icon(Icons.delete_forever_rounded, size: 20),
+              icon: const Icon(Icons.delete_outline_outlined, size: 30),
               label: const Text(
                 "Delete Equipment",
                 style: TextStyle(

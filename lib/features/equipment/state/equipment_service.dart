@@ -50,7 +50,6 @@ class EquipmentService {
 
       return parsed;
     } catch (e) {
-      
       throw Exception(e);
     }
   }
@@ -77,7 +76,7 @@ class EquipmentService {
     }
   }
 
-  Future<Equipment> updateEquipment(
+  Future<Equipment?> updateEquipment(
     String equipmentId,
     Map<String, dynamic> data,
   ) async {
@@ -86,11 +85,14 @@ class EquipmentService {
 
       return Equipment.fromJson(response.data['data']);
     } on DioException catch (e) {
-      throw Exception(e.response?.data ?? 'Failed to update equipment');
+      return null;
+      // throw Exception(e.response?.data ?? 'Failed to update equipment');
+    } catch (e) {
+      return null;
     }
   }
 
-  Future<Equipment> updateEquipmentLocation(
+  Future<Equipment?> updateEquipmentLocation(
     String equipmentId,
     Map<String, dynamic> data,
   ) async {
@@ -103,6 +105,8 @@ class EquipmentService {
       return Equipment.fromJson(response.data['data']);
     } on DioException catch (e) {
       throw Exception(e.response?.data ?? 'Failed to update equipment');
+    } catch (e) {
+      return null;
     }
   }
 

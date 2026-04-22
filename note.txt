@@ -165,4 +165,7 @@ after review allow creating equipment
 
 ---- ----
 
-Become and owner, register as an owner, publish / advertise your equipment and Services, find clients
+Become an owner, register as an owner, publish / advertise your equipment and Services, find clients
+
+
+flutter build apk --release

@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:prokat/core/router/app_routes.dart';
+import 'package:prokat/core/utils/format.dart';
+import 'package:prokat/core/widgets/base_tile.dart';
 import 'package:prokat/features/equipment/models/equipment_model.dart';
 import 'package:prokat/features/equipment/providers/equipment_provider.dart';
 
@@ -10,141 +13,117 @@ class OwnerEquipmentCard extends ConsumerWidget {
 
   const OwnerEquipmentCard({super.key, required this.equipment});
 
-  String _formatPriceRate(String? rate) {
-    switch (rate?.toUpperCase()) {
-      case "PER_TRIP":
-        return "/ Trip";
-      case "PER_CUBIC_METER":
-        return "/ M3";
-      case "PER_HOUR":
-        return "/ Hour";
-      default:
-        return "";
-    }
-  }
-
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
 
     // Theme-based colors
-    final accentColor = theme.primaryColor;
     final ghostGray = colorScheme.onSurface.withValues(alpha: 0.5);
 
-    final locationText = equipment.location?.city ?? "No location set";
+    final locationText = equipment.city ?? "No location set";
+
     final priceEntry = equipment.prices.firstOrNull;
     final priceDisplay = priceEntry != null
-        ? "${priceEntry.price} ${_formatPriceRate(priceEntry.priceRate)}"
+        ? "${priceEntry.price} ${getPriceRate(priceEntry.priceRate)}"
         : "No Price Set";
 
-    return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      decoration: BoxDecoration(
-        color: colorScheme.surface,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: colorScheme.outline.withValues(alpha: 0.5)),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.5),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          children: [
-            // TOP ROW: Image, Info, and Toggle
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _buildImage(equipment.imageUrl),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        equipment.name,
-                        style: theme.textTheme.titleLarge,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      Text(
-                        "MODEL: ${equipment.model.toUpperCase()}",
-                        style: theme.textTheme.labelLarge,
-                      ),
-                      const SizedBox(height: 8),
-                    ],
-                  ),
-                ),
-
-                // Dedicated Edit Button
-                ElevatedButton(
-                  onPressed: () {
-                    ref
-                        .read(equipmentProvider.notifier)
-                        .selectEditEquipment(equipment);
-                    context.push('/owner/equipment/${equipment.id}');
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: colorScheme.primaryContainer,
-                    foregroundColor: colorScheme.onPrimaryContainer,
-                    elevation: 0,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                  ),
-                  child: const Icon(Icons.edit, size: 16),
-                ),
-              ],
-            ),
-
-            const Padding(
-              padding: EdgeInsets.symmetric(vertical: 12),
-              child: Divider(height: 1),
-            ),
-
-            // BOTTOM ROW: Location, Price, and Edit Button
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Column(
+    return BaseTile(
+      child: Column(
+        children: [
+          // TOP ROW: Image, Info, and Toggle
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _buildImage(equipment.imageUrl),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Row(
-                      children: [
-                        Icon(Icons.location_on, size: 16, color: ghostGray),
-                        const SizedBox(width: 4),
-                        Text(locationText, style: theme.textTheme.bodyMedium),
-                      ],
-                    ),
-                    const SizedBox(height: 4),
                     Text(
-                      priceDisplay,
-                      style: TextStyle(
-                        color: accentColor,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16,
-                      ),
+                      equipment.name,
+                      style: theme.textTheme.titleLarge,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    Text(
+                      equipment.model.toUpperCase(),
+                      style: theme.textTheme.labelMedium,
+                    ),
+                    Text(
+                      equipment.plateNumber?.toUpperCase() ?? "",
+                      style: theme.textTheme.labelMedium,
                     ),
                   ],
                 ),
+              ),
 
-                Spacer(),
+              // Dedicated Edit Button
+              ElevatedButton(
+                onPressed: () {
+                  ref
+                      .read(equipmentProvider.notifier)
+                      .selectEditEquipment(equipment);
+                  context.push('${AppRoutes.ownerEquiment}/${equipment.id}');
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: colorScheme.primaryContainer,
+                  foregroundColor: colorScheme.onPrimaryContainer,
+                  elevation: 0,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+                child: const Icon(Icons.edit, size: 16),
+              ),
+            ],
+          ),
 
-                _StatusBadge(status: equipment.status),
+          SizedBox(height: 12),
 
-                Spacer(),
+          // const Padding(
+          //   padding: EdgeInsets.symmetric(vertical: 12),
+          //   child: Divider(height: 1),
+          // ),
 
-                // Online Toggle
-                _onlineToggle(context, ref),
-              ],
-            ),
-          ],
-        ),
+          // BOTTOM ROW: Location, Price, and Edit Button
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Icon(Icons.location_on, size: 16, color: ghostGray),
+                      const SizedBox(width: 4),
+                      Text(locationText, style: theme.textTheme.bodyMedium),
+                    ],
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    priceDisplay,
+                    style: TextStyle(
+                      color: theme.primaryColor,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                    ),
+                  ),
+                ],
+              ),
+
+              Spacer(),
+
+              _StatusBadge(status: equipment.status),
+
+              Spacer(),
+
+              // Online Toggle
+              _onlineToggle(context, ref),
+            ],
+          ),
+        ],
       ),
     );
   }

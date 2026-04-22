@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:prokat/features/appstartup/app_startup_provider.dart';
 import 'package:prokat/features/auth/models/auth_credentials.dart';
 import 'package:prokat/features/auth/providers/auth_provider.dart';
 import '../widgets/auth_button.dart';
@@ -47,7 +48,8 @@ class _LoginWithUsernameFormState extends ConsumerState<LoginWithUsernameForm> {
       final res = await ref.read(authProvider.notifier).login(credentials);
 
       if (res == true) {
-        if (mounted) context.push("/dashboard");
+        await ref.read(appStartupProvider.notifier).init();
+        // context.push("/dashboard");
       } else {
         // Handle case where res is false but no exception was thrown
         widget.onError("Invalid username or password");

@@ -11,23 +11,15 @@ class PriceEntryTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-
-    final ghostGray = colorScheme.onSurface.withValues(alpha: 0.6);
     final accent = colorScheme.primary;
 
     return Container(
-      margin: const EdgeInsets.symmetric(vertical: 6),
+      margin: EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        /// ✅ Use layered surface (NOT light grey / blue)
-        color: colorScheme.surfaceContainerHigh,
-
+        color: Colors.grey[100],
         borderRadius: BorderRadius.circular(16),
-
-        /// subtle separation inside panel
-        border: Border.all(
-          color: colorScheme.onSurface.withValues(alpha: 0.05),
-        ),
+        border: Border.all(color: colorScheme.outline.withValues(alpha: 0.25)),
       ),
       child: Row(
         children: [
@@ -38,9 +30,8 @@ class PriceEntryTile extends StatelessWidget {
               children: [
                 Text(
                   price.priceRate, // e.g. "Per Hour"
-                  style: theme.textTheme.labelSmall?.copyWith(
-                    color: ghostGray,
-                    fontWeight: FontWeight.bold,
+                  style: theme.textTheme.labelMedium?.copyWith(
+                    color: theme.primaryColor,
                   ),
                 ),
                 const SizedBox(height: 4),

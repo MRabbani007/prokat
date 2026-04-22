@@ -6,26 +6,39 @@ import 'package:prokat/features/equipment/models/price_entry_model.dart';
 
 class Equipment {
   final String id;
+
   final String name;
   final String model;
+  final String? plateNumber;
+
   final String capacity;
   final String capacityUnit;
+
   final String? ownerComment;
   final String rentCondition;
+
   final String status;
   final bool isVisible;
+
   final User? owner;
   final String? imageUrl;
+
   final List<PriceEntry> prices;
+
+  final String? city;
   final EquipmentLocation? location;
+
   final String? categoryId;
   final Category? category;
   final DateTime? updatedAt;
 
   Equipment({
     required this.id,
+
     required this.name,
     required this.model,
+    this.plateNumber,
+
     required this.capacity,
     required this.capacityUnit,
     this.ownerComment,
@@ -36,16 +49,23 @@ class Equipment {
     this.owner,
     this.categoryId,
     this.category,
+
+    this.city,
     this.location,
+
     required this.prices,
+
     this.updatedAt,
   });
 
   Map<String, dynamic> toJson() {
     final data = <String, dynamic>{
       "id": id,
+
       "name": name,
       "model": model,
+      "plateNumber": plateNumber,
+
       "capacity": capacity,
       "capacityUnit": capacityUnit,
       "rentCondition": rentCondition,
@@ -53,6 +73,7 @@ class Equipment {
       "isVisible": isVisible,
       "owner": owner,
       "category": category,
+      "city": city,
       "updatedAt": updatedAt,
     };
 
@@ -81,6 +102,7 @@ class Equipment {
         id: json["id"] ?? '',
         name: json["name"] ?? '',
         model: json["model"] ?? '',
+        plateNumber: json["plateNumber"] ?? '',
 
         capacity: json["capacity"].toString(),
         capacityUnit: json["capacityUnit"]?.toString() ?? '',
@@ -100,13 +122,12 @@ class Equipment {
 
         owner: json["owner"] != null ? User.fromJson(json["owner"]) : null,
 
+        city: json["city"],
         location: json['location'] != null
             ? EquipmentLocation.fromJson(json['location'])
             : null,
 
-        categoryId: json["categoryId"] != null
-            ? json["categoryId"].toString()
-            : null,
+        categoryId: json["categoryId"]?.toString(),
 
         category: json["category"] != null
             ? Category.fromJson(json["category"])

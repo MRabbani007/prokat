@@ -38,7 +38,7 @@ class _OwnerEquipmentListScreenState
     final state = ref.watch(equipmentProvider);
 
     return Scaffold(
-        backgroundColor: theme.scaffoldBackgroundColor,
+      backgroundColor: theme.scaffoldBackgroundColor,
       body: CustomScrollView(
         slivers: [
           // 1. App Bar with Back Button
@@ -62,7 +62,7 @@ class _OwnerEquipmentListScreenState
                 color: theme.colorScheme.onPrimary,
               ),
             ),
-            centerTitle: true,
+            centerTitle: false,
             actions: [
               IconButton(
                 onPressed: () => context.push(AppRoutes.ownerEquimentCreate),
@@ -80,7 +80,7 @@ class _OwnerEquipmentListScreenState
           // 2. Stats and Add Button Section
           SliverToBoxAdapter(
             child: Padding(
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.all(24),
               child: Row(
                 children: [
                   Expanded(
@@ -129,11 +129,11 @@ class _OwnerEquipmentListScreenState
             _buildSliverEmptyState(context)
           else
             SliverPadding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
+              padding: const EdgeInsets.symmetric(horizontal: 24),
               sliver: SliverList(
                 delegate: SliverChildBuilderDelegate(
                   (context, index) => Padding(
-                    padding: const EdgeInsets.only(bottom: 12),
+                    padding: const EdgeInsets.only(bottom: 24),
                     child: OwnerEquipmentCard(
                       equipment: state.ownerEquipment[index],
                     ),
@@ -207,6 +207,9 @@ class _OwnerEquipmentListScreenState
       padding: EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.15),
+        border: Border.all(
+          color: color.withValues(alpha: 0.3),
+        ),
         borderRadius: BorderRadius.circular(16),
       ),
       child: Column(
@@ -214,7 +217,7 @@ class _OwnerEquipmentListScreenState
         children: [
           // The Large Count
           Text(
-            count.toString(),
+            count.toString().padLeft(2, '0'),
             style: theme.textTheme.titleLarge?.copyWith(
               fontWeight: FontWeight.bold,
               color: theme.colorScheme.onSurface,

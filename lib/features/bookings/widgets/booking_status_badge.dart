@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:prokat/core/utils/format.dart';
 
 class BookingStatusBadge extends StatelessWidget {
   final String status;
@@ -7,55 +8,21 @@ class BookingStatusBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
-    Color statusColor;
-    switch (status.toUpperCase()) {
-      case 'CREATED':
-        statusColor = Colors.orange;
-        break;
-      case 'CONFIRMED':
-        statusColor = Colors.blue;
-        break;
-      case 'COMPLETED':
-        statusColor = Colors.green;
-        break;
-      default:
-        statusColor = Colors.grey;
-    }
-
     return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
-        // 1. SOLID BASE: This stops color mixing/bleeding from the tile
-        color: theme.cardColor, // Usually white or your theme's surface color
-        borderRadius: BorderRadius.circular(8),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.2),
-            blurRadius: 6,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Container(
-        // 2. OVERLAY: The low-alpha status color on top of the solid base
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-        decoration: BoxDecoration(
-          color: statusColor.withValues(alpha: 0.12),
-          borderRadius: BorderRadius.circular(8),
-          border: Border.all(
-            color: statusColor.withValues(alpha: 0.2),
-            width: 1,
-          ),
+        color: getBookingColor(status).withValues(alpha: 0.15),
+        borderRadius: BorderRadius.circular(4),
+        border: Border.all(
+          color: getBookingColor(status).withValues(alpha: 0.4),
         ),
-        child: Text(
-          status.toUpperCase(),
-          style: TextStyle(
-            color: statusColor,
-            fontSize: 11,
-            fontWeight: FontWeight.bold,
-            letterSpacing: 0.5,
-          ),
+      ),
+      child: Text(
+        getBookingStatus(status),
+        style: TextStyle(
+          fontSize: 12,
+          fontWeight: FontWeight.w600,
+          color: getBookingColor(status),
         ),
       ),
     );

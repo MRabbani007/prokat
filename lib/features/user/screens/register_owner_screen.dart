@@ -9,6 +9,8 @@ class RegisterOwnerPage extends ConsumerStatefulWidget {
 }
 
 class _RegisterOwnerPageState extends ConsumerState<RegisterOwnerPage> {
+  final _formKey = GlobalKey<FormState>();
+
   final fullNameController = TextEditingController();
   final iinController = TextEditingController();
   final displayNameController = TextEditingController();
@@ -19,74 +21,98 @@ class _RegisterOwnerPageState extends ConsumerState<RegisterOwnerPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Register as Owner")),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.fromLTRB(20, 16, 20, 32),
+      backgroundColor: const Color(0xFF003893), // Match the dark blue header
+      body: SafeArea(
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            /// 🔹 BASIC INFO
-            _sectionTitle(context, "Basic Information"),
-
-            const SizedBox(height: 12),
-            _inputField(controller: fullNameController, hint: "Full Name"),
-
-            const SizedBox(height: 12),
-            _inputField(
-              controller: iinController,
-              hint: "IIN",
-              keyboardType: TextInputType.number,
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 10),
+              child: Column(
+                children: [
+                  Row(
+                    children: [
+                      IconButton(
+                        icon: const Icon(
+                          Icons.arrow_back_ios,
+                          color: Colors.white,
+                        ),
+                        onPressed: () {},
+                      ),
+                      const Text(
+                        "Become a provider",
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 20),
+                  // Simple Stepper UI
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      _stepCircle("1", "Business", true),
+                      _stepLine(),
+                      _stepCircle("2", "Licenses", false),
+                      _stepLine(),
+                      _stepCircle("3", "Documents", false),
+                    ],
+                  ),
+                ],
+              ),
             ),
 
-            const SizedBox(height: 12),
-            _inputField(
-              controller: displayNameController,
-              hint: "Display Name",
-            ),
+            Expanded(
+              child: Container(
+                padding: const EdgeInsets.all(20),
+                decoration: const BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+                ),
+                child: SingleChildScrollView(
+                  child: Form(
+                    key: _formKey,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          "Step 1 — Business information",
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                            color: Color(0xFF003893),
+                          ),
+                        ),
+                        const SizedBox(height: 20),
 
-            const SizedBox(height: 28),
+                        _buildInputField("Full name", "Aibek Tulegenov"),
+                        _buildInputField(
+                          "Business / company name",
+                          "e.g. Aibek Transport LLP",
+                        ),
+                        _buildInputField(
+                          "BIN / IIN (business ID number)",
+                          "12-digit number",
+                        ),
 
-            /// 🔹 PAYMENT
-            _sectionTitle(context, "Payment Details"),
+                        const Text(
+                          "Operating region",
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                        const SizedBox(height: 8),
+                        _buildDropdownField("Atyrau region"),
 
-            const SizedBox(height: 12),
-            _inputField(
-              controller: paymentController,
-              hint: "IBAN / Card Number",
-            ),
+                        const SizedBox(height: 24),
+                        _buildInfoBox(),
+                        const SizedBox(height: 40),
 
-            const SizedBox(height: 28),
-
-            /// 🔹 EQUIPMENT
-            _sectionTitle(context, "Equipment"),
-
-            const SizedBox(height: 12),
-
-            ...equipment.map((e) => _equipmentTile(e)),
-
-            const SizedBox(height: 12),
-
-            OutlinedButton.icon(
-              onPressed: () {
-                setState(() {
-                  equipment.add("New Equipment ${equipment.length + 1}");
-                });
-              },
-              icon: const Icon(Icons.add),
-              label: const Text("Add Equipment"),
-            ),
-
-            const SizedBox(height: 32),
-
-            /// 🔹 CTA
-            SizedBox(
-              width: double.infinity,
-              height: 56,
-              child: ElevatedButton(
-                onPressed: () {
-                  // TODO: submit logic
-                },
-                child: const Text("REGISTER OWNER"),
+                        _buildNextButton(),
+                      ],
+                    ),
+                  ),
+                ),
               ),
             ),
           ],
@@ -142,4 +168,106 @@ class _RegisterOwnerPageState extends ConsumerState<RegisterOwnerPage> {
       ),
     );
   }
+}
+
+Widget _stepCircle(String num, String label, bool isActive) {
+  return Column(
+    children: [
+      CircleAvatar(
+        radius: 15,
+        backgroundColor: isActive ? Colors.white : Colors.white24,
+        child: Text(
+          num,
+          style: TextStyle(
+            color: isActive ? const Color(0xFF003893) : Colors.white,
+          ),
+        ),
+      ),
+      const SizedBox(height: 4),
+      Text(label, style: const TextStyle(color: Colors.white, fontSize: 10)),
+    ],
+  );
+}
+
+Widget _stepLine() => Container(height: 1, width: 40, color: Colors.white24);
+
+Widget _buildInputField(String label, String hint) {
+  return Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      Text(label, style: const TextStyle(fontWeight: FontWeight.bold)),
+      const SizedBox(height: 8),
+      TextFormField(
+        decoration: InputDecoration(
+          hintText: hint,
+          border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: 16,
+            vertical: 12,
+          ),
+        ),
+      ),
+      const SizedBox(height: 16),
+    ],
+  );
+}
+
+Widget _buildDropdownField(String value) {
+  return Container(
+    padding: const EdgeInsets.symmetric(horizontal: 16),
+    decoration: BoxDecoration(
+      border: Border.all(color: Colors.grey),
+      borderRadius: BorderRadius.circular(12),
+    ),
+    child: DropdownButtonHideUnderline(
+      child: DropdownButton<String>(
+        value: value,
+        isExpanded: true,
+        items: [
+          value,
+        ].map((e) => DropdownMenuItem(value: e, child: Text(e))).toList(),
+        onChanged: (_) {},
+      ),
+    ),
+  );
+}
+
+Widget _buildInfoBox() {
+  return Container(
+    padding: const EdgeInsets.all(12),
+    decoration: BoxDecoration(
+      color: const Color(0xFFE8F0FE),
+      borderRadius: BorderRadius.circular(12),
+    ),
+    child: const Row(
+      children: [
+        Icon(Icons.info_outline, color: Color(0xFF003893)),
+        SizedBox(width: 12),
+        Expanded(
+          child: Text(
+            "Your application will be reviewed by our team. You remain a regular client until approved.",
+            style: TextStyle(fontSize: 13, color: Color(0xFF003893)),
+          ),
+        ),
+      ],
+    ),
+  );
+}
+
+Widget _buildNextButton() {
+  return SizedBox(
+    width: double.infinity,
+    height: 50,
+    child: ElevatedButton(
+      style: ElevatedButton.styleFrom(
+        backgroundColor: const Color(0xFF003893),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      ),
+      onPressed: () {},
+      child: const Text(
+        "Next — Licenses",
+        style: TextStyle(color: Colors.white, fontSize: 16),
+      ),
+    ),
+  );
 }

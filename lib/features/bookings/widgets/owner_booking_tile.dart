@@ -6,10 +6,11 @@ import 'package:prokat/core/utils/format.dart';
 import 'package:prokat/features/bookings/models/booking_model.dart';
 import 'package:prokat/features/bookings/models/booking_status.dart';
 import 'package:prokat/features/bookings/state/booking_provider.dart';
+import 'package:prokat/features/bookings/widgets/booking_status_badge.dart';
 import 'package:prokat/features/bookings/widgets/booking_status_sheet.dart';
 import 'package:prokat/features/bookings/widgets/cancel_booking_sheet.dart';
-import 'package:url_launcher/url_launcher.dart';
 import 'package:go_router/go_router.dart';
+import 'package:prokat/features/bookings/widgets/show_location_sheet.dart';
 
 class OwnerBookingTile extends ConsumerWidget {
   final BookingModel booking;
@@ -131,36 +132,14 @@ class OwnerBookingTile extends ConsumerWidget {
                       ),
                     ),
 
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 6,
-                      ),
-                      decoration: BoxDecoration(
-                        color: getBookingColor(
-                          booking.status,
-                        ).withValues(alpha: 0.15),
-                        borderRadius: BorderRadius.circular(4),
-                        border: Border.all(
-                          color: getBookingColor(
-                            booking.status,
-                          ).withValues(alpha: 0.4),
-                        ),
-                      ),
-                      child: Text(
-                        getBookingStatus(booking.status),
-                        style: TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w600,
-                          color: getBookingColor(booking.status),
-                        ),
-                      ),
-                    ),
+                    // Booking Status Badge
+                    BookingStatusBadge(status: booking.status),
                   ],
                 ),
 
                 const SizedBox(height: 16),
 
+                // Equipment Image and Info
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -224,7 +203,7 @@ class OwnerBookingTile extends ConsumerWidget {
                       child: InfoTile(
                         label: 'Location',
                         value: booking.location.street,
-                        onTap: () => _showLocationSheet(context, booking),
+                        onTap: () => showLocationSheet(context, booking.location),
                       ),
                     ),
                     const SizedBox(width: 12),
@@ -305,9 +284,7 @@ class OwnerBookingTile extends ConsumerWidget {
                     Expanded(
                       child: OutlinedButton(
                         onPressed: () {
-                          context.push(
-                            "${AppRoutes.ownerChatList}/${booking.id}",
-                          );
+                          context.push("${AppRoutes.ownerChat}/${booking.id}");
                         },
                         style: OutlinedButton.styleFrom(
                           side: BorderSide(
@@ -491,71 +468,6 @@ class InfoTile extends StatelessWidget {
   }
 }
 
-void _showLocationSheet(BuildContext context, BookingModel booking) {
-  final theme = Theme.of(context);
-  final lat = booking.location.latitude; // Ensure your model has these
-  final lon = booking.location.longitude;
-
-  showModalBottomSheet(
-    context: context,
-    shape: const RoundedRectangleBorder(
-      borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
-    ),
-    builder: (context) => Padding(
-      padding: const EdgeInsets.all(24.0),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text("Delivery Address", style: theme.textTheme.titleLarge),
-          const SizedBox(height: 8),
-          Text(
-            "${booking.location.street}, ${booking.location.city}",
-            style: theme.textTheme.bodyMedium,
-          ),
-          const SizedBox(height: 24),
-
-          // 2GIS Button
-          ListTile(
-            leading: const Icon(Icons.map_outlined, color: Colors.green),
-            title: const Text("Open in 2GIS"),
-            onTap: () => _launchMap('2gis', lat, lon),
-          ),
-
-          // Google Maps Button
-          ListTile(
-            leading: const Icon(Icons.location_on, color: Colors.red),
-            title: const Text("Open in Google Maps"),
-            onTap: () => _launchMap('google', lat, lon),
-          ),
-          const SizedBox(height: 16),
-        ],
-      ),
-    ),
-  );
-}
-
-Future<void> _launchMap(String type, double lat, double lon) async {
-  final String googleWeb = 'https://google.com';
-  final String dgisWeb = 'https://2gis.kz'; // Web URL
-  final String dgisApp = 'dgis://2gis.ru/routeSearch/rsType/car/to/$lon,$lat';
-
-  if (type == '2gis') {
-    final uriApp = Uri.parse(dgisApp);
-    final uriWeb = Uri.parse(dgisWeb);
-
-    // Try app first, if fail (or on web), open browser
-    if (await canLaunchUrl(uriApp)) {
-      await launchUrl(uriApp);
-    } else {
-      await launchUrl(uriWeb, mode: LaunchMode.externalApplication);
-    }
-  } else {
-    // Google Maps is very good at handling HTTPS by opening the app itself
-    await launchUrl(Uri.parse(googleWeb), mode: LaunchMode.externalApplication);
-  }
-}
-
 Future<void> _handleCancel(
   BuildContext context,
   WidgetRef ref,
@@ -633,16 +545,6 @@ Future<void> _handleCancel(
   }
 
   // Open reason sheet
-  _showCancelSheet(context, ref, booking);
-}
-
-void _showCancelSheet(
-  BuildContext context,
-  WidgetRef ref,
-  BookingModel booking,
-) {
-  final theme = Theme.of(context);
-
   showModalBottomSheet(
     context: context,
     isScrollControlled: true,

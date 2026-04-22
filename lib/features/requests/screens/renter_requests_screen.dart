@@ -91,17 +91,17 @@ class _RenterRequestsScreenState extends ConsumerState<RenterRequestsScreen> {
                   ),
                   tooltip: "Create Request",
                 ),
-                IconButton(
-                  onPressed: () => authSession == null
-                      ? null
-                      : context.push(AppRoutes.clientRequestHistory),
-                  icon: Icon(
-                    Icons.history_toggle_off_rounded,
-                    color: theme.colorScheme.onPrimary.withValues(alpha: 0.7),
-                    size: 24,
-                  ),
-                  tooltip: "Requests History",
-                ),
+                // IconButton(
+                //   onPressed: () => authSession == null
+                //       ? null
+                //       : context.push(AppRoutes.clientRequestHistory),
+                //   icon: Icon(
+                //     Icons.history_toggle_off_rounded,
+                //     color: theme.colorScheme.onPrimary.withValues(alpha: 0.7),
+                //     size: 24,
+                //   ),
+                //   tooltip: "Requests History",
+                // ),
               ],
               actionsPadding: EdgeInsets.only(right: 12),
             ),

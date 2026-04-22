@@ -14,10 +14,14 @@ class AppRoutes {
   static const String helpSupport = '/help';
 
   // User Screens
+  static const String clientMain = '/client'; // TODO: move all client pages under /client
+
   static const String dashboard = '/dashboard';
   static const String categories = '/categories';
+
   static const String searchList = '/search/list';
   static const String searchMap = '/search/map';
+
   static const String equipmentId = '/equipment/:id';
   static const String booking = '/equipment/:id/book';
 
@@ -37,24 +41,41 @@ class AppRoutes {
   static const String becomeOwner = '/become-owner';
 
   // Owner Screens
+
   // prefixed with /owner
   static const String ownerDashboard = '/owner/dashboard';
 
-  static const String ownerEquiment = '/owner/equipment/list';
-  static const String ownerEquimentMap = '/owner/equipment/map';
-  static const String ownerEquimentId = '/owner/equipment/:id';
-  static const String ownerEquimentCreate = '/owner/equipment/create';
+  // Owner Equipment
+  static const String ownerEquiment = '/owner/equipment';
+  // Sub paths for router
+  static const String createEquipment = '/create';
+  static const String editEquipment = '/:id';
+  static const String equipmentMap = '/map'; // TODO: Screen Not implemented
+  // Full path for components
+  static const String ownerEquimentCreate = '$ownerEquiment$createEquipment';
+  static const String ownerEquimentId = '$ownerEquiment$editEquipment';
+  static const String ownerEquimentMap = '$ownerEquiment$equipmentMap';
 
+  // Owner Addresses
   static const String ownerAddresses = '/owner/addresses';
-  static const String ownerAddressCreate = '/owner/addresses/create';
-  static const String ownerAddressEdit = '/owner/addresses/edit';
-  static const String ownerAddressSelect = '/owner/addresses/select';
-  static const String ownerAddressMap = '/owner/addresses/map';
+  // Sub paths for router
+  static const String createAddress = '/create';
+  static const String editAddress = '/edit';
+  static const String pinToMap = '/map';
+  // Full path for components
+  static const String ownerAddressCreate = '$ownerAddresses$createAddress';
+  static const String ownerAddressEdit = '$ownerAddresses$editAddress';
+  static const String ownerAddressMap = '$ownerAddresses$pinToMap';
 
+  // Owner Requests
   static const String ownerRequests = '/owner/requests';
 
+  // Owner Bookings
   static const String ownerBookings = '/owner/bookings';
-  static const String ownerBookingsHistory = '/owner/bookings/history';
+  // Sub paths for router
+  static const String bookingHistory = '/history';
+  // Full path for components
+  static const String ownerBookingsHistory = '$ownerBookings$bookingHistory';
 
   static const String ownerProfile = '/owner/profile';
   static const String ownerSettings = '/owner/settings';
@@ -62,9 +83,9 @@ class AppRoutes {
   static const String ownerPayment = '/owner/payment';
   static const String ownerRegistration = '/owner/registration';
 
-  static const String ownerChatList =
-      '/owner/chat'; // 
-
+  // Owner Chats
+  static const String ownerChat = '/owner/chat'; // List of chats
+  // Sub paths for router
   static const String chatDetail = ':id';
   static const String chatInfo = 'info';
 }

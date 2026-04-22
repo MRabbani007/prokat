@@ -133,7 +133,7 @@ class _OwnerDashboardHeaderState extends ConsumerState<OwnerDashboardHeader> {
               color: theme.colorScheme.onPrimary,
             ),
             onPressed: () {
-              context.push(AppRoutes.ownerChatList);
+              context.push(AppRoutes.ownerChat);
             },
           ),
         ],

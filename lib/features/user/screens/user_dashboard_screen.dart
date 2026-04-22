@@ -37,9 +37,11 @@ class _UserDashboardPageState extends ConsumerState<UserDashboardPage> {
               automaticallyImplyLeading: false,
               expandedHeight: 160.0, // Adjust height as needed
               floating: true, // AppBar reappears immediately when scrolling up
+              snap: true,
               pinned: false, // AppBar hides completely when scrolling down
               backgroundColor: theme.colorScheme.primary,
               flexibleSpace: FlexibleSpaceBar(
+                collapseMode: CollapseMode.pin,
                 background: UserDashboardHeader(), // Your header widget
               ),
             ),

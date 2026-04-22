@@ -131,6 +131,8 @@ class _OwnerEquipmentDetailScreenState
                     const SizedBox(height: 20),
 
                     LocationSection(
+                      ref: ref,
+                      equipment: equipment,
                       location: equipment.location != null
                           ? '${equipment.location?.street}, ${equipment.location?.city}'
                           : "NO LOCATION SET",

@@ -16,8 +16,8 @@ final appStartupProvider =
 
 class AppStartupController extends StateNotifier<AppStartupState> {
   final Ref ref;
-  bool _initialized = false;
-  bool _isInitializing = false;
+  // bool _initialized = false;
+  // bool _isInitializing = false;
 
   AppStartupController(this.ref) : super(AppStartupState.loading) {
     Future.microtask(() async {
@@ -89,9 +89,9 @@ class AppStartupController extends StateNotifier<AppStartupState> {
   }
 
   Future<void> init() async {
-    if (_initialized || _isInitializing) return;
+    // if (_initialized || _isInitializing) return;
 
-    _isInitializing = true;
+    // _isInitializing = true;
 
     try {
       final start = DateTime.now();
@@ -139,11 +139,11 @@ class AppStartupController extends StateNotifier<AppStartupState> {
 
       state = await loadAppData();
 
-      _initialized = true;
+      // _initialized = true;
     } catch (e) {
       state = AppStartupState.error;
     } finally {
-      _isInitializing = false;
+      // _isInitializing = false;
     }
   }
 }
