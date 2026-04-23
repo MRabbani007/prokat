@@ -132,6 +132,8 @@ class AuthNotifier extends StateNotifier<AuthState> {
 
         state = state.copyWith(session: result.data, isLoading: false);
 
+        await ref.read(appStartupProvider.notifier).reloadApp();
+
         return true;
       } else {
         print("Notifier ${result.error.toString()}");
@@ -183,14 +185,14 @@ class AuthNotifier extends StateNotifier<AuthState> {
     try {
       final result = await api.verifyOtp(phone, otp);
 
-      print(result.data?.toJson());
-
       if (result.data != null) {
         await storage.saveSession(result.data as AuthSession);
 
         await storage.clearOtpSession();
 
         state = state.copyWith(session: result.data, isLoading: false);
+
+        await ref.read(appStartupProvider.notifier).reloadApp();
 
         return true;
       }

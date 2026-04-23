@@ -1,6 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:prokat/core/providers/api_provider.dart';
-
 import 'chat_notifier.dart';
 import 'chat_service.dart';
 import 'chat_state.dart';
@@ -13,5 +12,6 @@ final chatServiceProvider = Provider<ChatService>((ref) {
 final chatProvider =
     StateNotifierProvider<ChatNotifier, ChatState>((ref) {
   final service = ref.read(chatServiceProvider);
-  return ChatNotifier(service);
+  final secureStorage = ref.read(secureStorageProvider);
+  return ChatNotifier(service, secureStorage);
 });

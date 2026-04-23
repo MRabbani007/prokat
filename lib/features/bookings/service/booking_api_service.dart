@@ -29,17 +29,13 @@ class BookingApiService {
           .map((e) => BookingModel.fromJson(e))
           .toList();
     } catch (e) {
-      print(e);
       return [];
     }
   }
 
   Future<bool> createBooking(Map<String, dynamic> data) async {
     try {
-      print(data.toString());
       final res = await _dio.post("/bookings", data: data);
-
-      print(res.toString());
 
       if (res.statusCode == 200 || res.statusCode == 201) {
         return true;
@@ -64,7 +60,6 @@ class BookingApiService {
     String? workStatus,
   }) async {
     try {
-      print("updating");
       final res = await _dio.patch(
         "/bookings/$id/status",
         data: {

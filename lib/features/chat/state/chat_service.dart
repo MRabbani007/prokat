@@ -13,12 +13,13 @@ class ChatService {
   /// Get all conversations
   Future<List<ChatModel>> getConversations() async {
     try {
-      final res = await _dio.get('/chat/conversations');
+      final res = await _dio.get('/chats');
 
       return (res.data['data'] as List)
           .map((e) => ChatModel.fromJson(e))
           .toList();
     } catch (e) {
+      print(e);
       return [];
     }
   }
@@ -26,7 +27,7 @@ class ChatService {
   /// Get messages in a conversation
   Future<List<ChatMessageModel>> getMessages(String conversationId) async {
     try {
-      final res = await _dio.get('/chat/$conversationId/messages');
+      final res = await _dio.get('/chats/$conversationId/messages');
 
       return (res.data['data'] as List)
           .map((e) => ChatMessageModel.fromJson(e))
@@ -43,11 +44,8 @@ class ChatService {
   }) async {
     try {
       final res = await _dio.post(
-        '/chat/$conversationId/messages',
-        data: {
-          "message": message,
-          "type": "TEXT",
-        },
+        '/chats/$conversationId/messages',
+        data: {"message": message, "type": "TEXT"},
       );
 
       if (res.statusCode == 200 || res.statusCode == 201) {
@@ -61,15 +59,11 @@ class ChatService {
   }
 
   /// Create or get conversation (important for Prokat use case)
-  Future<ChatModel?> createOrGetConversation({
-    required String userId,
-  }) async {
+  Future<ChatModel?> createOrGetConversation({required String userId}) async {
     try {
       final res = await _dio.post(
-        '/chat/conversations',
-        data: {
-          "userId": userId,
-        },
+        '/chats/conversations',
+        data: {"userId": userId},
       );
 
       return ChatModel.fromJson(res.data['data']);

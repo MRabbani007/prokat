@@ -117,8 +117,6 @@ class BookingNotifier extends StateNotifier<BookingState> {
     try {
       state = state.copyWith(isLoading: true);
 
-      print(id);
-
       final updated = await api.updateBookingStatus(
         id: id,
         status: status,

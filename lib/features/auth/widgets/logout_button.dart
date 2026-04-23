@@ -49,11 +49,7 @@ class LogoutButton extends ConsumerWidget {
 
     await ref.read(authProvider.notifier).logout();
 
-    print("after logout notifier");
-
     await ref.read(appStartupProvider.notifier).init();
-
-    print("after app startup ");
 
     context.go('/login');
   }
