@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:prokat/core/router/app_routes.dart';
-import 'package:prokat/core/widgets/base_tile.dart';
+import 'package:prokat/core/widgets/inline_tile.dart';
 
 class CreateRequestTile extends StatelessWidget {
   const CreateRequestTile({super.key});
@@ -12,7 +12,7 @@ class CreateRequestTile extends StatelessWidget {
 
     return GestureDetector(
       onTap: () => context.push(AppRoutes.createRequest),
-      child: BaseTile(
+      child: InlineTile(
         child: Row(
           children: [
             // Enhanced Icon Container

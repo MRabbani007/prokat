@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:prokat/features/user/state/user_profile_service.dart';
 import 'package:prokat/features/user/state/user_profile_state.dart';
+import 'dart:io';
 
 class UserProfileNotifier extends StateNotifier<UserProfileState> {
   final UserProfileService service;
@@ -26,8 +27,8 @@ class UserProfileNotifier extends StateNotifier<UserProfileState> {
       state = state.copyWith(isLoading: true);
 
       final data = await service.getUserProfile();
-      
-      state = state.copyWith(isLoading: false, userProfile: data);
+
+      state = state.copyWith(isLoading: false, userProfile: () => data);
 
       if (data == null) {
         return false;
@@ -37,7 +38,7 @@ class UserProfileNotifier extends StateNotifier<UserProfileState> {
     } catch (e) {
       state = state.copyWith(
         isLoading: false,
-        userProfile: null,
+        userProfile: () => null,
         error: e.toString(),
       );
 
@@ -156,6 +157,27 @@ class UserProfileNotifier extends StateNotifier<UserProfileState> {
       return false;
     } catch (e) {
       state = state.copyWith(isLoading: false, error: e.toString());
+      return false;
+    }
+  }
+
+  Future<bool> uploadProfileImage(File imageFile) async {
+    try {
+      state = state.copyWith(isLoading: true);
+
+      print("upload image");
+
+      final response = await service.uploadProfileImage(imageFile);
+
+      await service.getUserProfile();
+
+      state = state.copyWith(isLoading: false);
+
+      return response;
+    } catch (e) {
+      print('Error during upload: $e');
+      state = state.copyWith(isLoading: false, error: e.toString());
+
       return false;
     }
   }

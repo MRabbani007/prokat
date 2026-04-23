@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:prokat/core/widgets/inline_tile.dart';
 
-class InfoTile extends StatelessWidget {
+class UserProfileTile extends StatelessWidget {
   final IconData icon;
   final String label;
   final String value;
   final VoidCallback? onTap;
   final Widget? trailing;
 
-  const InfoTile({
+  const UserProfileTile({
     super.key,
     required this.icon,
     required this.label,
@@ -24,24 +25,7 @@ class InfoTile extends StatelessWidget {
 
     return GestureDetector(
       onTap: onTap,
-      child: Container(
-        margin: const EdgeInsets.symmetric(horizontal: 24, vertical: 0),
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: theme.cardColor,
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(
-            color: colorScheme.outline.withValues(alpha: 0.3),
-          ),
-          // Optional: always-visible shadow
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.3),
-              blurRadius: 8,
-              offset: const Offset(0, 4),
-            ),
-          ],
-        ),
+      child: InlineTile(
         child: Row(
           children: [
             /// Icon container
@@ -61,15 +45,9 @@ class InfoTile extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    label,
-                    style: textTheme.labelMedium,
-                  ),
+                  Text(label, style: textTheme.labelMedium),
                   const SizedBox(height: 4),
-                  Text(
-                    value,
-                    style: textTheme.bodyMedium,
-                  ),
+                  Text(value, style: textTheme.bodyMedium),
                 ],
               ),
             ),

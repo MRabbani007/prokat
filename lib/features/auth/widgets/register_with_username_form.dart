@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:prokat/core/router/app_routes.dart';
 import 'package:prokat/features/appstartup/app_startup_provider.dart';
 import 'package:prokat/features/auth/providers/auth_provider.dart';
 import 'package:prokat/features/auth/widgets/auth_button.dart';
 import 'package:prokat/features/auth/widgets/auth_text_field.dart';
-import 'package:go_router/go_router.dart';
 
 class RegisterWithUsernameForm extends ConsumerStatefulWidget {
   final Function(String?) onError;
@@ -64,9 +62,6 @@ class _RegisterWithUsernameFormState
               firstName: firstName,
               lastName: lastName,
             );
-
-        print("RegisterForm");
-        print(result);
 
         if (result == true) {
           await ref.read(appStartupProvider.notifier).init();

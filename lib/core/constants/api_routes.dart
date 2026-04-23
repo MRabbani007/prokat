@@ -10,6 +10,7 @@ class ApiRoutes {
   static const userCategory = "/user/profile/category";
   static const userAddress = "/user/profile/address";
   static const userCityRegion = "/user/profile/region";
+  static const userProfileImage = "/user/profile/image";
   // Auth
   static const login = "/auth/login";
   static const register = "/auth/register";

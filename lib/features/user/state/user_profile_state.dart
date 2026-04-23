@@ -31,7 +31,7 @@ class UserProfileState {
     String? phoneNumber,
     int? rating,
     String? darkMode,
-    UserProfileModel? userProfile,
+    UserProfileModel? Function()? userProfile,
   }) {
     return UserProfileState(
       isLoading: isLoading ?? this.isLoading,
@@ -41,7 +41,7 @@ class UserProfileState {
       phoneNumber: phoneNumber ?? this.phoneNumber,
       rating: rating ?? this.rating,
       darkMode: darkMode ?? this.darkMode,
-      userProfile: userProfile ?? this.userProfile,
+      userProfile: userProfile != null ? userProfile() : this.userProfile,
     );
   }
 }

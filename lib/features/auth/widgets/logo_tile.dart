@@ -17,14 +17,14 @@ class LogoTile extends StatelessWidget {
           // 1. Icon
           Container(
             padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: theme.primaryColor.withValues(alpha: 0.15),
-              shape: BoxShape.circle,
-            ),
-            child: Icon(LucideIcons.truck, color: theme.primaryColor, size: 40),
+            // decoration: BoxDecoration(
+            //   color: theme.primaryColor.withValues(alpha: 0.15),
+            //   shape: BoxShape.circle,
+            // ),
+            child: Icon(LucideIcons.truck, color: theme.primaryColor, size: 60),
           ),
 
-          const SizedBox(width: 16),
+          const SizedBox(width: 8),
 
           // 2. Prokat (Brand Name)
           Column(
@@ -32,12 +32,13 @@ class LogoTile extends StatelessWidget {
             children: [
               RichText(
                 text: TextSpan(
-                  style: TextStyle(
-                    fontSize: 22,
-                    fontWeight: FontWeight.w800,
-                    letterSpacing: 0.04 * 22,
-                    color: Color(0xFF1A1A2E),
-                  ),
+                  style: theme.textTheme.displayLarge, 
+                  // TextStyle(
+                  //   fontSize: 22,
+                  //   fontWeight: FontWeight.w800,
+                  //   letterSpacing: 0.04 * 22,
+                  //   color: Color(0xFF1A1A2E),
+                  // ),
                   children: [
                     TextSpan(text: 'PRO'),
                     TextSpan(

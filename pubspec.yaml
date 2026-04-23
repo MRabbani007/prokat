@@ -67,6 +67,8 @@ dependencies:
   hooks_riverpod: ^2.6.1
   url_launcher: ^6.3.2
   socket_io_client: ^3.1.4
+  image_picker: ^1.2.1
+  image_cropper: ^12.2.1
 
 dev_dependencies:
   flutter_test:

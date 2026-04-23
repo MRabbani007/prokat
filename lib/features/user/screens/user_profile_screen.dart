@@ -1,14 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:intl/intl.dart';
 import 'package:prokat/features/auth/widgets/logout_button.dart';
 import 'package:prokat/features/user/state/user_profile_provider.dart';
 import 'package:prokat/features/user/widgets/become_owner_cta.dart';
-import 'package:prokat/features/user/widgets/build_info_tile.dart';
+import 'package:prokat/features/user/widgets/edit_name_sheet.dart';
+import 'package:prokat/features/user/widgets/profile_image_picker.dart';
+import 'package:prokat/features/user/widgets/user_profile_tile.dart';
 import 'package:prokat/features/user/widgets/display_name.dart';
-import 'package:prokat/features/user/widgets/edit_phone_sheet.dart';
 import 'package:prokat/features/user/widgets/setting_link_tile.dart';
-import 'package:prokat/features/user/widgets/show_edit_username.dart';
 import 'package:go_router/go_router.dart';
 
 class UserProfileScreen extends ConsumerStatefulWidget {
@@ -32,8 +31,9 @@ class _UserProfileScreenState extends ConsumerState<UserProfileScreen> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final state = ref.watch(userProfileProvider);
+    final profileNotifier = ref.read(userProfileProvider.notifier);
+
     final username = state.userProfile?.username;
-    final profileImageUrl = state.userProfile?.profileImageUrl ?? "";
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
@@ -72,8 +72,18 @@ class _UserProfileScreenState extends ConsumerState<UserProfileScreen> {
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                         // Profile Image Stack
-                        _buildProfileImage(theme, profileImageUrl),
-                        const SizedBox(width: 16),
+                        ProfileImagePicker(
+                          onImageSelected: (file) async {
+                            print("image selected");
+                            if (file != null) {
+                              await profileNotifier.uploadProfileImage(file);
+                            }
+                          },
+                          initialImageUrl:
+                              state.userProfile?.profileImageUrl ?? "",
+                        ),
+
+                        const SizedBox(width: 20),
                         // Name and Rating Info
                         // Note: Ensure _buildProfileInfo uses theme.colorScheme.onPrimary
                         // for text colors to be readable against the gradient.
@@ -87,131 +97,91 @@ class _UserProfileScreenState extends ConsumerState<UserProfileScreen> {
           ),
 
           // 2. The Settings/Info List
-          SliverList(
-            delegate: SliverChildListDelegate([
-              const SizedBox(height: 20),
+          SliverPadding(
+            padding: const EdgeInsets.symmetric(
+              horizontal: 16.0,
+            ), // Apply your padding here
+            sliver: SliverList(
+              delegate: SliverChildListDelegate([
+                const SizedBox(height: 20),
 
-              InfoTile(
-                icon: Icons.phone_android_rounded,
-                label: "Phone Number",
-                value: state.userProfile?.phoneNumber ?? "+7 234 ...",
-                onTap: () => showEditPhoneSheet(
-                  context,
-                  ref,
-                  state.userProfile?.phoneNumber ?? "",
+                UserProfileTile(
+                  icon: Icons.phone_android_rounded,
+                  label: "Phone Number",
+                  value: state.userProfile?.phoneNumber ?? "+7 234 ...",
+                  onTap: () {},
+                  // () => showEditPhoneSheet(
+                  //   context,
+                  //   ref,
+                  //   state.userProfile?.phoneNumber ?? "",
+                  // )
+                  trailing: const Icon(Icons.edit, color: Colors.white54),
                 ),
-                trailing: const Icon(Icons.edit, color: Colors.white54),
-              ),
 
-              const SizedBox(height: 20),
+                const SizedBox(height: 20),
 
-              InfoTile(
-                icon: Icons.email_outlined,
-                label: "Username",
-                value: username ?? "Add Username",
-                onTap: () => showEditUsernameSheet(context, ref, username),
-                trailing: username == null
-                    ? const Icon(Icons.add, color: Colors.white54)
-                    : null,
-              ),
-
-              // const SizedBox(height: 20),
-
-              Padding(
-                padding: const EdgeInsets.all(24),
-                child: const BecomeOwnerCTA(),
-              ),
-
-              // const SizedBox(height: 20),
-
-              SettingsLinkTile(
-                icon: Icons.favorite_outline,
-                title: 'Support Us',
-                subtitle: 'Donate or help us grow',
-                onTap: () => context.push('/support-us'),
-              ),
-
-              SettingsLinkTile(
-                icon: Icons.description_outlined,
-                title: 'Terms & Conditions',
-                onTap: () => context.push('/terms'),
-              ),
-
-              SettingsLinkTile(
-                icon: Icons.help_outline,
-                title: 'Help & Support',
-                subtitle: 'Get help or contact support',
-                onTap: () => context.push('/help'),
-              ),
-
-              Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 24,
-                  vertical: 16,
+                UserProfileTile(
+                  icon: Icons.person,
+                  label: "Display Name",
+                  value: state.userProfile?.displayName ?? "Add Display Name",
+                  onTap: () => showModalBottomSheet(
+                    context: context,
+                    isScrollControlled: true,
+                    backgroundColor: Theme.of(context).colorScheme.surface,
+                    shape: const RoundedRectangleBorder(
+                      borderRadius: BorderRadius.vertical(
+                        top: Radius.circular(20),
+                      ),
+                    ),
+                    builder: (_) => EditNameSheet(
+                      initialName: state.userProfile?.displayName ?? "",
+                    ),
+                  ),
+                  trailing: username == null
+                      ? const Icon(Icons.add, color: Colors.white54)
+                      : null,
                 ),
-                child: const LogoutButton(),
-              ),
 
-              const SizedBox(height: 40), // Bottom spacing
-            ]),
+                const SizedBox(height: 20),
+
+                const BecomeOwnerCTA(),
+
+                const SizedBox(height: 20),
+
+                SettingsLinkTile(
+                  icon: Icons.favorite_outline,
+                  title: 'Support Us',
+                  subtitle: 'Donate or help us grow',
+                  onTap: () => context.push('/support-us'),
+                ),
+
+                const SizedBox(height: 20),
+
+                SettingsLinkTile(
+                  icon: Icons.description_outlined,
+                  title: 'Terms & Conditions',
+                  onTap: () => context.push('/terms'),
+                ),
+
+                const SizedBox(height: 20),
+
+                SettingsLinkTile(
+                  icon: Icons.help_outline,
+                  title: 'Help & Support',
+                  subtitle: 'Get help or contact support',
+                  onTap: () => context.push('/help'),
+                ),
+
+                const SizedBox(height: 20),
+
+                const LogoutButton(),
+
+                const SizedBox(height: 40), // Bottom spacing
+              ]),
+            ),
           ),
         ],
       ),
-    );
-  }
-
-  // Helper to keep the build method clean
-  Widget _buildProfileImage(ThemeData theme, String url) {
-    return Stack(
-      children: [
-        Container(
-          width: 108,
-          height: 108,
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.25),
-                blurRadius: 20,
-                offset: const Offset(0, 6),
-              ),
-            ],
-          ),
-        ),
-        Container(
-          padding: const EdgeInsets.all(4),
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            border: Border.all(
-              color: theme.colorScheme.outline.withValues(alpha: 0.6),
-              width: 2,
-            ),
-            color: theme.colorScheme.surface,
-          ),
-          child: CircleAvatar(
-            radius: 50,
-            backgroundColor: theme.colorScheme.surface,
-            backgroundImage: NetworkImage(url),
-            child: url.isEmpty ? const Icon(Icons.person, size: 40) : null,
-          ),
-        ),
-        Positioned(
-          bottom: 0,
-          right: 4,
-          child: Container(
-            padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              color: theme.colorScheme.primary,
-              shape: BoxShape.circle,
-            ),
-            child: const Icon(
-              Icons.edit_rounded,
-              color: Colors.white,
-              size: 18,
-            ),
-          ),
-        ),
-      ],
     );
   }
 
@@ -223,27 +193,34 @@ class _UserProfileScreenState extends ConsumerState<UserProfileScreen> {
       mainAxisSize: MainAxisSize.min,
       children: [
         const DisplayName(),
-        const SizedBox(height: 4),
         Row(
           children: [
-            const Icon(Icons.star, size: 18, color: Colors.amber),
+            const Icon(Icons.star_rate_rounded, size: 30, color: Colors.amber),
             const SizedBox(width: 6),
             Text(
               (state.userProfile?.ratingStars ?? 0).toStringAsFixed(1),
-              style: theme.textTheme.bodyLarge?.copyWith(
-                fontWeight: FontWeight.w600,
+              style: theme.textTheme.bodyMedium?.copyWith(
                 color: theme.colorScheme.onPrimary,
+              ),
+            ),
+
+            const SizedBox(width: 8),
+            Text(
+              "- 2 Orders",
+              style: theme.textTheme.labelMedium?.copyWith(
+                fontWeight: FontWeight.w400,
+                color: theme.colorScheme.onPrimary.withValues(alpha: 0.5),
               ),
             ),
           ],
         ),
-        if (state.userProfile?.createdAt != null)
-          Text(
-            "Member since ${DateFormat('MMMM yyyy').format(state.userProfile!.createdAt!)}",
-            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-              color: theme.colorScheme.onPrimary.withValues(alpha: 0.6),
-            ),
-          ),
+        // if (state.userProfile?.createdAt != null)
+        //   Text(
+        //     "Member since ${DateFormat('MMMM yyyy').format(state.userProfile!.createdAt!)}",
+        //     style: Theme.of(context).textTheme.bodySmall?.copyWith(
+        //       color: theme.colorScheme.onPrimary.withValues(alpha: 0.6),
+        //     ),
+        //   ),
       ],
     );
   }

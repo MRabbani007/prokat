@@ -45,7 +45,7 @@ class BecomeOwnerCTA extends ConsumerWidget {
           ],
         ),
         style: ElevatedButton.styleFrom(
-          elevation: 6,
+          elevation: 0,
           padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
           backgroundColor: isOwner
               ? theme.colorScheme.primary
@@ -54,7 +54,7 @@ class BecomeOwnerCTA extends ConsumerWidget {
               ? Colors.white
               : theme.colorScheme.onSecondaryContainer,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(12),
           ),
         ),
         onPressed: () {

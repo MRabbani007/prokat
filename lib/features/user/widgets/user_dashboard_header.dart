@@ -28,7 +28,7 @@ class _UserHeaderState extends ConsumerState<UserDashboardHeader> {
         : (userProfileState.userProfile?.phoneNumber ?? '').isNotEmpty
         ? formatPhoneNumber(userProfileState.userProfile!.phoneNumber!)
         : 'Hello!';
-    // print(userProfileState.userProfile?.toJson());
+    print(profileImageUrl);
 
     return Padding(
       // Padding adjusted for the AppBar's safe area
@@ -40,10 +40,17 @@ class _UserHeaderState extends ConsumerState<UserDashboardHeader> {
           GestureDetector(
             onTap: () => context.push(AppRoutes.profile),
             child: CircleAvatar(
-              radius: 30,
+              radius: 35,
               backgroundColor: theme.colorScheme.primaryContainer,
-              backgroundImage: NetworkImage(profileImageUrl),
-              onBackgroundImageError: (_, _) => const Icon(Icons.person),
+              child: ClipOval(
+                child: Image.network(
+                  profileImageUrl,
+                  width: 100,
+                  height: 100,
+                  fit: BoxFit.cover,
+                  errorBuilder: (_, _, _) => const Icon(Icons.person, size: 40),
+                ),
+              ),
             ),
           ),
           const SizedBox(width: 16),
@@ -85,7 +92,7 @@ class _UserHeaderState extends ConsumerState<UserDashboardHeader> {
               ],
             ),
           ),
-          
+
           LanguageSelectorTile(
             value: selectedLanguage,
             onChanged: (lang) => setState(() => selectedLanguage = lang),

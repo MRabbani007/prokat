@@ -2,6 +2,7 @@ import 'package:prokat/core/api/api_client.dart';
 import 'package:dio/dio.dart';
 import 'package:prokat/core/constants/api_routes.dart';
 import 'package:prokat/features/user/models/user_profile_model.dart';
+import 'dart:io';
 
 class UserProfileService {
   final ApiClient apiClient;
@@ -130,6 +131,39 @@ class UserProfileService {
       return null;
     } catch (e) {
       return null;
+    }
+  }
+
+  Future<bool> uploadProfileImage(File imageFile) async {
+    try {
+      String fileName = imageFile.path.split('/').last;
+
+      FormData formData = FormData.fromMap({
+        // "profileImage" must match the key expected by your Node.js Multer setup
+        "profileImage": await MultipartFile.fromFile(
+          imageFile.path,
+          filename: fileName,
+        ),
+        // Optional: you can add other fields here
+        "type": "avatar",
+      });
+
+      print("image service");
+
+      // 2. Send the POST request
+      final res = await _dio.post(
+        ApiRoutes.userProfileImage, // Ensure this points to your upload route
+        data: formData,
+        // Optional: Track upload progress
+        onSendProgress: (sent, total) {
+          print("Upload progress: ${(sent / total * 100).toStringAsFixed(0)}%");
+        },
+      );
+
+      return true;
+    } catch (e) {
+      print(e);
+      return false;
     }
   }
 }

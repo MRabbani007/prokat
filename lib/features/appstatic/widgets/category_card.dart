@@ -23,15 +23,15 @@ class CategoryCard extends StatelessWidget {
         children: [
           Expanded(
             child: Container(
-              padding: const EdgeInsets.all(12),
+              // padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: theme.scaffoldBackgroundColor,
-                border: Border.all(
-                  color: isSelected
-                      ? theme.colorScheme.primary
-                      : theme.colorScheme.outline.withValues(alpha: 0.4),
-                ),
-                borderRadius: BorderRadius.circular(16),
+                color: theme.cardColor,
+                // border: Border.all(
+                //   color: isSelected
+                //       ? theme.colorScheme.primary
+                //       : theme.colorScheme.outline.withValues(alpha: 0.2),
+                // ),
+                // borderRadius: BorderRadius.circular(16),
               ),
               child: Image.network(
                 height: 72, // 👈 image limit only
@@ -45,18 +45,14 @@ class CategoryCard extends StatelessWidget {
               ),
             ),
           ),
-          const SizedBox(height: 8),
+          // const SizedBox(height: 8),
           Text(
             category.name,
-            style: TextStyle(
-              fontSize: 14,
+            style: theme.textTheme.bodySmall?.copyWith(
               fontWeight: FontWeight.w600,
               color: isSelected
-                  ? theme.colorScheme.primary
-                  : theme
-                        .textTheme
-                        .bodyMedium
-                        ?.color, // .withValues(alpha: 0.4),
+                  ? theme.primaryColor
+                  : theme.textTheme.bodySmall?.color,
             ),
           ),
         ],

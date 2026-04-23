@@ -24,8 +24,6 @@ class DisplayName extends ConsumerWidget {
     final state = ref.watch(userProfileProvider);
     final name = (state.userProfile?.displayName ?? '').isNotEmpty
         ? state.userProfile!.displayName
-        : (state.userProfile?.phoneNumber ?? '').isNotEmpty
-        ? state.userProfile!.phoneNumber!
         : 'Hello!';
 
     return Row(
@@ -36,7 +34,7 @@ class DisplayName extends ConsumerWidget {
           child: Text(
             name,
             style: theme.textTheme.titleLarge?.copyWith(
-              fontWeight: FontWeight.w700,
+              fontWeight: FontWeight.w600,
               color: theme.colorScheme.onPrimary,
             ),
           ),

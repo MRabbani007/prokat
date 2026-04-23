@@ -21,20 +21,22 @@ class GuestEquipmentCard extends StatelessWidget {
     final isTop = true;
 
     return Container(
+      height: 120,
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Colors.grey.withValues(alpha: 0.05),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: theme.colorScheme.outline, width: 0.5),
+        // border: Border.all(color: theme.colorScheme.outline, width: 0.2),
       ),
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           // ── Thumbnail ────────────────────────────────────────────────
           ClipRRect(
             borderRadius: BorderRadius.circular(10),
             child: Image.network(
               item.imageUrl ?? "",
-              width: 76,
+              width: 100,
               height: 76,
               fit: BoxFit.cover,
               errorBuilder: (_, _, _) => Container(
@@ -67,71 +69,76 @@ class GuestEquipmentCard extends StatelessWidget {
 
           // ── Info ─────────────────────────────────────────────────────
           Expanded(
+            child: Padding(
+              padding: EdgeInsets.all(8),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    item.name,
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                      color: theme.primaryColor,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  const SizedBox(height: 3),
+                  Text(
+                    item.category?.name ?? "",
+                    style: theme.textTheme.labelMedium,
+                  ),
+                  const SizedBox(height: 6),
+                  Row(
+                    children: [
+                      const Icon(
+                        Icons.star_rate_rounded,
+                        size: 20,
+                        color: Color(0xFFF59E0B),
+                      ),
+                      const SizedBox(width: 3),
+                      Text(
+                        "4.8", //item.rating.toStringAsFixed(1)
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w500,
+                          color: theme.textTheme.bodyLarge?.color,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+
+          Padding(
+            padding: EdgeInsets.all(8),
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.end,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(
-                  item.name,
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                    color: theme.primaryColor,
-                  ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                const SizedBox(height: 3),
-                Text(
-                  item.category?.name ?? "",
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: theme.secondaryHeaderColor,
-                  ),
-                ),
-                const SizedBox(height: 6),
-                Row(
-                  children: [
-                    const Icon(
-                      Icons.star_rounded,
-                      size: 14,
-                      color: Color(0xFFF59E0B),
-                    ),
-                    const SizedBox(width: 3),
-                    Text(
-                      "4.8", //item.rating.toStringAsFixed(1)
-                      style: TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w500,
-                        color: theme.textTheme.bodyLarge?.color,
+                _StatusBadge(isTop: isTop),
+
+                RichText(
+                  text: TextSpan(
+                    children: [
+                      TextSpan(
+                        text:
+                            '${_formatPrice(item.prices[0].price.floorToDouble())} ₸',
+                        style: const TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w600,
+                          color: Color(0xFF1D4ED8),
+                        ),
                       ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 8),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    RichText(
-                      text: TextSpan(
-                        children: [
-                          TextSpan(
-                            text:
-                                '${_formatPrice(item.prices[0].price.floorToDouble())} ₸',
-                            style: const TextStyle(
-                              fontSize: 15,
-                              fontWeight: FontWeight.w600,
-                              color: Color(0xFF1D4ED8),
-                            ),
-                          ),
-                          const TextSpan(
-                            text: ' / day',
-                            style: TextStyle(fontSize: 11), // color: kTextMuted
-                          ),
-                        ],
+                      const TextSpan(
+                        text: ' / day',
+                        style: TextStyle(fontSize: 11), // color: kTextMuted
                       ),
-                    ),
-                    _StatusBadge(isTop: isTop),
-                  ],
+                    ],
+                  ),
                 ),
               ],
             ),

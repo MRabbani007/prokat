@@ -5,7 +5,6 @@ import 'package:prokat/features/auth/models/auth_credentials.dart';
 import 'package:prokat/features/auth/providers/auth_provider.dart';
 import '../widgets/auth_button.dart';
 import '../widgets/auth_text_field.dart';
-import 'package:go_router/go_router.dart';
 
 class LoginWithUsernameForm extends ConsumerStatefulWidget {
   final Function(String?) onError;

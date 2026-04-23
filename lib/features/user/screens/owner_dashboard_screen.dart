@@ -129,10 +129,13 @@ class _OwnerDashboardScreenState extends ConsumerState<OwnerDashboardScreen> {
                   children: [
                     _buildStatCard(
                       context,
-                      "Fleet",
-                      equipmentCount.toString().padLeft(2, '0'),
+                      "Client Requests",
+                      hasRequests
+                          ? '$count new pending ${count == 1 ? 'request' : 'requests'}'
+                          : 'No new requests at the moment',
+                      // equipmentCount.toString().padLeft(2, '0'),
                       Colors.blue,
-                      AppRoutes.ownerEquiment,
+                      AppRoutes.ownerRequests,
                     ),
 
                     const SizedBox(width: 24),
@@ -154,19 +157,19 @@ class _OwnerDashboardScreenState extends ConsumerState<OwnerDashboardScreen> {
                 const SizedBox(height: 24),
 
                 // 2. Client Requests Tile (High Priority)
-                _buildActionTile(
-                  context,
-                  title: 'Client Requests',
-                  subtitle: hasRequests
-                      ? '$count new pending ${count == 1 ? 'request' : 'requests'}'
-                      : 'No new requests at the moment',
-                  icon: LucideIcons.users,
-                  color: Colors.orange,
-                  onTap: () => {
-                    if (context.mounted)
-                      {context.push(AppRoutes.ownerRequests)},
-                  },
-                ),
+                // _buildActionTile(
+                //   context,
+                //   title: 'Client Requests',
+                //   subtitle: hasRequests
+                //       ? '$count new pending ${count == 1 ? 'request' : 'requests'}'
+                //       : 'No new requests at the moment',
+                //   icon: LucideIcons.users,
+                //   color: Colors.orange,
+                //   onTap: () => {
+                //     if (context.mounted)
+                //       {context.push(AppRoutes.ownerRequests)},
+                //   },
+                // ),
 
                 const SizedBox(height: 24),
 

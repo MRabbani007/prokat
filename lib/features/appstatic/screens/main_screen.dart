@@ -143,12 +143,12 @@ class _MainScreenState extends ConsumerState<MainScreen> {
             SliverAppBar(
               automaticallyImplyLeading: false,
               // 'pinned' keeps the small toolbar visible; 'false' hides it completely
-              pinned: true,
+              pinned: false,
               // 'floating' makes it reappear as soon as you scroll up
               floating: true,
               // 'snap' makes it animate fully into/out of view
-              snap: true,
-              expandedHeight: 120.0, // Height when fully expanded
+              snap: false,
+              // expandedHeight: 120.0, // Height when fully expanded
               backgroundColor: theme.colorScheme.surface,
               titleSpacing: 0,
               title: Padding(
@@ -165,9 +165,8 @@ class _MainScreenState extends ConsumerState<MainScreen> {
                       child: RichText(
                         softWrap: false,
                         text: TextSpan(
-                          style: theme.textTheme.headlineSmall?.copyWith(
+                          style: theme.textTheme.headlineMedium?.copyWith(
                             fontWeight: FontWeight.bold,
-                            color: theme.colorScheme.onSurface,
                           ),
                           children: [
                             const TextSpan(text: 'PRO'),
@@ -206,16 +205,17 @@ class _MainScreenState extends ConsumerState<MainScreen> {
                   ],
                 ),
               ),
-              actionsPadding: EdgeInsets.only(right: 12),
-              bottom: PreferredSize(
-                preferredSize: const Size.fromHeight(80),
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: SearchBox(), // The search box from earlier
-                ),
-              ),
+              // actionsPadding: EdgeInsets.only(right: 12),
+              // bottom: PreferredSize(
+              //   preferredSize: const Size.fromHeight(80),
+              //   child: Padding(
+              //     padding: const EdgeInsets.all(8.0),
+              //     child: SearchBox(), // The search box from earlier
+              //   ),
+              // ),
             ),
 
+            // Hero Banner
             SliverToBoxAdapter(
               child: _HeroBanner(
                 city: selectedCity,
@@ -242,6 +242,7 @@ class _MainScreenState extends ConsumerState<MainScreen> {
               ),
             ),
 
+            // Get Started
             SliverToBoxAdapter(
               child: Padding(
                 padding: const EdgeInsets.symmetric(
@@ -283,22 +284,31 @@ class _MainScreenState extends ConsumerState<MainScreen> {
               ),
             ),
 
+            // Services Header
             SliverToBoxAdapter(
               child: Padding(
-                padding: const EdgeInsets.symmetric(vertical: 0),
-                child: _SectionHeader(title: 'Services', onSeeAll: () {}),
+                padding: const EdgeInsets.fromLTRB(24, 0, 24, 12),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text("Services", style: theme.textTheme.titleLarge),
+                    GestureDetector(
+                      onTap: () {},
+                      child: const Text(
+                        'See all',
+                        style: TextStyle(fontSize: 12, color: kBlue),
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
 
-            SliverPadding(
-              padding: const EdgeInsets.only(top: 14),
-              sliver: SliverToBoxAdapter(child: Container()),
-            ),
-
+            // Services
             SliverPadding(
               padding: const EdgeInsets.symmetric(
-                horizontal: 16,
-                vertical: 14,
+                horizontal: 24,
+                vertical: 0,
               ), // Adjust padding as needed
               sliver: SliverGrid(
                 gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
@@ -321,31 +331,30 @@ class _MainScreenState extends ConsumerState<MainScreen> {
               ),
             ),
 
+            // Popular / Top Ranked Rents
             SliverToBoxAdapter(
               child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 0),
+                padding: const EdgeInsets.fromLTRB(24, 0, 24, 12),
                 child: Column(
                   children: [
                     const SizedBox(height: 20),
 
-                    _SectionHeader(title: 'Popular rents', onSeeAll: () {}),
-
-                    const SizedBox(height: 14),
-
-                    // Text("Search: $currentQuery"),
-                    _FilterPills(
-                      selected: _selectedFilter,
-                      onSelect: (f) => setState(() => _selectedFilter = f),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          "Popular rents",
+                          style: theme.textTheme.titleLarge,
+                        ),
+                      ],
                     ),
-
-                    const SizedBox(height: 20),
                   ],
                 ),
               ),
             ),
 
             SliverPadding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              padding: const EdgeInsets.symmetric(horizontal: 24.0),
               sliver: SliverList(
                 delegate: SliverChildBuilderDelegate((context, index) {
                   final item = equipmentState.renterEquipment[index];
@@ -442,42 +451,6 @@ class _HeroBanner extends StatelessWidget {
                   ),
                 ],
               ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-// ─── Section Header ───────────────────────────────────────────────────────────
-
-class _SectionHeader extends StatelessWidget {
-  final String title;
-  final VoidCallback onSeeAll;
-
-  const _SectionHeader({required this.title, required this.onSeeAll});
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            title,
-            style: const TextStyle(
-              fontSize: 15,
-              fontWeight: FontWeight.w500,
-              color: kTextPrimary,
-            ),
-          ),
-          GestureDetector(
-            onTap: onSeeAll,
-            child: const Text(
-              'See all',
-              style: TextStyle(fontSize: 12, color: kBlue),
             ),
           ),
         ],
