@@ -203,7 +203,8 @@ class OwnerBookingTile extends ConsumerWidget {
                       child: InfoTile(
                         label: 'Location',
                         value: booking.location.street,
-                        onTap: () => showLocationSheet(context, booking.location),
+                        onTap: () =>
+                            showLocationSheet(context, booking.location),
                       ),
                     ),
                     const SizedBox(width: 12),

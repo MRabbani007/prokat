@@ -13,23 +13,17 @@ class ChatTile extends StatelessWidget {
 
     return ListTile(
       onTap: onTap,
-      leading: CircleAvatar(
-        radius: 28,
-        backgroundImage: NetworkImage("chat.otherParticipant.avatarUrl"),
-      ),
+      leading: CircleAvatar(radius: 28, backgroundImage: NetworkImage("")),
       title: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(
-            "chat.otherParticipant.name",
+            "Client Name",
             style: theme.textTheme.bodyLarge?.copyWith(
               fontWeight: FontWeight.bold,
             ),
           ),
-          Text(
-            "timeago.format(chat.lastMessageAt)",
-            style: theme.textTheme.labelSmall,
-          ),
+          Text("10 min ago", style: theme.textTheme.labelSmall),
         ],
       ),
       subtitle: Column(
@@ -40,7 +34,7 @@ class ChatTile extends StatelessWidget {
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
             style: theme.textTheme.bodyMedium?.copyWith(
-              color: "chat.unreadCount".length > 0
+              color: [""].length > 0
                   ? theme.textTheme.bodyLarge?.color
                   : theme.disabledColor,
             ),
@@ -52,7 +46,7 @@ class ChatTile extends StatelessWidget {
           //   ),
         ],
       ),
-      trailing: "chat.unreadCount".length > 0
+      trailing: 5 > 0
           ? Container(
               padding: const EdgeInsets.all(6),
               decoration: BoxDecoration(

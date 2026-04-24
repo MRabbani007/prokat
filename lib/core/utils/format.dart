@@ -182,7 +182,9 @@ int getRemainingMinutes(dynamic createdAt, {int totalDuration = 60}) {
     final difference = now.difference(dt).inMinutes;
 
     final remaining = totalDuration - difference;
-    return remaining > 0 ? remaining : 0;
+
+    return remaining;
+    // return remaining > 0 ? remaining : 0;
   } catch (e) {
     // 5. Catch-all for any unexpected errors (e.g., out-of-range dates)
     return 0;

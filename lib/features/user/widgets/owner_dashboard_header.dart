@@ -24,10 +24,8 @@ class _OwnerDashboardHeaderState extends ConsumerState<OwnerDashboardHeader> {
     final theme = Theme.of(context);
     final colorScheme = Theme.of(context).colorScheme;
 
-    print(profileImageUrl);
-    
     return Container(
-      padding: const EdgeInsets.fromLTRB(20, 20, 20, 20),
+      padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
         color: colorScheme.surface,
         gradient: LinearGradient(

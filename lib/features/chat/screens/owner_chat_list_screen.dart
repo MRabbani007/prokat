@@ -41,6 +41,7 @@ class OwnerChatListScreen extends ConsumerWidget {
                   color: theme.colorScheme.onPrimary,
                 ),
               ),
+              centerTitle: false,
             ),
 
             if (chatState.isLoading)

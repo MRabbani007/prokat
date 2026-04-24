@@ -48,8 +48,7 @@ class _OtpVerificationFormState extends ConsumerState<OtpVerificationForm> {
           .verifyOtp(widget.phone, otp);
 
       if (success == true) {
-        
-      await ref.read(userProfileProvider.notifier).getUserProfile();
+        await ref.read(userProfileProvider.notifier).getUserProfile();
 
         if (mounted) context.go(AppRoutes.dashboard);
       } else {

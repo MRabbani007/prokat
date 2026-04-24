@@ -38,6 +38,7 @@ import 'package:prokat/features/requests/screens/renter_requests_history_screen.
 import 'package:prokat/features/requests/screens/renter_requests_screen.dart';
 import 'package:prokat/features/user/screens/owner_dashboard_screen.dart';
 import 'package:prokat/features/user/screens/owner_payments_screen.dart';
+import 'package:prokat/features/user/screens/owner_payments_topup_screen.dart';
 import 'package:prokat/features/user/screens/owner_profile_screen.dart';
 import 'package:prokat/features/user/screens/owner_registration_screen.dart';
 import 'package:prokat/features/user/screens/owner_settings_screen.dart';
@@ -459,6 +460,12 @@ GoRouter createRouter(WidgetRef ref) {
               GoRoute(
                 path: AppRoutes.ownerPayment,
                 builder: (_, _) => const OwnerPaymentsScreen(),
+                routes: [
+                  GoRoute(
+                    path: AppRoutes.topUp,
+                    builder: (_, _) => const OwnerPaymentsTopupScreen(),
+                  ),
+                ],
               ),
               //
               // Owner Chat

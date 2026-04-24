@@ -84,7 +84,7 @@ class EquipmentService {
       final response = await _dio.patch('/equipment/$equipmentId', data: data);
 
       return Equipment.fromJson(response.data['data']);
-    } on DioException catch (e) {
+    } on DioException catch (_) {
       return null;
       // throw Exception(e.response?.data ?? 'Failed to update equipment');
     } catch (e) {
@@ -140,12 +140,16 @@ class EquipmentService {
     String status,
   ) async {
     try {
-      await _dio.patch(
+      final res = await _dio.patch(
         '/equipment/$equipmentId/status',
         data: {"id": equipmentId, "isVisible": isVisible, "status": status},
       );
 
-      return true;
+      if (res.statusCode == 200 || res.statusCode == 201) {
+        return true;
+      }
+
+      return false;
     } catch (e) {
       if (e is DioException) {
         throw Exception(e.response?.data ?? 'Failed to update equipment');

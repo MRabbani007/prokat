@@ -74,7 +74,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                 ),
                               ),
                               Text(
-                                "Enter your phone number", // "Pickup where you left off"
+                                "Pickup where you left off", // "Enter your phone number"
                                 style: theme.textTheme.bodySmall?.copyWith(
                                   color: theme.colorScheme.onSurface.withValues(
                                     alpha: 0.6,

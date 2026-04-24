@@ -47,7 +47,7 @@ class _OwnerEquipmentDetailScreenState
     final state = ref.watch(equipmentProvider);
 
     final equipment = state.ownerEquipment
-        .where((item) => item.id == state.editEquipment?.id)
+        .where((item) => item.id == widget.equipmentId)
         .firstOrNull;
 
     /// ERROR STATE
@@ -108,7 +108,7 @@ class _OwnerEquipmentDetailScreenState
                 padding: const EdgeInsets.fromLTRB(16, 24, 16, 24),
                 sliver: SliverList(
                   delegate: SliverChildListDelegate([
-                    CategorySelectorTile(mode: "edit_equipment",),
+                    CategorySelectorTile(mode: "edit_equipment"),
 
                     const SizedBox(height: 20),
 

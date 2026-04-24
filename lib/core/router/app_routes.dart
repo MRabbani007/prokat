@@ -14,7 +14,8 @@ class AppRoutes {
   static const String helpSupport = '/help';
 
   // User Screens
-  static const String clientMain = '/client'; // TODO: move all client pages under /client
+  static const String clientMain =
+      '/client'; // TODO: move all client pages under /client
 
   static const String dashboard = '/dashboard';
   static const String categories = '/categories';
@@ -81,6 +82,11 @@ class AppRoutes {
   static const String ownerSettings = '/owner/settings';
 
   static const String ownerPayment = '/owner/payment';
+  // Sub paths for router
+  static const String topUp = '/topUp';
+  // Full path for components
+  static const String ownerPaymentTopUp = '$ownerPayment$topUp';
+
   static const String ownerRegistration = '/owner/registration';
 
   // Owner Chats
