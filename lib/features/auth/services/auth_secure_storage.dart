@@ -6,10 +6,7 @@ class OtpSessionData {
   final String phone;
   final DateTime requestedAt;
 
-  OtpSessionData({
-    required this.phone,
-    required this.requestedAt,
-  });
+  OtpSessionData({required this.phone, required this.requestedAt});
 }
 
 class AuthSecureStorage {

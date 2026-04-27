@@ -4,71 +4,119 @@ import 'package:prokat/features/chat/state/chat_message_model.dart';
 import 'package:prokat/features/chat/state/chat_model.dart';
 
 class ChatService {
+  static const String _resolveChatIdPath = '/chats/chat-id';
+
   final ApiClient apiClient;
 
   ChatService(this.apiClient);
 
   Dio get _dio => apiClient.dio;
 
-  /// Get all conversations
   Future<List<ChatModel>> getConversations() async {
     try {
       final res = await _dio.get('/chats');
+      final data = res.data is Map<String, dynamic> ? res.data['data'] : null;
 
-      return (res.data['data'] as List)
-          .map((e) => ChatModel.fromJson(e))
-          .toList();
-    } catch (e) {
-      print(e);
-      return [];
+      if (data is! List) {
+        return const [];
+      }
+
+      return data
+          .whereType<dynamic>()
+          .map(
+            (item) => ChatModel.fromJson(
+              item is Map<String, dynamic>
+                  ? item
+                  : Map<String, dynamic>.from(item as Map),
+            ),
+          )
+          .toList(growable: false);
+    } on DioException catch (error) {
+      throw Exception(_extractErrorMessage(error));
+    } catch (error) {
+      throw Exception(error.toString());
     }
   }
 
-  /// Get messages in a conversation
-  Future<List<ChatMessageModel>> getMessages(String conversationId) async {
+  Future<List<ChatMessageModel>> getMessages(String chatId) async {
     try {
-      final res = await _dio.get('/chats/$conversationId/messages');
+      final res = await _dio.get('/chats/$chatId/messages');
+      final data = res.data is Map<String, dynamic> ? res.data['data'] : null;
 
-      return (res.data['data'] as List)
-          .map((e) => ChatMessageModel.fromJson(e))
-          .toList();
-    } catch (e) {
-      return [];
+      if (data is! List) {
+        return const [];
+      }
+
+      return data
+          .whereType<dynamic>()
+          .map(
+            (item) => ChatMessageModel.fromJson(
+              item is Map<String, dynamic>
+                  ? item
+                  : Map<String, dynamic>.from(item as Map),
+            ),
+          )
+          .toList(growable: false);
+    } on DioException catch (error) {
+      throw Exception(_extractErrorMessage(error));
+    } catch (error) {
+      throw Exception(error.toString());
     }
   }
 
-  /// Send message
-  Future<ChatMessageModel?> sendMessage({
-    required String conversationId,
-    required String message,
-  }) async {
+  Future<String?> getChatId({String? bookingId, String? requestId}) async {
     try {
-      final res = await _dio.post(
-        '/chats/$conversationId/messages',
-        data: {"message": message, "type": "TEXT"},
+      final res = await _dio.get(
+        _resolveChatIdPath,
+        queryParameters: {
+          if ((bookingId ?? '').isNotEmpty) 'bookingId': bookingId,
+          if ((requestId ?? '').isNotEmpty) 'requestId': requestId,
+        },
       );
 
-      if (res.statusCode == 200 || res.statusCode == 201) {
-        return ChatMessageModel.fromJson(res.data['data']);
+      final body = res.data;
+      if (body is String && body.isNotEmpty) {
+        return body;
+      }
+
+      if (body is Map<String, dynamic>) {
+        final data = body['data'];
+        if (data is String && data.isNotEmpty) {
+          return data;
+        }
+
+        if (data is Map<String, dynamic>) {
+          return data['id']?.toString() ?? data['chatId']?.toString();
+        }
+
+        return body['id']?.toString() ?? body['chatId']?.toString();
       }
 
       return null;
-    } catch (e) {
-      return null;
+    } on DioException catch (error) {
+      throw Exception(_extractErrorMessage(error));
+    } catch (error) {
+      throw Exception(error.toString());
     }
   }
 
-  /// Create or get conversation (important for Prokat use case)
-  Future<ChatModel?> createOrGetConversation({required String userId}) async {
-    try {
-      final res = await _dio.post(
-        '/chats/conversations',
-        data: {"userId": userId},
-      );
+  String _extractErrorMessage(DioException error) {
+    final data = error.response?.data;
 
-      return ChatModel.fromJson(res.data['data']);
-    } catch (e) {
-      return null;
+    if (data is Map<String, dynamic>) {
+      final message = data['message'] ?? data['error'] ?? data['detail'];
+      if (message is List) {
+        return message.join(', ');
+      }
+      if (message != null) {
+        return message.toString();
+      }
     }
+
+    if (data is String && data.isNotEmpty) {
+      return data;
+    }
+
+    return error.message ?? 'Chat request failed';
   }
 }

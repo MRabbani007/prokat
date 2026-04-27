@@ -8,7 +8,7 @@ class BookingState {
   final String? error;
 
   final List<BookingModel> bookings;
-  final List<BookingModel> ownerBookings; 
+  final List<BookingModel> ownerBookings;
 
   /// Renter draft booking
   final BookingModel? currentBooking;
@@ -66,7 +66,7 @@ class BookingState {
       selectedPriceEntry: selectedPriceEntry ?? this.selectedPriceEntry,
       selectedDate: selectedDate ?? this.selectedDate,
       selectedTime: selectedTime ?? this.selectedTime,
-      
+
       comment: comment ?? this.comment,
     );
   }

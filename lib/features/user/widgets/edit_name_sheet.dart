@@ -71,10 +71,7 @@ class _EditNameSheetState extends ConsumerState<EditNameSheet> {
             ),
           ),
 
-          Text(
-            "Edit Name",
-            style: theme.textTheme.titleMedium,
-          ),
+          Text("Edit Name", style: theme.textTheme.titleMedium),
 
           const SizedBox(height: 16),
 

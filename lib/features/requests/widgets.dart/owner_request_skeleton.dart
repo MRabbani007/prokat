@@ -9,7 +9,11 @@ class RequestTileSkeleton extends StatelessWidget {
     final theme = Theme.of(context);
 
     // Helper to create the gray placeholders
-    Widget shimmerBlock({required double width, required double height, double radius = 4}) {
+    Widget shimmerBlock({
+      required double width,
+      required double height,
+      double radius = 4,
+    }) {
       return Shimmer.fromColors(
         baseColor: theme.hoverColor,
         highlightColor: theme.highlightColor,
@@ -31,7 +35,9 @@ class RequestTileSkeleton extends StatelessWidget {
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.5), // Reduced alpha for skeleton feel
+            color: Colors.black.withValues(
+              alpha: 0.5,
+            ), // Reduced alpha for skeleton feel
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),

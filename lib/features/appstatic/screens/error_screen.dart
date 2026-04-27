@@ -21,7 +21,11 @@ class ErrorScreen extends ConsumerWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(Icons.sync_problem_rounded, size: 80, color: accentColor),
+            const Icon(
+              Icons.sync_problem_rounded,
+              size: 80,
+              color: accentColor,
+            ),
             const SizedBox(height: 32),
             const Text(
               "INITIALIZATION ERROR",

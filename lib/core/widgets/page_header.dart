@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:lucide_icons/lucide_icons.dart'; 
+import 'package:lucide_icons/lucide_icons.dart';
 
 class PageHeader extends StatelessWidget {
   final String? title;
@@ -33,10 +33,7 @@ class PageHeader extends StatelessWidget {
                 icon: const Icon(LucideIcons.chevronLeft, size: 25),
                 onPressed:
                     onBack ?? () => context.canPop() ? context.pop() : null,
-                constraints: const BoxConstraints(
-                  minWidth: 40,
-                  minHeight: 40,
-                ),
+                constraints: const BoxConstraints(minWidth: 40, minHeight: 40),
                 padding: EdgeInsets.zero,
               ),
 

@@ -55,14 +55,11 @@ class _AuthTextFieldState extends State<AuthTextField> {
         suffixIcon: widget.isPassword
             ? IconButton(
                 icon: Icon(
-                  _obscureText
-                      ? Icons.visibility_off
-                      : Icons.visibility,
+                  _obscureText ? Icons.visibility_off : Icons.visibility,
                   size: 20,
                   color: onSurface.withValues(alpha: 0.6),
                 ),
-                onPressed: () =>
-                    setState(() => _obscureText = !_obscureText),
+                onPressed: () => setState(() => _obscureText = !_obscureText),
               )
             : null,
 
@@ -78,10 +75,7 @@ class _AuthTextFieldState extends State<AuthTextField> {
 
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(
-            color: primary,
-            width: 1.5,
-          ),
+          borderSide: BorderSide(color: primary, width: 1.5),
         ),
 
         contentPadding: const EdgeInsets.symmetric(

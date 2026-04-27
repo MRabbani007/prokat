@@ -23,8 +23,9 @@ class EquipmentMapState {
     bool clearSelection = false, // 👈 add this
   }) {
     return EquipmentMapState(
-      selectedEquipment:
-          clearSelection ? null : selectedEquipment ?? this.selectedEquipment,
+      selectedEquipment: clearSelection
+          ? null
+          : selectedEquipment ?? this.selectedEquipment,
       isSheetExpanded: isSheetExpanded ?? this.isSheetExpanded,
     );
   }
@@ -41,10 +42,7 @@ class EquipmentMapController extends StateNotifier<EquipmentMapState> {
   }
 
   void clearSelection() {
-    state = state.copyWith(
-      clearSelection: true,
-      isSheetExpanded: false,
-    );
+    state = state.copyWith(clearSelection: true, isSheetExpanded: false);
   }
 
   void toggleSheet(bool expanded) {

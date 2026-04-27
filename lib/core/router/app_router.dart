@@ -319,16 +319,18 @@ GoRouter createRouter(WidgetRef ref) {
                 },
                 routes: [
                   GoRoute(
-                    path: "/:id",
+                    path: ':id',
                     builder: (context, state) {
-                      final chatId = state.uri.queryParameters['chatId'] ?? '';
+                      final chatId = state.pathParameters['id'] ?? '';
 
                       return ClientChatScreen(chatId: chatId);
                     },
                     routes: [
                       GoRoute(
-                        path: "/info",
-                        builder: (_, _) => ClientChatInfoScreen(),
+                        path: 'info',
+                        builder: (context, state) => ClientChatInfoScreen(
+                          chatId: state.pathParameters['id'],
+                        ),
                       ),
                     ],
                   ),
@@ -483,8 +485,9 @@ GoRouter createRouter(WidgetRef ref) {
                     routes: [
                       GoRoute(
                         path: AppRoutes.chatInfo,
-                        builder: (context, state) =>
-                            const OwnerChatInfoScreen(),
+                        builder: (context, state) => OwnerChatInfoScreen(
+                          chatId: state.pathParameters['id'],
+                        ),
                       ),
                     ],
                   ),

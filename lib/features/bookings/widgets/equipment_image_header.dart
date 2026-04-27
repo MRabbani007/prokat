@@ -44,20 +44,14 @@ class EquipmentImageHeader extends StatelessWidget {
                 gradient: LinearGradient(
                   begin: Alignment.bottomCenter,
                   end: Alignment.center,
-                  colors: [
-                    Colors.black26,
-                    Colors.transparent,
-                  ],
+                  colors: [Colors.black26, Colors.transparent],
                 ),
               ),
             ),
           ),
 
           /// Optional overlay widget (title, actions, etc.)
-          if (overlay != null)
-            Positioned.fill(
-              child: overlay!,
-            ),
+          if (overlay != null) Positioned.fill(child: overlay!),
         ],
       ),
     );

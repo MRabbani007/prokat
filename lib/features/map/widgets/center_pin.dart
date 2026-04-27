@@ -7,11 +7,7 @@ class CenterPin extends StatelessWidget {
   Widget build(BuildContext context) {
     return const Center(
       child: IgnorePointer(
-        child: Icon(
-          Icons.location_pin,
-          size: 50,
-          color: Colors.red,
-        ),
+        child: Icon(Icons.location_pin, size: 50, color: Colors.red),
       ),
     );
   }

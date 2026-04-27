@@ -52,47 +52,49 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         crossAxisAlignment: CrossAxisAlignment.center,
-                    
+
                         children: [
                           Text(""),
                           Spacer(),
-                    
+
                           Container(
                             margin: const EdgeInsets.all(0),
                             padding: const EdgeInsets.fromLTRB(24, 40, 24, 24),
                             decoration: BoxDecoration(
-                              borderRadius: BorderRadius.all(Radius.circular(32)),
+                              borderRadius: BorderRadius.all(
+                                Radius.circular(32),
+                              ),
                               color: theme.scaffoldBackgroundColor,
                             ),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 LogoTile(),
-                    
+
                                 const SizedBox(height: 45),
-                    
+
                                 Text(
                                   "Create Account",
-                                  style: theme.textTheme.headlineMedium?.copyWith(
-                                    fontWeight: FontWeight.w500,
-                                    letterSpacing: -1,
-                                    color: colorScheme.onSurface,
-                                  ),
+                                  style: theme.textTheme.headlineMedium
+                                      ?.copyWith(
+                                        fontWeight: FontWeight.w500,
+                                        letterSpacing: -1,
+                                        color: colorScheme.onSurface,
+                                      ),
                                 ),
                                 Text(
                                   "Join the Prokat community today",
                                   style: theme.textTheme.bodyMedium?.copyWith(
-                                    color: theme.colorScheme.onSurface.withValues(
-                                      alpha: 0.6,
-                                    ),
+                                    color: theme.colorScheme.onSurface
+                                        .withValues(alpha: 0.6),
                                   ),
                                 ),
-                    
+
                                 const SizedBox(height: 32),
-                    
+
                                 if (errorMessage != null)
                                   _buildErrorBox(context, errorColor),
-                    
+
                                 AnimatedSwitcher(
                                   duration: const Duration(milliseconds: 300),
                                   child: useEmail
@@ -105,9 +107,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                           onError: setErrorMessage,
                                         ),
                                 ),
-                    
+
                                 const SizedBox(height: 16),
-                    
+
                                 /// TOGGLE METHOD
                                 Center(
                                   child: TextButton(
@@ -119,19 +121,20 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                       useEmail
                                           ? "Register with Phone instead"
                                           : "Use Email & Password",
-                                      style: theme.textTheme.labelLarge?.copyWith(
-                                        color: accentColor,
-                                        fontWeight: FontWeight.w600,
-                                      ),
+                                      style: theme.textTheme.labelLarge
+                                          ?.copyWith(
+                                            color: accentColor,
+                                            fontWeight: FontWeight.w600,
+                                          ),
                                     ),
                                   ),
                                 ),
                               ],
                             ),
                           ),
-                    
+
                           Spacer(),
-                    
+
                           /// BOTTOM LINK
                           Padding(
                             padding: const EdgeInsets.only(bottom: 20),
@@ -141,24 +144,24 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                 text: TextSpan(
                                   text: "Already Registered? ",
                                   style: theme.textTheme.bodySmall?.copyWith(
-                                    color: theme.colorScheme.onPrimary.withValues(
-                                      alpha: 0.6,
-                                    ),
+                                    color: theme.colorScheme.onPrimary
+                                        .withValues(alpha: 0.6),
                                   ),
                                   children: [
                                     TextSpan(
                                       text: "Login",
-                                      style: theme.textTheme.bodySmall?.copyWith(
-                                        color: theme.colorScheme.onPrimary,
-                                        fontWeight: FontWeight.bold,
-                                      ),
+                                      style: theme.textTheme.bodySmall
+                                          ?.copyWith(
+                                            color: theme.colorScheme.onPrimary,
+                                            fontWeight: FontWeight.bold,
+                                          ),
                                     ),
                                   ],
                                 ),
                               ),
                             ),
                           ),
-                    
+
                           const SizedBox(height: 10),
                         ],
                       ),

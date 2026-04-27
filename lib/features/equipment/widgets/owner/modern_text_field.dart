@@ -26,7 +26,9 @@ class ModernTextField extends StatelessWidget {
         prefixIcon: Icon(icon, size: 20),
         labelText: label,
         filled: true,
-        fillColor: Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.4),
+        fillColor: Theme.of(
+          context,
+        ).colorScheme.surfaceVariant.withOpacity(0.4),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
           borderSide: BorderSide.none,

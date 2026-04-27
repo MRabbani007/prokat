@@ -126,7 +126,7 @@ class GuestEquipmentCard extends StatelessWidget {
                     children: [
                       TextSpan(
                         text:
-                            '${_formatPrice(item.prices[0].price.floorToDouble())} ₸',
+                            '${_formatPrice(item.prices.isEmpty ? 0 : item.prices[0].price.floorToDouble())} ₸',
                         style: const TextStyle(
                           fontSize: 15,
                           fontWeight: FontWeight.w600,

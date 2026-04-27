@@ -4,11 +4,7 @@ class AppLinkButton extends StatelessWidget {
   final String label;
   final VoidCallback onTap;
 
-  const AppLinkButton({
-    super.key,
-    required this.label,
-    required this.onTap,
-  });
+  const AppLinkButton({super.key, required this.label, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -23,10 +19,7 @@ class AppLinkButton extends StatelessWidget {
       ),
       child: Text(
         label,
-        style: const TextStyle(
-          fontSize: 14,
-          fontWeight: FontWeight.w700,
-        ),
+        style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w700),
       ),
     );
   }

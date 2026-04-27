@@ -14,4 +14,3 @@ final apiClientProvider = Provider<ApiClient>((ref) {
 final dioProvider = Provider((ref) {
   return ref.watch(apiClientProvider).dio;
 });
-

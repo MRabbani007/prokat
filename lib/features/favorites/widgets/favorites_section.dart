@@ -43,7 +43,7 @@ class FavoritesSection extends ConsumerWidget {
           _buildEmptyFavorites(theme)
         else
           SizedBox(
-            height: 220, // Adjust height based on your equipment tile design
+            height: 200, // Adjust height based on your equipment tile design
             child: ListView.builder(
               scrollDirection: Axis.horizontal,
               itemCount: favorites?.length,
@@ -54,9 +54,7 @@ class FavoritesSection extends ConsumerWidget {
                 } else {
                   return Padding(
                     padding: const EdgeInsets.only(right: 12),
-                    child: FavoriteItemTile(
-                      equipment: item,
-                    ),
+                    child: FavoriteItemTile(equipment: item),
                   );
                 }
               },

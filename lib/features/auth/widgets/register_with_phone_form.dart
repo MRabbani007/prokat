@@ -11,7 +11,8 @@ class RegisterWithPhoneForm extends ConsumerStatefulWidget {
   const RegisterWithPhoneForm({super.key, required this.onError});
 
   @override
-  ConsumerState<RegisterWithPhoneForm> createState() => _RegisterWithPhoneFormState();
+  ConsumerState<RegisterWithPhoneForm> createState() =>
+      _RegisterWithPhoneFormState();
 }
 
 class _RegisterWithPhoneFormState extends ConsumerState<RegisterWithPhoneForm> {

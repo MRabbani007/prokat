@@ -4,7 +4,11 @@ class IndustrialInputContainer extends StatelessWidget {
   final String label;
   final Widget child;
 
-  const IndustrialInputContainer({super.key, required this.label, required this.child});
+  const IndustrialInputContainer({
+    super.key,
+    required this.label,
+    required this.child,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -22,13 +26,10 @@ class IndustrialInputContainer extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            label,
-            style: theme.textTheme.labelMedium,
-          ),
+          Text(label, style: theme.textTheme.labelMedium),
 
           const SizedBox(height: 4),
-          
+
           child,
         ],
       ),

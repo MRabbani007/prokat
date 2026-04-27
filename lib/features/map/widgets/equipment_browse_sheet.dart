@@ -10,21 +10,24 @@ class EquipmentBrowseSheet extends StatelessWidget {
     const accentColor = Color(0xFF4E73DF);
 
     return DraggableScrollableSheet(
-      initialChildSize: 0.22, // Slightly taller to show the location + peek at models
+      initialChildSize:
+          0.22, // Slightly taller to show the location + peek at models
       minChildSize: 0.18,
       maxChildSize: 0.5,
       builder: (context, controller) {
         return Container(
           decoration: BoxDecoration(
-            color: bgColor.withValues(alpha:0.95), // Slight transparency for map feel
+            color: bgColor.withValues(
+              alpha: 0.95,
+            ), // Slight transparency for map feel
             borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
-            border: Border.all(color: Colors.white.withValues(alpha:0.1)),
+            border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withValues(alpha:0.4),
+                color: Colors.black.withValues(alpha: 0.4),
                 blurRadius: 20,
                 spreadRadius: 5,
-              )
+              ),
             ],
           ),
           child: Column(
@@ -35,7 +38,7 @@ class EquipmentBrowseSheet extends StatelessWidget {
                 width: 36,
                 height: 4,
                 decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha:0.15),
+                  color: Colors.white.withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(10),
                 ),
               ),
@@ -51,21 +54,36 @@ class EquipmentBrowseSheet extends StatelessWidget {
                         Container(
                           padding: const EdgeInsets.all(8),
                           decoration: BoxDecoration(
-                            color: accentColor.withValues(alpha:0.1),
+                            color: accentColor.withValues(alpha: 0.1),
                             shape: BoxShape.circle,
                           ),
-                          child: const Icon(Icons.my_location_rounded, 
-                            color: accentColor, size: 18),
+                          child: const Icon(
+                            Icons.my_location_rounded,
+                            color: accentColor,
+                            size: 18,
+                          ),
                         ),
                         const SizedBox(width: 12),
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text("CURRENT LOCATION", 
-                              style: TextStyle(color: Colors.white.withValues(alpha:0.3), 
-                              fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 1)),
-                            const Text("Atyrau, Kazakhstan", 
-                              style: TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w500)),
+                            Text(
+                              "CURRENT LOCATION",
+                              style: TextStyle(
+                                color: Colors.white.withValues(alpha: 0.3),
+                                fontSize: 10,
+                                fontWeight: FontWeight.bold,
+                                letterSpacing: 1,
+                              ),
+                            ),
+                            const Text(
+                              "Atyrau, Kazakhstan",
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 14,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
                           ],
                         ),
                       ],
@@ -74,17 +92,36 @@ class EquipmentBrowseSheet extends StatelessWidget {
                     const SizedBox(height: 24),
 
                     /// 2. Horizontal Model Options
-                    const Text("SELECT CAPACITY / MODEL", 
-                      style: TextStyle(color: Colors.white30, fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 1)),
+                    const Text(
+                      "SELECT CAPACITY / MODEL",
+                      style: TextStyle(
+                        color: Colors.white30,
+                        fontSize: 10,
+                        fontWeight: FontWeight.bold,
+                        letterSpacing: 1,
+                      ),
+                    ),
                     const SizedBox(height: 12),
                     SizedBox(
                       height: 100,
                       child: ListView(
                         scrollDirection: Axis.horizontal,
                         children: [
-                          _ModelOptionCard(icon: Icons.local_shipping, capacity: "10 Kub", model: "Standard"),
-                          _ModelOptionCard(icon: Icons.fire_truck, capacity: "15 Kub", model: "Heavy Duty"),
-                          _ModelOptionCard(icon: Icons.chair, capacity: "20 Kub", model: "Industrial"),
+                          _ModelOptionCard(
+                            icon: Icons.local_shipping,
+                            capacity: "10 Kub",
+                            model: "Standard",
+                          ),
+                          _ModelOptionCard(
+                            icon: Icons.fire_truck,
+                            capacity: "15 Kub",
+                            model: "Heavy Duty",
+                          ),
+                          _ModelOptionCard(
+                            icon: Icons.chair,
+                            capacity: "20 Kub",
+                            model: "Industrial",
+                          ),
                         ],
                       ),
                     ),
@@ -101,11 +138,18 @@ class EquipmentBrowseSheet extends StatelessWidget {
                           backgroundColor: accentColor,
                           foregroundColor: Colors.white,
                           elevation: 0,
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(16),
+                          ),
                         ),
                         icon: const Icon(Icons.add_circle_outline_rounded),
-                        label: const Text("CREATE NEW REQUEST", 
-                          style: TextStyle(fontWeight: FontWeight.bold, letterSpacing: 1)),
+                        label: const Text(
+                          "CREATE NEW REQUEST",
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            letterSpacing: 1,
+                          ),
+                        ),
                       ),
                     ),
                     const SizedBox(height: 20),
@@ -125,7 +169,11 @@ class _ModelOptionCard extends StatelessWidget {
   final String capacity;
   final String model;
 
-  const _ModelOptionCard({required this.icon, required this.capacity, required this.model});
+  const _ModelOptionCard({
+    required this.icon,
+    required this.capacity,
+    required this.model,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -142,8 +190,21 @@ class _ModelOptionCard extends StatelessWidget {
         children: [
           Icon(icon, color: const Color(0xFF4E73DF), size: 28),
           const SizedBox(height: 8),
-          Text(capacity, style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold)),
-          Text(model, style: TextStyle(color: Colors.white.withOpacity(0.4), fontSize: 10)),
+          Text(
+            capacity,
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 12,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          Text(
+            model,
+            style: TextStyle(
+              color: Colors.white.withOpacity(0.4),
+              fontSize: 10,
+            ),
+          ),
         ],
       ),
     );

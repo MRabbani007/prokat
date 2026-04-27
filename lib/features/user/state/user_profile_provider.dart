@@ -7,13 +7,11 @@ import 'package:prokat/features/user/state/user_profile_state.dart';
 final userProfileServiceProvider = Provider<UserProfileService>((ref) {
   final dio = ref.watch(apiClientProvider);
 
-  return UserProfileService(dio); 
+  return UserProfileService(dio);
 });
 
 final userProfileProvider =
-    StateNotifierProvider<UserProfileNotifier, UserProfileState>(
-  (ref) {
-    final service = ref.read(userProfileServiceProvider);
-    return UserProfileNotifier(service);
-  },
-);
+    StateNotifierProvider<UserProfileNotifier, UserProfileState>((ref) {
+      final service = ref.read(userProfileServiceProvider);
+      return UserProfileNotifier(service);
+    });

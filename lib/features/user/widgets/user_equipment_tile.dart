@@ -114,7 +114,7 @@ class UserEquipmentTile extends ConsumerWidget {
                             overflow: TextOverflow.ellipsis,
                           ),
                         ),
-                
+
                         isFavorite == true
                             ? const Padding(
                                 padding: EdgeInsets.only(right: 6),
@@ -132,11 +132,15 @@ class UserEquipmentTile extends ConsumerWidget {
                                   color: Colors.redAccent,
                                 ),
                               ),
-                
+
                         /// RATING
                         Row(
                           children: [
-                            const Icon(Icons.star, size: 14, color: Colors.amber),
+                            const Icon(
+                              Icons.star,
+                              size: 14,
+                              color: Colors.amber,
+                            ),
                             const SizedBox(width: 4),
                             Text(
                               "4.8 (24)",
@@ -148,13 +152,13 @@ class UserEquipmentTile extends ConsumerWidget {
                             ),
                           ],
                         ),
-                
+
                         _StatusIndicator(status: equipment.status),
                       ],
                     ),
-                
+
                     const SizedBox(height: 4),
-                
+
                     /// NAME
                     Text(
                       equipment.name,
@@ -165,15 +169,15 @@ class UserEquipmentTile extends ConsumerWidget {
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
-                
+
                     /// MODEL + CAPACITY
                     Text(
                       "${equipment.model} • ${equipment.capacity} ${equipment.capacityUnit}",
                       style: TextStyle(fontSize: 14, color: Colors.grey[600]),
                     ),
-                
+
                     const SizedBox(height: 8),
-                
+
                     /// LOCATION + PRICE
                     Row(
                       children: [
@@ -196,7 +200,7 @@ class UserEquipmentTile extends ConsumerWidget {
                             ],
                           ),
                         ),
-                
+
                         /// PRICE
                         Row(
                           children: [

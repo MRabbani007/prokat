@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:prokat/core/router/app_routes.dart';
+import 'package:prokat/features/appstartup/app_startup_provider.dart';
 import 'package:prokat/features/user/state/user_profile_provider.dart';
 
 class BecomeOwnerCTA extends ConsumerWidget {
@@ -57,9 +58,11 @@ class BecomeOwnerCTA extends ConsumerWidget {
             borderRadius: BorderRadius.circular(12),
           ),
         ),
-        onPressed: () {
+        onPressed: () async {
           if (isOwner) {
-            context.push(AppRoutes.ownerDashboard);
+            await ref.read(appStartupProvider.notifier).setOwnerMode();
+            if (!context.mounted) return;
+            context.go(AppRoutes.ownerDashboard);
           } else {
             context.push(AppRoutes.becomeOwner);
           }

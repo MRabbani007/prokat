@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:prokat/core/utils/format.dart';
 import 'package:prokat/features/auth/providers/auth_provider.dart';
 import 'package:prokat/features/equipment/models/equipment_model.dart';
 import 'package:prokat/features/favorites/state/favorites_provider.dart';
@@ -18,7 +19,7 @@ class ClientEquipmentCard extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final authSession = ref.watch(authProvider).session;
-    final isClient = authSession != null ? true : false;
+    final isClient = authSession != null;
 
     final notifier = ref.read(favoriteProvider.notifier);
     final bool isFavorite = notifier.isFavorite(equipment.id);
@@ -26,199 +27,110 @@ class ClientEquipmentCard extends ConsumerWidget {
     final priceEntry = equipment.prices.isNotEmpty
         ? equipment.prices.first
         : null;
-
-    final priceRate = priceEntry != null
-        ? priceEntry.priceRate.toUpperCase() == "PER_TRIP"
-              ? "/ Trip"
-              : priceEntry.priceRate.toUpperCase() == "PER_CUBIC_METER"
-              ? "/ M3"
-              : priceEntry.priceRate.toUpperCase() == "PER_HOUR"
-              ? "/ Hour"
-              : ""
-        : "";
+    final priceRate = getPriceRate(priceEntry?.priceRate);
 
     return Container(
+      margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 4),
       decoration: BoxDecoration(
         color: theme.cardColor,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(
-          color: theme.colorScheme.outline.withValues(alpha: 0.3),
-        ),
+        borderRadius: BorderRadius.circular(24), // Softer corners
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.3),
-            blurRadius: 8,
-            offset: const Offset(0, 4),
+            color: Colors.black.withValues(alpha: 0.06), // Much softer shadow
+            blurRadius: 20,
+            offset: const Offset(0, 10),
           ),
         ],
       ),
       child: Column(
         children: [
-          /// IMAGE + BADGES
+          /// 1. IMAGE SECTION (Clean & Floating Elements)
           Stack(
             children: [
               ClipRRect(
                 borderRadius: const BorderRadius.vertical(
-                  top: Radius.circular(20),
+                  top: Radius.circular(24),
                 ),
                 child: Image.network(
                   equipment.imageUrl ?? "",
-                  height: 180,
+                  height: 200, // Slightly taller for better presence
                   width: double.infinity,
                   fit: BoxFit.cover,
                 ),
               ),
-
-              /// STATUS BADGE
+              // Floating Badges
               Positioned(
-                top: 12,
-                left: 12,
+                top: 16,
+                left: 16,
                 child: Row(
                   children: [
                     _badge(
                       text: equipment.status.toLowerCase() == "available"
-                          ? "ONLINE"
+                          ? "• ONLINE"
                           : "OFFLINE",
                       color: equipment.status.toLowerCase() == "available"
                           ? Colors.green
                           : Colors.grey,
                     ),
-
-                    SizedBox(width: 12),
-
+                    const SizedBox(width: 8),
                     _badge(
                       text: equipment.location?.city ?? "",
-                      color: Colors.black87,
+                      color: Colors.black.withValues(alpha: 0.6),
                     ),
                   ],
                 ),
               ),
-
-              /// PRICE BADGE
+              // Floating Favorite (Moved to top-right for cleaner look)
               Positioned(
-                bottom: 12,
-                right: 12,
-                // Price container
-                child: Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 14,
-                    vertical: 8,
+                top: 8,
+                right: 8,
+                child: IconButton(
+                  icon: Icon(
+                    isFavorite ? Icons.favorite : Icons.favorite_border,
                   ),
-                  decoration: BoxDecoration(
-                    color: theme.primaryColor,
-                    borderRadius: BorderRadius.circular(30),
-                  ),
-                  child: Row(
-                    children: [
-                      // Price Amount
-                      Text(
-                        priceEntry != null ? "${priceEntry.price} ₸" : "POA",
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                        ),
-                      ),
-                      const SizedBox(width: 2),
-                      // Price Rate (unit)
-                      Text(
-                        priceRate,
-                        style: TextStyle(fontSize: 10, color: Colors.white),
-                      ),
-                    ],
-                  ),
+                  color: isFavorite ? Colors.red : Colors.white,
+                  iconSize: 28,
+                  onPressed: isClient
+                      ? () => notifier.toggleFavorite(equipment.id)
+                      : null,
                 ),
               ),
             ],
           ),
 
-          /// CONTENT
+          /// 2. CONTENT SECTION
           Padding(
-            padding: const EdgeInsets.all(14),
+            padding: const EdgeInsets.all(20),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                /// NAME + RATING
+                // Title and Rating Row
                 Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    /// TEXT CONTENT
                     Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            children: [
-                              Text(
-                                equipment.name,
-                                style: theme.textTheme.titleLarge?.copyWith(
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-
-                              const SizedBox(width: 4),
-
-                              Text(
-                                equipment.model,
-                                style: theme.textTheme.bodyLarge?.copyWith(
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                            ],
-                          ),
-
-                          Text(
-                            equipment.owner?.displayName ?? "",
-                            style: theme.textTheme.labelMedium?.copyWith(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-
-                          // Equipment specs
-                          Row(
-                            children: [
-                              Text(
-                                equipment.capacity,
-                                style: theme.textTheme.labelMedium?.copyWith(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
-
-                              const SizedBox(width: 4),
-
-                              Text(
-                                equipment.capacityUnit,
-                                style: theme.textTheme.labelMedium?.copyWith(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
+                      child: Text(
+                        "${equipment.name} ${equipment.model}",
+                        style: theme.textTheme.titleLarge?.copyWith(
+                          fontWeight: FontWeight.bold,
+                          letterSpacing: -0.5,
+                        ),
+                        overflow: TextOverflow.ellipsis,
                       ),
                     ),
-
-                    /// RATING
                     Row(
                       children: [
                         const Icon(
-                          Icons.star,
-                          color: Color.fromARGB(255, 255, 205, 57),
-                          size: 32,
+                          Icons.star_rounded,
+                          color: Colors.amber,
+                          size: 22,
                         ),
-
                         const SizedBox(width: 4),
-
                         Text(
                           "4.5",
                           style: const TextStyle(
-                            fontWeight: FontWeight.w800,
-                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
                           ),
                         ),
                       ],
@@ -226,50 +138,78 @@ class ClientEquipmentCard extends ConsumerWidget {
                   ],
                 ),
 
-                const SizedBox(height: 6),
+                const SizedBox(height: 12),
 
-                /// RENT BUTTON
+                // Specs Row (Owner, Capacity, and Price integrated)
                 Row(
                   children: [
-                    /// FAVORITE BUTTON
-                    GestureDetector(
-                      onTap: isClient
-                          ? () async {
-                              ref
-                                  .read(favoriteProvider.notifier)
-                                  .toggleFavorite(equipment.id);
-                            }
-                          : null,
-                      child: Padding(
-                        padding: const EdgeInsets.only(right: 8),
-                        child: Icon(
-                          isFavorite ? Icons.favorite : Icons.favorite_border,
-                          color: Colors.red,
-                          size: 32,
-                        ),
-                      ),
+                    const Icon(
+                      Icons.person_outline,
+                      size: 16,
+                      color: Colors.grey,
                     ),
-
-                    Expanded(
-                      child: ElevatedButton(
-                        onPressed: onTap,
-                        style: ElevatedButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(vertical: 20),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(14),
-                          ),
-                          backgroundColor: theme.primaryColor,
-                        ),
-                        child: const Text(
-                          "RESERVE NOW",
+                    const SizedBox(width: 4),
+                    Text(
+                      equipment.owner?.displayName ?? "Owner",
+                      style: const TextStyle(color: Colors.grey),
+                    ),
+                    const SizedBox(width: 12),
+                    const Icon(Icons.straighten, size: 16, color: Colors.grey),
+                    const SizedBox(width: 4),
+                    Text(
+                      "${equipment.capacity} ${equipment.capacityUnit}",
+                      style: const TextStyle(color: Colors.grey),
+                    ),
+                    const Spacer(),
+                    // The Price: Now a clean text element instead of a bubble
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        Text(
+                          priceEntry != null ? "${priceEntry.price} ₸" : "POA",
                           style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
+                            fontSize: 18,
+                            fontWeight: FontWeight.w900,
+                            color: theme.primaryColor,
                           ),
                         ),
-                      ),
+                        Text(
+                          priceRate,
+                          style: TextStyle(
+                            fontSize: 11,
+                            color: Colors.grey[600],
+                          ),
+                        ),
+                      ],
                     ),
                   ],
+                ),
+
+                const SizedBox(height: 20),
+
+                /// 3. ACTION BUTTON
+                SizedBox(
+                  width: double.infinity,
+                  height: 54,
+                  child: ElevatedButton(
+                    onPressed: onTap,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: theme.primaryColor,
+                      foregroundColor: Colors.white,
+                      elevation: 0,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                    ),
+                    child: const Text(
+                      "RESERVE NOW",
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        letterSpacing: 1,
+                      ),
+                    ),
+                  ),
                 ),
               ],
             ),

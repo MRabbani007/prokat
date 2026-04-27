@@ -15,7 +15,6 @@ class MapRenterEquipmentScreen extends ConsumerStatefulWidget {
 
 class _MapRenterEquipmentScreenState
     extends ConsumerState<MapRenterEquipmentScreen> {
-
   @override
   void initState() {
     super.initState();

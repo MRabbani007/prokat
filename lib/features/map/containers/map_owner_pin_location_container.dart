@@ -87,7 +87,7 @@ class _MapOwnerPinLocationContainerState
       final created = await notifier.createLocation(location);
 
       if (!mounted) return;
-      
+
       if (created == true) {
         Navigator.pop(context, created);
       }

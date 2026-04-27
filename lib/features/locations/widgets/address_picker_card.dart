@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:prokat/core/widgets/inline_tile.dart';
 
 class AddressPickerCard extends StatelessWidget {
   final dynamic selectedAddress; // Replace with your Address model
@@ -16,24 +17,7 @@ class AddressPickerCard extends StatelessWidget {
 
     return GestureDetector(
       onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: theme.cardColor,
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(
-            color: theme.colorScheme.outline.withValues(
-              alpha: 0.3,
-            ), 
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.3),
-              blurRadius: 8,
-              offset: const Offset(0, 4),
-            ),
-          ],
-        ),
+      child: InlineTile(
         child: Row(
           children: [
             /// Icon Container

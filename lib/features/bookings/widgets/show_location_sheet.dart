@@ -46,7 +46,6 @@ void showLocationSheet(BuildContext context, LocationModel location) {
   );
 }
 
-
 Future<void> _launchMap(String type, double lat, double lon) async {
   final String googleWeb = 'https://google.com';
   final String dgisWeb = 'https://2gis.kz'; // Web URL

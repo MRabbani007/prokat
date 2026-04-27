@@ -28,12 +28,12 @@ class SwipeableListTile extends ConsumerWidget {
       child: Dismissible(
         key: ValueKey('fav_${equipment.id}'),
         direction: DismissDirection.startToEnd, // Swipe right only
-        dismissThresholds: const {
-          DismissDirection.startToEnd: 0.4, 
-        },
+        dismissThresholds: const {DismissDirection.startToEnd: 0.4},
         confirmDismiss: (direction) async {
           // Toggle favorite on swipe without removing the tile from the list
-          isRenter ? ref.read(favoriteProvider.notifier).toggleFavorite(equipment.id) : null;
+          isRenter
+              ? ref.read(favoriteProvider.notifier).toggleFavorite(equipment.id)
+              : null;
           return false; // Return false so the tile snaps back instead of disappearing
         },
         background: Container(

@@ -23,9 +23,14 @@ class EditSheet extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         color: bgColor,
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(28)), // Large Item Radius
+        borderRadius: const BorderRadius.vertical(
+          top: Radius.circular(28),
+        ), // Large Item Radius
         border: Border(
-          top: BorderSide(color: Colors.white.withValues(alpha: 0.08), width: 1), // Rim Light top edge
+          top: BorderSide(
+            color: Colors.white.withValues(alpha: 0.08),
+            width: 1,
+          ), // Rim Light top edge
         ),
       ),
       padding: EdgeInsets.only(
@@ -53,7 +58,7 @@ class EditSheet extends StatelessWidget {
             /// Technical Title Header
             Text(
               title,
-              style:  TextStyle(
+              style: TextStyle(
                 color: theme.colorScheme.onSurface,
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
@@ -79,7 +84,9 @@ class EditSheet extends StatelessWidget {
                   foregroundColor: theme.colorScheme.onPrimary,
                   elevation: 0,
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16), // Small Item Radius
+                    borderRadius: BorderRadius.circular(
+                      16,
+                    ), // Small Item Radius
                   ),
                 ),
                 child: Text(
@@ -99,12 +106,9 @@ class EditSheet extends StatelessWidget {
   }
 }
 
-void showEditSheet({
-  required BuildContext context,
-  required Widget sheet,
-}) {
-    final theme = Theme.of(context);
-    final bgColor = theme.colorScheme.surface;
+void showEditSheet({required BuildContext context, required Widget sheet}) {
+  final theme = Theme.of(context);
+  final bgColor = theme.colorScheme.surface;
 
   showModalBottomSheet(
     context: context,

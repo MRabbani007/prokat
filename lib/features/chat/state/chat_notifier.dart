@@ -1,183 +1,349 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:prokat/core/config/env.dart';
 import 'package:prokat/features/auth/services/auth_secure_storage.dart';
 import 'package:prokat/features/chat/state/chat_message_model.dart';
 import 'package:prokat/features/chat/state/chat_model.dart';
-import 'package:socket_io_client/socket_io_client.dart' as IO;
-import 'chat_service.dart';
-import 'chat_state.dart';
+import 'package:prokat/features/chat/state/chat_service.dart';
+import 'package:prokat/features/chat/state/chat_socket_service.dart';
+import 'package:prokat/features/chat/state/chat_state.dart';
 
 class ChatNotifier extends StateNotifier<ChatState> {
   final ChatService service;
+  final ChatSocketService socketService;
   final AuthSecureStorage secureStorage;
-  IO.Socket? _socket;
 
-  ChatNotifier(this.service, this.secureStorage) : super(ChatState()) {
-    getConversations();
-    connectWebSocket();
+  String? _sessionToken;
+
+  ChatNotifier(this.service, this.socketService, this.secureStorage)
+    : super(const ChatState()) {
+    _loadSession();
+    loadConversations();
   }
 
-  void connectWebSocket() async {
-    if (_socket != null && _socket!.connected) return;
-
+  Future<void> _loadSession() async {
     final session = await secureStorage.readSession();
-    final token = session?.sessionToken ?? "";
+    _sessionToken = session?.sessionToken ?? '';
 
-    _socket = IO.io(
-      Env.baseUrl,
-      IO.OptionBuilder()
-          .setTransports(['websocket'])
-          .setExtraHeaders({'Authorization': 'Bearer $token'})
-          .build(),
+    state = state.copyWith(
+      currentUserId:
+          session?.user?.id ??
+          session?.user?.username ??
+          session?.user?.phone ??
+          session?.user?.displayName,
+    );
+  }
+
+  Future<void> loadConversations() async {
+    try {
+      state = state.copyWith(isLoadingConversations: true, error: null);
+
+      final conversations = await service.getConversations();
+
+      state = state.copyWith(
+        isLoadingConversations: false,
+        conversations: _sortConversations(conversations),
+        error: null,
+      );
+    } catch (error) {
+      state = state.copyWith(
+        isLoadingConversations: false,
+        error: error.toString().replaceFirst('Exception: ', ''),
+      );
+    }
+  }
+
+  Future<void> openChatById(String chatId) async {
+    try {
+      if ((_sessionToken ?? '').isEmpty) {
+        await _loadSession();
+      }
+
+      final knownChat = _findConversationById(chatId);
+      if (knownChat != null) {
+        state = state.copyWith(currentChat: knownChat, error: null);
+      } else {
+        state = state.copyWith(currentChat: ChatModel(id: chatId), error: null);
+      }
+
+      state = state.copyWith(
+        isLoadingMessages: true,
+        messages: const <ChatMessageModel>[],
+      );
+
+      final messages = await service.getMessages(chatId);
+      final chat = _findConversationById(chatId) ?? state.currentChat;
+
+      state = state.copyWith(
+        currentChat: chat,
+        messages: _sortMessages(messages),
+        isLoadingMessages: false,
+      );
+
+      await _connectToChat(chatId);
+    } catch (error) {
+      state = state.copyWith(
+        isLoadingMessages: false,
+        error: error.toString().replaceFirst('Exception: ', ''),
+      );
+    }
+  }
+
+  Future<void> leaveCurrentChat() async {
+    final currentChatId = state.currentChat?.id;
+    if ((currentChatId ?? '').isNotEmpty) {
+      socketService.leaveChat(currentChatId!);
+    }
+
+    socketService.disconnect();
+  }
+
+  Future<void> sendMessage(String text) async {
+    final trimmed = text.trim();
+    final chat = state.currentChat;
+    if (chat == null || trimmed.isEmpty) {
+      return;
+    }
+
+    final currentUserId = state.currentUserId ?? 'me';
+    final clientTempId = DateTime.now().microsecondsSinceEpoch.toString();
+
+    final optimisticMessage = ChatMessageModel(
+      id: clientTempId,
+      chatId: chat.id,
+      senderId: currentUserId,
+      senderName: 'You',
+      message: trimmed,
+      type: 'TEXT',
+      clientTempId: clientTempId,
+      isPending: true,
+      createdAt: DateTime.now(),
     );
 
-    _socket?.onConnect((_) {
-      print('Socket connected');
-    });
+    state = state.copyWith(
+      isSendingMessage: true,
+      messages: [optimisticMessage, ...state.messages],
+      currentChat: chat.copyWith(lastMessage: optimisticMessage),
+      conversations: _mergeConversationPreview(
+        chatId: chat.id,
+        message: optimisticMessage,
+      ),
+      error: null,
+    );
 
-    _socket?.on('receive_message', (data) {
-      if (data != null) {
-        final newMessage = ChatMessageModel.fromJson(data);
-        if (state.currentChat?.id == newMessage.conversationId) {
-          state = state.copyWith(
-            messages: [newMessage, ...state.messages],
-          );
-        }
-        
-        // Also update conversations list with last message
-        updateConversationLastMessage(newMessage.conversationId, newMessage);
-      }
-    });
-
-    _socket?.onDisconnect((_) => print('Socket disconnected'));
+    try {
+      await _connectToChat(chat.id);
+      socketService.sendMessage(
+        chatId: chat.id,
+        message: trimmed,
+        type: optimisticMessage.type,
+        clientTempId: clientTempId,
+      );
+      state = state.copyWith(isSendingMessage: false);
+    } catch (error) {
+      state = state.copyWith(
+        isSendingMessage: false,
+        error: error.toString().replaceFirst('Exception: ', ''),
+        messages: state.messages
+            .map(
+              (message) => message.clientTempId == clientTempId
+                  ? message.copyWith(isPending: false)
+                  : message,
+            )
+            .toList(growable: false),
+      );
+    }
   }
 
-  void disconnectWebSocket() {
-    _socket?.disconnect();
-    _socket?.dispose();
-    _socket = null;
+  Future<String?> getChatId({String? bookingId, String? requestId}) async {
+    final normalizedBookingId = (bookingId ?? '').trim();
+    final normalizedRequestId = (requestId ?? '').trim();
+
+    if (normalizedBookingId.isEmpty && normalizedRequestId.isEmpty) {
+      return null;
+    }
+
+    final localMatch = state.conversations.firstWhere(
+      (chat) =>
+          (normalizedBookingId.isNotEmpty &&
+              chat.bookingId == normalizedBookingId) ||
+          (normalizedRequestId.isNotEmpty &&
+              chat.requestId == normalizedRequestId),
+      orElse: () => const ChatModel(id: ''),
+    );
+
+    if (localMatch.id.isNotEmpty) {
+      return localMatch.id;
+    }
+
+    try {
+      final resolvedId = await service.getChatId(
+        bookingId: normalizedBookingId.isEmpty ? null : normalizedBookingId,
+        requestId: normalizedRequestId.isEmpty ? null : normalizedRequestId,
+      );
+
+      await loadConversations();
+      return resolvedId;
+    } catch (error) {
+      state = state.copyWith(
+        error: error.toString().replaceFirst('Exception: ', ''),
+      );
+      return null;
+    }
+  }
+
+  Future<void> _connectToChat(String chatId) async {
+    if ((_sessionToken ?? '').isEmpty) {
+      await _loadSession();
+    }
+
+    await socketService.connect(token: _sessionToken ?? '');
+    socketService.onNewMessage(_handleIncomingMessage);
+    await socketService.joinChat(chatId);
+  }
+
+  void _handleIncomingMessage(ChatMessageModel incoming) {
+    final isCurrentChat = state.currentChat?.id == incoming.chatId;
+    final mergedMessages = isCurrentChat
+        ? _mergeMessages(state.messages, incoming)
+        : state.messages;
+
+    final updatedConversations = _mergeConversationPreview(
+      chatId: incoming.chatId,
+      message: incoming.copyWith(isPending: false),
+    );
+
+    final currentChat = state.currentChat?.id == incoming.chatId
+        ? (state.currentChat ?? ChatModel(id: incoming.chatId)).copyWith(
+            lastMessage: incoming.copyWith(isPending: false),
+          )
+        : state.currentChat;
+
+    state = state.copyWith(
+      messages: mergedMessages,
+      conversations: updatedConversations,
+      currentChat: currentChat,
+      isSendingMessage: false,
+      error: null,
+    );
+  }
+
+  List<ChatModel> _mergeConversationPreview({
+    required String chatId,
+    required ChatMessageModel message,
+  }) {
+    final current = List<ChatModel>.from(state.conversations);
+    final index = current.indexWhere((chat) => chat.id == chatId);
+
+    if (index == -1) {
+      current.insert(
+        0,
+        ChatModel(
+          id: chatId,
+          lastMessage: message.copyWith(isPending: false),
+          updatedAt: message.createdAt ?? DateTime.now(),
+        ),
+      );
+      return _sortConversations(current);
+    }
+
+    final updated = current[index].copyWith(
+      lastMessage: message.copyWith(isPending: false),
+      updatedAt: message.createdAt ?? DateTime.now(),
+    );
+    current
+      ..removeAt(index)
+      ..insert(0, updated);
+
+    return _sortConversations(current);
+  }
+
+  List<ChatMessageModel> _mergeMessages(
+    List<ChatMessageModel> existing,
+    ChatMessageModel incoming,
+  ) {
+    final updated = List<ChatMessageModel>.from(existing);
+
+    final exactIndex = updated.indexWhere(
+      (message) => message.id.isNotEmpty && message.id == incoming.id,
+    );
+    if (exactIndex != -1) {
+      updated[exactIndex] = incoming.copyWith(isPending: false);
+      return _sortMessages(updated);
+    }
+
+    final tempIndex = updated.indexWhere(
+      (message) =>
+          (message.clientTempId ?? '').isNotEmpty &&
+          message.clientTempId == incoming.clientTempId,
+    );
+    if (tempIndex != -1) {
+      updated[tempIndex] = incoming.copyWith(isPending: false);
+      return _sortMessages(updated);
+    }
+
+    final fallbackPendingIndex = updated.indexWhere(
+      (message) =>
+          message.isPending &&
+          message.senderId == incoming.senderId &&
+          message.message.trim() == incoming.message.trim() &&
+          _withinThirtySeconds(message.createdAt, incoming.createdAt),
+    );
+    if (fallbackPendingIndex != -1) {
+      updated[fallbackPendingIndex] = incoming.copyWith(isPending: false);
+      return _sortMessages(updated);
+    }
+
+    updated.insert(0, incoming.copyWith(isPending: false));
+    return _sortMessages(updated);
+  }
+
+  ChatModel? _findConversationById(String chatId) {
+    for (final chat in state.conversations) {
+      if (chat.id == chatId) {
+        return chat;
+      }
+    }
+    return null;
+  }
+
+  List<ChatModel> _sortConversations(List<ChatModel> conversations) {
+    final sorted = List<ChatModel>.from(conversations);
+    sorted.sort((a, b) {
+      final aDate =
+          a.lastMessage?.createdAt ??
+          a.updatedAt ??
+          a.createdAt ??
+          DateTime(1970);
+      final bDate =
+          b.lastMessage?.createdAt ??
+          b.updatedAt ??
+          b.createdAt ??
+          DateTime(1970);
+      return bDate.compareTo(aDate);
+    });
+    return sorted;
+  }
+
+  List<ChatMessageModel> _sortMessages(List<ChatMessageModel> messages) {
+    final sorted = List<ChatMessageModel>.from(messages);
+    sorted.sort((a, b) {
+      final aDate = a.createdAt ?? DateTime(1970);
+      final bDate = b.createdAt ?? DateTime(1970);
+      return bDate.compareTo(aDate);
+    });
+    return sorted;
+  }
+
+  bool _withinThirtySeconds(DateTime? first, DateTime? second) {
+    if (first == null || second == null) {
+      return false;
+    }
+
+    return first.difference(second).inSeconds.abs() <= 30;
   }
 
   @override
   void dispose() {
-    disconnectWebSocket();
+    socketService.disconnect();
     super.dispose();
-  }
-
-  void updateConversationLastMessage(String conversationId, ChatMessageModel msg) {
-    if (state.conversations.isEmpty) return;
-    final index = state.conversations.indexWhere((c) => c.id == conversationId);
-    if (index != -1) {
-      final updatedLists = List<ChatModel>.from(state.conversations);
-      // We don't have a copyWith for ChatModel but we can create a new instance or if we had it.
-      // Since it's a model, let's just make a new one reflecting the last message
-      final old = updatedLists[index];
-      updatedLists[index] = ChatModel(
-        id: old.id,
-        participantIds: old.participantIds,
-        bookingId: old.bookingId,
-        requestId: old.requestId,
-        lastMessage: msg,
-        createdAt: old.createdAt,
-        updatedAt: DateTime.now(),
-      );
-      state = state.copyWith(conversations: updatedLists);
-    }
-  }
-
-  Future<void> getConversations() async {
-    try {
-      state = state.copyWith(isLoading: true);
-
-      final data = await service.getConversations();
-
-      state = state.copyWith(isLoading: false, conversations: data);
-    } catch (e) {
-      state = state.copyWith(isLoading: false, error: e.toString());
-    }
-  }
-
-  Future<void> openChat(ChatModel chat) async {
-    state = state.copyWith(currentChat: chat, isLoading: true);
-
-    final messages = await service.getMessages(chat.id);
-
-    state = state.copyWith(isLoading: false, messages: messages);
-  }
-
-  Future<void> sendMessage(String text) async {
-    final chat = state.currentChat;
-    if (chat == null) return;
-
-    /// optimistic UI (instant message)
-    final tempMessage = ChatMessageModel(
-      id: DateTime.now().toString(),
-      conversationId: chat.id,
-      senderId: "me",
-      message: text,
-      type: "TEXT",
-      createdAt: DateTime.now(),
-    );
-
-    state = state.copyWith(messages: [tempMessage, ...state.messages]);
-
-    final sent = await service.sendMessage(
-      conversationId: chat.id,
-      message: text,
-    );
-
-    if (sent != null) {
-      // Opt UI handled, but socket might stream it back, need deduplication typically.
-      // updateConversationLastMessage(chat.id, sent);
-    }
-  }
-
-  Future<void> startChat(String userId) async {
-    state = state.copyWith(isLoading: true);
-
-    final chat = await service.createOrGetConversation(userId: userId);
-
-    if (chat != null) {
-      await openChat(chat);
-    }
-
-    state = state.copyWith(isLoading: false);
-  }
-
-  Future<String?> getChatId({String? bookingId, String? requestId}) async {
-    try {
-      /// 1. Try to find in existing conversations
-      final existing = state.conversations.firstWhere(
-        (chat) =>
-            (bookingId != null && chat.bookingId == bookingId) ||
-            (requestId != null && chat.requestId == requestId),
-        orElse: () => ChatModel(id: '', participantIds: []),
-      );
-
-      if (existing.id.isNotEmpty) {
-        return existing.id;
-      }
-
-      /// 2. Fallback → refetch from backend
-      final chats = await service.getConversations();
-
-      state = state.copyWith(conversations: chats);
-
-      final fetched = chats.firstWhere(
-        (chat) =>
-            (bookingId != null && chat.bookingId == bookingId) ||
-            (requestId != null && chat.requestId == requestId),
-        orElse: () => ChatModel(id: '', participantIds: []),
-      );
-
-      if (fetched.id.isNotEmpty) {
-        return fetched.id;
-      }
-
-      return null;
-    } catch (e) {
-      state = state.copyWith(error: e.toString());
-      return null;
-    }
   }
 }

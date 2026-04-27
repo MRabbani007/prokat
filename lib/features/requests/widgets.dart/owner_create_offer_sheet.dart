@@ -20,7 +20,11 @@ void openResponseSheet(BuildContext context, RequestModel request) {
           final equipmentState = ref.watch(equipmentProvider);
 
           final equipmentOptions = equipmentState.ownerEquipment
-              .where((e) => e.category?.id.toString() == offersState.selectedRequest?.categoryId)
+              .where(
+                (e) =>
+                    e.category?.id.toString() ==
+                    offersState.selectedRequest?.categoryId,
+              )
               .toList();
 
           return Container(
@@ -242,7 +246,7 @@ void openResponseSheet(BuildContext context, RequestModel request) {
                           Navigator.pop(context);
                         }
                       },
-                      child:  Text(
+                      child: Text(
                         "Send Offer",
                         style: TextStyle(
                           fontSize: 16,

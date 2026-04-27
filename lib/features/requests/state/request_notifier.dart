@@ -66,7 +66,6 @@ class RequestNotifier extends StateNotifier<RequestState> {
       final data = await service.getOwnerRequests();
 
       state = state.copyWith(isLoading: false, ownerRequests: data);
-      
     } catch (e) {
       print(e);
       state = state.copyWith(

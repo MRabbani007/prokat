@@ -1,4 +1,5 @@
 class User {
+  final String? id;
   final String? username;
   final String? phone;
   final String? firstName;
@@ -6,6 +7,7 @@ class User {
   final String? role;
 
   const User({
+    this.id,
     this.username,
     this.phone,
     this.firstName,
@@ -23,6 +25,7 @@ class User {
   factory User.fromJson(Map<String, dynamic> json) {
     try {
       return User(
+        id: json['id']?.toString(),
         firstName: json['firstName']?.toString(),
         lastName: json['lastName']?.toString(),
         username: json['username']?.toString(),
@@ -40,6 +43,7 @@ class User {
 
   Map<String, dynamic> toJson() {
     return {
+      'id': id,
       'username': username,
       'phone': phone,
       'firstName': firstName,

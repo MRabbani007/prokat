@@ -23,9 +23,10 @@ class _OwnerDashboardHeaderState extends ConsumerState<OwnerDashboardHeader> {
 
     final theme = Theme.of(context);
     final colorScheme = Theme.of(context).colorScheme;
+    final topInset = MediaQuery.of(context).padding.top;
 
     return Container(
-      padding: const EdgeInsets.all(24),
+      padding: EdgeInsets.fromLTRB(24, topInset + 20, 24, 24),
       decoration: BoxDecoration(
         color: colorScheme.surface,
         gradient: LinearGradient(

@@ -47,7 +47,7 @@ class FavoriteNotifier extends StateNotifier<FavoritesState> {
       }
 
       state = state.copyWith(favoritesIds: updated);
-      
+
       final res = await service.toggleFavorite(equipmentId);
 
       state = state.copyWith(isLoading: false);

@@ -35,11 +35,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Icon(
-              Icons.lock_reset_rounded,
-              size: 64,
-              color: accentColor,
-            ),
+            const Icon(Icons.lock_reset_rounded, size: 64, color: accentColor),
             const SizedBox(height: 32),
             Text(
               _isSent ? "Check your email" : "Reset Password",
@@ -57,7 +53,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                   : "Enter your registered email below to receive a password reset link.",
               style: const TextStyle(color: ghostGray, fontSize: 16),
             ),
-            
+
             // Error Field Rendering
             if (errorMessage != null) ...[
               const SizedBox(height: 24),
@@ -114,7 +110,10 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                   },
                   child: const Text(
                     "Resend Link",
-                    style: TextStyle(color: accentColor, fontWeight: FontWeight.bold),
+                    style: TextStyle(
+                      color: accentColor,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
               ),

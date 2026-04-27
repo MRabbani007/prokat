@@ -93,7 +93,6 @@ class SidebarDrawer extends ConsumerWidget {
                   const SizedBox(height: 32),
 
                   // SECTION: OWNER (Conditional logic can be added here)
-
                   SidebarTile(
                     icon: Icons.construction,
                     label: "Equipment",

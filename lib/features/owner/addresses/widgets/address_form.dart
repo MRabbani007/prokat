@@ -11,7 +11,7 @@ class AddressForm extends ConsumerStatefulWidget {
   ConsumerState<AddressForm> createState() => AddressFormState();
 }
 
-class AddressFormState  extends ConsumerState<AddressForm> {
+class AddressFormState extends ConsumerState<AddressForm> {
   final streetController = TextEditingController();
   final cityController = TextEditingController();
   final countryController = TextEditingController();

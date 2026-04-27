@@ -5,13 +5,13 @@ import '../../../core/providers/api_provider.dart';
 import '../state/equipment_service.dart';
 
 final equipmentServiceProvider = Provider<EquipmentService>((ref) {
-  final  api = ref.watch(apiClientProvider);
+  final api = ref.watch(apiClientProvider);
 
   return EquipmentService(api);
 });
 
 final equipmentProvider =
     StateNotifierProvider<EquipmentNotifier, EquipmentState>((ref) {
-  final service = ref.read(equipmentServiceProvider);
-  return EquipmentNotifier(service);
-});
+      final service = ref.read(equipmentServiceProvider);
+      return EquipmentNotifier(service);
+    });

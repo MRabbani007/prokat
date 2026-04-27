@@ -28,9 +28,9 @@ class _UserHeaderState extends ConsumerState<UserDashboardHeader> {
         : (userProfileState.userProfile?.phoneNumber ?? '').isNotEmpty
         ? formatPhoneNumber(userProfileState.userProfile!.phoneNumber!)
         : 'Hello!';
-    print(profileImageUrl);
 
-    return Padding(
+    return Container(
+      decoration: BoxDecoration(color: theme.primaryColor),
       // Padding adjusted for the AppBar's safe area
       padding: const EdgeInsets.fromLTRB(20, 20, 20, 20),
       child: Row(

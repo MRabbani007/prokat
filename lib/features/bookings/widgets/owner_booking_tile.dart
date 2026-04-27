@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
-import 'package:prokat/core/router/app_routes.dart';
 import 'package:prokat/core/utils/format.dart';
 import 'package:prokat/features/bookings/models/booking_model.dart';
 import 'package:prokat/features/bookings/models/booking_status.dart';
@@ -9,8 +8,8 @@ import 'package:prokat/features/bookings/state/booking_provider.dart';
 import 'package:prokat/features/bookings/widgets/booking_status_badge.dart';
 import 'package:prokat/features/bookings/widgets/booking_status_sheet.dart';
 import 'package:prokat/features/bookings/widgets/cancel_booking_sheet.dart';
-import 'package:go_router/go_router.dart';
 import 'package:prokat/features/bookings/widgets/show_location_sheet.dart';
+import 'package:prokat/features/chat/utils/chat_navigation.dart';
 
 class OwnerBookingTile extends ConsumerWidget {
   final BookingModel booking;
@@ -284,8 +283,13 @@ class OwnerBookingTile extends ConsumerWidget {
 
                     Expanded(
                       child: OutlinedButton(
-                        onPressed: () {
-                          context.push("${AppRoutes.ownerChat}/${booking.id}");
+                        onPressed: () async {
+                          await openChatFromLink(
+                            context: context,
+                            ref: ref,
+                            isOwner: true,
+                            bookingId: booking.id,
+                          );
                         },
                         style: OutlinedButton.styleFrom(
                           side: BorderSide(

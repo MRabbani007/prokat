@@ -87,6 +87,7 @@ class EquipmentNotifier extends StateNotifier<EquipmentState> {
 
       state = state.copyWith(renterEquipment: equipment, isLoading: false);
     } catch (e) {
+      print(e.toString());
       state = state.copyWith(isLoading: false, error: e.toString());
     }
   }

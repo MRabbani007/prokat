@@ -79,7 +79,7 @@ class RequestModel {
       print("Request Parse Failed");
       print(e.toString());
       print(json);
-      rethrow; 
+      rethrow;
     }
   }
 

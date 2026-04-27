@@ -34,64 +34,57 @@ class _OwnerBookingsScreenState extends ConsumerState<OwnerBookingsScreen> {
         .toList();
 
     return Scaffold(
-        backgroundColor: theme.scaffoldBackgroundColor,
-        body: SafeArea(
-          child: CustomScrollView(
-            slivers: [
-              SliverAppBar(
-                floating: true,
-                pinned: true,
-                elevation: 0,
-                scrolledUnderElevation: 2,
-                backgroundColor: theme.colorScheme.primary,
-                leading: IconButton(
-                  icon: Icon(
-                    LucideIcons.chevronLeft,
-                    size: 20,
-                    color: theme.colorScheme.onPrimary,
-                  ),
-                  onPressed: () => context.pop(),
-                ),
-                title: Text(
-                  "My Orders",
-                  style: theme.textTheme.titleLarge?.copyWith(
-                    color: theme.colorScheme.onPrimary,
-                  ),
-                ),
-                centerTitle: false,
-                actions: [
-                  IconButton(
-                    onPressed: () =>
-                        context.push(AppRoutes.ownerBookingsHistory),
-                    icon: Icon(
-                      Icons.history_toggle_off_rounded,
-                      color: theme.colorScheme.onPrimary,
-                      size: 24,
-                    ),
-                    tooltip: "Job History",
-                  ),
-                ],
-                actionsPadding: EdgeInsets.only(right: 12),
+      backgroundColor: theme.scaffoldBackgroundColor,
+      body: CustomScrollView(
+        slivers: [
+          SliverAppBar(
+            floating: true,
+            pinned: true,
+            elevation: 0,
+            scrolledUnderElevation: 2,
+            backgroundColor: theme.colorScheme.primary,
+            leading: IconButton(
+              icon: Icon(
+                LucideIcons.chevronLeft,
+                size: 20,
+                color: theme.colorScheme.onPrimary,
               ),
-
-              SliverPadding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 24,
-                  vertical: 16,
+              onPressed: () => context.pop(),
+            ),
+            title: Text(
+              "My Orders",
+              style: theme.textTheme.titleLarge?.copyWith(
+                color: theme.colorScheme.onPrimary,
+              ),
+            ),
+            centerTitle: false,
+            actions: [
+              IconButton(
+                onPressed: () => context.push(AppRoutes.ownerBookingsHistory),
+                icon: Icon(
+                  Icons.history_toggle_off_rounded,
+                  color: theme.colorScheme.onPrimary,
+                  size: 24,
                 ),
-                sliver: SliverList(
-                  delegate: SliverChildBuilderDelegate(
-                    (context, index) => Padding(
-                      padding: const EdgeInsets.only(bottom: 12),
-                      child: OwnerBookingTile(booking: newBookings[index]),
-                    ),
-                    childCount: newBookings.length,
-                  ),
-                ),
+                tooltip: "Job History",
               ),
             ],
+            actionsPadding: const EdgeInsets.only(right: 12),
           ),
-        ),
+          SliverPadding(
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+            sliver: SliverList(
+              delegate: SliverChildBuilderDelegate(
+                (context, index) => Padding(
+                  padding: const EdgeInsets.only(bottom: 12),
+                  child: OwnerBookingTile(booking: newBookings[index]),
+                ),
+                childCount: newBookings.length,
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

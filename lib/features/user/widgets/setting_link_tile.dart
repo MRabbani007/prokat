@@ -37,16 +37,10 @@ class SettingsLinkTile extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    title,
-                    style: theme.textTheme.bodyLarge,
-                  ),
+                  Text(title, style: theme.textTheme.bodyLarge),
                   if (subtitle != null) ...[
                     const SizedBox(height: 4),
-                    Text(
-                      subtitle!,
-                      style: theme.textTheme.labelMedium,
-                    ),
+                    Text(subtitle!, style: theme.textTheme.labelMedium),
                   ],
                 ],
               ),

@@ -1,30 +1,70 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:prokat/core/router/app_routes.dart';
 import 'package:prokat/features/chat/state/chat_provider.dart';
-import 'package:go_router/go_router.dart';
 import 'package:prokat/features/chat/widgets/chat_tile.dart';
 import 'package:shimmer/shimmer.dart';
 
-class ClientChatListScreen extends ConsumerWidget {
+class ClientChatListScreen extends ConsumerStatefulWidget {
   final String? bookingId;
   final String? requestId;
 
   const ClientChatListScreen({super.key, this.bookingId, this.requestId});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<ClientChatListScreen> createState() =>
+      _ClientChatListScreenState();
+}
+
+class _ClientChatListScreenState extends ConsumerState<ClientChatListScreen> {
+  bool _handledLinkedNavigation = false;
+
+  @override
+  void initState() {
+    super.initState();
+    Future.microtask(() async {
+      await ref.read(chatProvider.notifier).loadConversations();
+      await _openLinkedChatIfNeeded();
+    });
+  }
+
+  Future<void> _openLinkedChatIfNeeded() async {
+    if (_handledLinkedNavigation) {
+      return;
+    }
+
+    final hasBookingId = (widget.bookingId ?? '').isNotEmpty;
+    final hasRequestId = (widget.requestId ?? '').isNotEmpty;
+    if (!hasBookingId && !hasRequestId) {
+      return;
+    }
+
+    _handledLinkedNavigation = true;
+    final chatId = await ref
+        .read(chatProvider.notifier)
+        .getChatId(bookingId: widget.bookingId, requestId: widget.requestId);
+
+    if (!mounted) {
+      return;
+    }
+
+    if ((chatId ?? '').isEmpty) {
+      final error = ref.read(chatProvider).error ?? 'Unable to open chat';
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(error)));
+      return;
+    }
+
+    context.push('${AppRoutes.chat}/$chatId');
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final chatState = ref.watch(chatProvider);
     final chats = chatState.conversations;
-
-    // Effect to handle navigation to a specific chat if IDs are provided
-    // useEffect(() {
-    //   if (bookingId != null || requestId != null) {
-    //     ...
-    //   }
-    //   return null;
-    // }, [bookingId, requestId]);
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
@@ -51,31 +91,19 @@ class ClientChatListScreen extends ConsumerWidget {
               },
             ),
             title: Text(
-              "Messages",
+              'Messages',
               style: theme.textTheme.titleLarge?.copyWith(
                 color: theme.colorScheme.onPrimary,
               ),
             ),
             centerTitle: false,
-            actions: [
-              IconButton(
-                onPressed: () {},
-                icon: Icon(
-                  Icons.search,
-                  color: theme.colorScheme.onPrimary,
-                  size: 24,
-                ),
-              ),
-            ],
-            actionsPadding: const EdgeInsets.only(right: 12),
           ),
-          
-          if (chatState.isLoading)
-            _buildSliverSkeleton(context)
-          else if (chatState.error != null)
+          if (chatState.isLoadingConversations)
+            _buildSliverSkeleton()
+          else if (chatState.error != null && chats.isEmpty)
             SliverFillRemaining(
               hasScrollBody: false,
-              child: Center(child: Text("Error loading chats: ${chatState.error}")),
+              child: Center(child: Text(chatState.error!)),
             )
           else if (chats.isEmpty)
             _buildSliverEmptyState(theme)
@@ -83,29 +111,26 @@ class ClientChatListScreen extends ConsumerWidget {
             SliverPadding(
               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
               sliver: SliverList(
-                delegate: SliverChildBuilderDelegate(
-                  (context, index) {
-                    final chat = chats[index];
-                    return Padding(
-                      padding: const EdgeInsets.only(bottom: 16),
-                      child: ChatTile(
-                        chat: chat,
-                        onTap: () => context.push('${AppRoutes.chat}/${chat.id}'),
-                      ),
-                    );
-                  },
-                  childCount: chats.length,
-                ),
+                delegate: SliverChildBuilderDelegate((context, index) {
+                  final chat = chats[index];
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: 16),
+                    child: ChatTile(
+                      chat: chat,
+                      currentUserId: chatState.currentUserId,
+                      onTap: () => context.push('${AppRoutes.chat}/${chat.id}'),
+                    ),
+                  );
+                }, childCount: chats.length),
               ),
             ),
-            
           const SliverToBoxAdapter(child: SizedBox(height: 100)),
         ],
       ),
     );
   }
 
-  Widget _buildSliverSkeleton(BuildContext context) {
+  Widget _buildSliverSkeleton() {
     return SliverPadding(
       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
       sliver: SliverList(
@@ -137,7 +162,7 @@ class ClientChatListScreen extends ConsumerWidget {
           Icon(Icons.chat_bubble_outline, size: 64, color: theme.disabledColor),
           const SizedBox(height: 16),
           Text(
-            "No conversations yet",
+            'No conversations yet',
             style: theme.textTheme.titleMedium?.copyWith(
               color: theme.disabledColor,
             ),

@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:prokat/features/appstartup/app_mode_storage.dart';
 import 'package:prokat/features/auth/providers/auth_provider.dart';
 import 'package:prokat/features/bookings/state/booking_provider.dart';
 import 'package:prokat/features/categories/providers/category_provider.dart';
@@ -11,15 +12,18 @@ enum AppStartupState { loading, guest, otp, client, owner, error }
 
 final appStartupProvider =
     StateNotifierProvider<AppStartupController, AppStartupState>((ref) {
-      return AppStartupController(ref);
+      return AppStartupController(ref, AppModeStorage());
     });
 
 class AppStartupController extends StateNotifier<AppStartupState> {
   final Ref ref;
+  final AppModeStorage modeStorage;
+  AppMode _currentMode = AppMode.clientMode;
   // bool _initialized = false;
   // bool _isInitializing = false;
 
-  AppStartupController(this.ref) : super(AppStartupState.loading) {
+  AppStartupController(this.ref, this.modeStorage)
+    : super(AppStartupState.loading) {
     Future.microtask(() async {
       // final authState = ref.read(authProvider);
 
@@ -32,11 +36,40 @@ class AppStartupController extends StateNotifier<AppStartupState> {
     });
   }
 
+  AppMode get currentMode => _currentMode;
+  bool get isClientMode => _currentMode == AppMode.clientMode;
+  bool get isOwnerMode => _currentMode == AppMode.ownerMode;
+
   Future<void> reloadApp() async {
     state = await loadAppData();
   }
 
+  Future<AppMode> loadSavedMode() async {
+    final savedMode = await modeStorage.readMode();
+    _currentMode = savedMode ?? AppMode.clientMode;
+    return _currentMode;
+  }
+
+  Future<void> setClientMode() async {
+    await _setMode(AppMode.clientMode);
+  }
+
+  Future<void> setOwnerMode() async {
+    await _setMode(AppMode.ownerMode);
+  }
+
+  Future<void> _setMode(AppMode mode) async {
+    _currentMode = mode;
+    await modeStorage.saveMode(mode);
+
+    if (ref.read(authProvider).session != null) {
+      state = await loadAppData();
+    }
+  }
+
   Future<AppStartupState> loadAppData() async {
+    await loadSavedMode();
+
     /// Fetch profile
     await ref.read(userProfileProvider.notifier).getUserProfile();
 
@@ -71,14 +104,26 @@ class AppStartupController extends StateNotifier<AppStartupState> {
 
     /// Role-based
     if (profile.role?.toLowerCase() == "owner") {
+      if (isOwnerMode) {
+        await Future.wait([
+          ref.read(bookingProvider.notifier).getOwnerBookings(),
+          ref.read(equipmentProvider.notifier).getOwnerEquipment(),
+          ref.read(locationProvider.notifier).getOwnerLocations(),
+        ]);
+
+        return AppStartupState.owner;
+      }
+
       await Future.wait([
-        ref.read(bookingProvider.notifier).getOwnerBookings(),
-        ref.read(equipmentProvider.notifier).getOwnerEquipment(),
-        ref.read(locationProvider.notifier).getOwnerLocations(),
+        ref.read(bookingProvider.notifier).getUserBookings(),
+        ref.read(requestProvider.notifier).getUserRequests(),
       ]);
 
-      return AppStartupState.owner;
+      return AppStartupState.client;
     } else {
+      _currentMode = AppMode.clientMode;
+      await modeStorage.saveMode(_currentMode);
+
       await Future.wait([
         ref.read(bookingProvider.notifier).getUserBookings(),
         ref.read(requestProvider.notifier).getUserRequests(),
@@ -95,6 +140,7 @@ class AppStartupController extends StateNotifier<AppStartupState> {
 
     try {
       final start = DateTime.now();
+      await loadSavedMode();
 
       final elapsed = DateTime.now().difference(start);
       const minDuration = Duration(milliseconds: 800);

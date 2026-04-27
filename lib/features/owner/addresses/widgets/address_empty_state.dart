@@ -11,10 +11,7 @@ class AddressEmptyState extends StatelessWidget {
         children: const [
           Icon(Icons.location_off, size: 64),
           SizedBox(height: 16),
-          Text(
-            "No equipment locations yet",
-            style: TextStyle(fontSize: 16),
-          ),
+          Text("No equipment locations yet", style: TextStyle(fontSize: 16)),
         ],
       ),
     );

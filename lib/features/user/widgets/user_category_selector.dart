@@ -13,8 +13,6 @@ class UserCategorySelector extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final categoriesState = ref.watch(categoriesProvider);
     final userProfileState = ref.read(userProfileProvider.notifier);
-    final accent = Theme.of(context).colorScheme.primary;
-
     final theme = Theme.of(context);
 
     Future<void> onCategorySelected(
@@ -37,19 +35,23 @@ class UserCategorySelector extends ConsumerWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          "Service",
-          style: theme.textTheme.titleLarge?.copyWith(
-            fontWeight: FontWeight.w800,
-            letterSpacing: -0.5,
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 4.0, vertical: 8.0),
+          child: Text(
+            "Explore Services", // More engaging title
+            style: theme.textTheme.titleLarge?.copyWith(
+              fontWeight: FontWeight.w900,
+              letterSpacing: -0.8,
+            ),
           ),
         ),
-
         SizedBox(
-          height: 220,
-          child: ListView.builder(
+          height: 140, // Slightly shorter for better vertical rhythm
+          child: ListView.separated(
             scrollDirection: Axis.horizontal,
             itemCount: categoriesState.categories.length,
+            padding: const EdgeInsets.symmetric(horizontal: 4),
+            separatorBuilder: (context, index) => const SizedBox(width: 12),
             itemBuilder: (context, index) {
               final cat = categoriesState.categories[index];
               final isSelected = categoriesState.selectedCategory?.id == cat.id;
@@ -57,66 +59,88 @@ class UserCategorySelector extends ConsumerWidget {
               return GestureDetector(
                 onTap: () => onCategorySelected(context, cat),
                 child: AnimatedContainer(
-                  duration: const Duration(milliseconds: 200),
-                  width: 160,
-                  margin: const EdgeInsets.fromLTRB(0, 4, 12, 4),
-                  padding: const EdgeInsets.all(8),
+                  duration: const Duration(milliseconds: 250),
+                  curve: Curves.easeOutCubic,
+                  width:
+                      130, // Square-ish look is trendier than long rectangles
                   decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(24),
                     color: theme.cardColor,
-                    borderRadius: BorderRadius.circular(16),
                     border: Border.all(
                       color: isSelected
-                          ? accent.withValues(alpha: 0.3)
-                          : theme.colorScheme.outline.withValues(alpha: 0.3),
+                          ? theme.primaryColor
+                          : Colors.transparent,
+                      width: 2,
                     ),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.3),
-                        blurRadius: 8,
+                        color: isSelected
+                            ? theme.primaryColor.withValues(alpha: 0.2)
+                            : Colors.black.withValues(alpha: 0.04),
+                        blurRadius: 10,
                         offset: const Offset(0, 4),
                       ),
                     ],
                   ),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
+                  child: Stack(
                     children: [
-                      /// IMAGE (RECTANGLE)
-                      AnimatedContainer(
-                        duration: const Duration(milliseconds: 200),
-                        height: 160,
-                        width: double.infinity,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(12),
-                          color: theme.colorScheme.surface,
+                      // 1. Background Image (Lower opacity or contained)
+                      Positioned.fill(
+                        child: Padding(
+                          padding: const EdgeInsets.all(12.0),
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(16),
+                            child:
+                                (cat.imageUrl != null &&
+                                    cat.imageUrl!.isNotEmpty)
+                                ? Image.network(
+                                    cat.imageUrl!,
+                                    fit: BoxFit.contain,
+                                    errorBuilder: (_, _, _) =>
+                                        _fallbackImage(theme),
+                                  )
+                                : _fallbackImage(theme),
+                          ),
                         ),
-                        clipBehavior: Clip.antiAlias,
-                        child:
-                            (cat.imageUrl != null && cat.imageUrl!.isNotEmpty)
-                            ? Image.network(
-                                cat.imageUrl!,
-                                fit: BoxFit.fitWidth,
-                                errorBuilder: (_, _, _) =>
-                                    _fallbackImage(theme),
-                              )
-                            : _fallbackImage(theme),
                       ),
 
-                      const SizedBox(height: 4),
+                      // 2. Subtle Gradient for Text Readability
+                      Align(
+                        alignment: Alignment.bottomCenter,
+                        child: Container(
+                          height: 50,
+                          decoration: BoxDecoration(
+                            borderRadius: const BorderRadius.vertical(
+                              bottom: Radius.circular(24),
+                            ),
+                            gradient: LinearGradient(
+                              begin: Alignment.topCenter,
+                              end: Alignment.bottomCenter,
+                              colors: [
+                                Colors.transparent,
+                                theme.cardColor.withValues(alpha: 0.8),
+                                theme.cardColor,
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
 
-                      /// TEXT BELOW IMAGE
-                      Text(
-                        cat.name,
-                        textAlign: TextAlign.center,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                          color: isSelected
-                              ? accent
-                              : theme.textTheme.bodyMedium?.color?.withValues(
-                                  alpha: 0.9,
-                                ),
+                      // 3. Label Text
+                      Align(
+                        alignment: Alignment.bottomCenter,
+                        child: Padding(
+                          padding: const EdgeInsets.only(bottom: 12.0),
+                          child: Text(
+                            cat.name,
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: isSelected
+                                  ? FontWeight.w800
+                                  : FontWeight.w600,
+                              color: isSelected ? theme.primaryColor : null,
+                            ),
+                          ),
                         ),
                       ),
                     ],

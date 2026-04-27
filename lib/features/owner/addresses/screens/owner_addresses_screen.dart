@@ -13,29 +13,25 @@ class OwnerAddressesScreen extends ConsumerWidget {
     final state = ref.watch(locationProvider);
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("Equipment Locations"),
-      ),
+      appBar: AppBar(title: const Text("Equipment Locations")),
       body: state.isLoading
           ? const Center(child: CircularProgressIndicator())
           : state.ownerLocations.isEmpty
-              ? const AddressEmptyState()
-              : ListView.builder(
-                  itemCount: state.ownerLocations.length,
-                  itemBuilder: (context, index) {
-                    final location = state.ownerLocations[index];
+          ? const AddressEmptyState()
+          : ListView.builder(
+              itemCount: state.ownerLocations.length,
+              itemBuilder: (context, index) {
+                final location = state.ownerLocations[index];
 
-                    return AddressListTile(location: location);
-                  },
-                ),
+                return AddressListTile(location: location);
+              },
+            ),
       floatingActionButton: FloatingActionButton(
         child: const Icon(Icons.add),
         onPressed: () {
           Navigator.push(
             context,
-            MaterialPageRoute(
-              builder: (_) => const OwnerAddressCreateScreen(),
-            ),
+            MaterialPageRoute(builder: (_) => const OwnerAddressCreateScreen()),
           );
         },
       ),

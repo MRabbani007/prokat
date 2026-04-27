@@ -8,7 +8,7 @@ class Env {
     if (kReleaseMode) {
       return "https://prokatbackend.onrender.com";
     }
-    
+
     if (runMode == "remote") {
       return "https://prokatbackend.onrender.com";
     }

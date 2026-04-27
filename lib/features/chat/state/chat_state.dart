@@ -1,41 +1,55 @@
-
 import 'package:prokat/features/chat/state/chat_message_model.dart';
 import 'package:prokat/features/chat/state/chat_model.dart';
 
 class ChatState {
-  final bool isLoading;
+  static const _unset = Object();
+
+  final bool isLoadingConversations;
+  final bool isLoadingMessages;
+  final bool isSendingMessage;
   final String? error;
-
-  /// conversation list
   final List<ChatModel> conversations;
-
-  /// current chat
   final ChatModel? currentChat;
-
-  /// messages of current chat
   final List<ChatMessageModel> messages;
+  final String? currentUserId;
 
-  ChatState({
-    this.isLoading = false,
+  const ChatState({
+    this.isLoadingConversations = false,
+    this.isLoadingMessages = false,
+    this.isSendingMessage = false,
     this.error,
     this.conversations = const [],
     this.currentChat,
     this.messages = const [],
+    this.currentUserId,
   });
 
   ChatState copyWith({
-    bool? isLoading,
-    String? error,
+    bool? isLoadingConversations,
+    bool? isLoadingMessages,
+    bool? isSendingMessage,
+    Object? error = _unset,
     List<ChatModel>? conversations,
-    ChatModel? currentChat,
-    List<ChatMessageModel>? messages,
+    Object? currentChat = _unset,
+    Object? messages = _unset,
+    Object? currentUserId = _unset,
   }) {
     return ChatState(
-      isLoading: isLoading ?? this.isLoading,
-      error: error,
+      isLoadingConversations:
+          isLoadingConversations ?? this.isLoadingConversations,
+      isLoadingMessages: isLoadingMessages ?? this.isLoadingMessages,
+      isSendingMessage: isSendingMessage ?? this.isSendingMessage,
+      error: identical(error, _unset) ? this.error : error as String?,
       conversations: conversations ?? this.conversations,
-      currentChat: currentChat ?? this.currentChat,
-      messages: messages ?? this.messages,
+      currentChat: identical(currentChat, _unset)
+          ? this.currentChat
+          : currentChat as ChatModel?,
+      messages: identical(messages, _unset)
+          ? this.messages
+          : messages as List<ChatMessageModel>,
+      currentUserId: identical(currentUserId, _unset)
+          ? this.currentUserId
+          : currentUserId as String?,
     );
   }
 }

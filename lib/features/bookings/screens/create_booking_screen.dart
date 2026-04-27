@@ -147,7 +147,7 @@ class _CreateBookingScreenState extends ConsumerState<CreateBookingScreen> {
                                 ),
                               ),
 
-                          const SizedBox(width: 8),
+                              const SizedBox(width: 8),
 
                               Column(
                                 mainAxisAlignment: MainAxisAlignment.start,

@@ -9,10 +9,17 @@ class CategoryIcon extends StatelessWidget {
     // Logic to pick icon based on category string
     IconData iconData;
     switch (category.toUpperCase()) {
-      case 'EXCAVATION': iconData = Icons.agriculture_rounded; break;
-      case 'LOGISTICS': iconData = Icons.local_shipping_rounded; break;
-      case 'LIFTING': iconData = Icons.precision_manufacturing_rounded; break;
-      default: iconData = Icons.construction_rounded;
+      case 'EXCAVATION':
+        iconData = Icons.agriculture_rounded;
+        break;
+      case 'LOGISTICS':
+        iconData = Icons.local_shipping_rounded;
+        break;
+      case 'LIFTING':
+        iconData = Icons.precision_manufacturing_rounded;
+        break;
+      default:
+        iconData = Icons.construction_rounded;
     }
 
     return Container(
@@ -21,7 +28,9 @@ class CategoryIcon extends StatelessWidget {
         color: Colors.black.withValues(alpha: 0.3), // Deep recessed look
         borderRadius: BorderRadius.circular(14), // Matches small item radius
         border: Border.all(
-          color: const Color(0xFF4E73DF).withValues(alpha: 0.2), // Faint blue glow
+          color: const Color(
+            0xFF4E73DF,
+          ).withValues(alpha: 0.2), // Faint blue glow
           width: 1,
         ),
       ),

@@ -56,142 +56,136 @@ class _RenterRequestsScreenState extends ConsumerState<RenterRequestsScreen> {
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
-      body: SafeArea(
-        child: CustomScrollView(
-          slivers: [
-            SliverAppBar(
-              automaticallyImplyLeading: false,
-              expandedHeight: 60, // Adjust height as needed
-              floating: true, // AppBar reappears immediately when scrolling up
-              pinned: true,
-              backgroundColor: theme.colorScheme.primary,
-              leading: IconButton(
+      body: CustomScrollView(
+        slivers: [
+          SliverAppBar(
+            automaticallyImplyLeading: false,
+            expandedHeight: 60, // Adjust height as needed
+            floating: true, // AppBar reappears immediately when scrolling up
+            pinned: true,
+            backgroundColor: theme.colorScheme.primary,
+            leading: IconButton(
+              icon: Icon(
+                Icons.arrow_back_ios_new_rounded,
+                size: 20,
+                color: theme.colorScheme.onPrimary,
+              ),
+              onPressed: () => context.pop(),
+            ),
+            title: Text(
+              "My Requests",
+              style: theme.textTheme.titleLarge?.copyWith(
+                color: theme.colorScheme.onPrimary,
+              ),
+            ),
+            actions: [
+              IconButton(
+                onPressed: () => authSession == null
+                    ? null
+                    : context.push(AppRoutes.createRequest),
                 icon: Icon(
-                  Icons.arrow_back_ios_new_rounded,
-                  size: 20,
+                  Icons.add,
                   color: theme.colorScheme.onPrimary,
+                  size: 24,
                 ),
-                onPressed: () => context.pop(),
+                tooltip: "Create Request",
               ),
-              title: Text(
-                "My Requests",
-                style: theme.textTheme.titleLarge?.copyWith(
-                  color: theme.colorScheme.onPrimary,
+              // IconButton(
+              //   onPressed: () => authSession == null
+              //       ? null
+              //       : context.push(AppRoutes.clientRequestHistory),
+              //   icon: Icon(
+              //     Icons.history_toggle_off_rounded,
+              //     color: theme.colorScheme.onPrimary.withValues(alpha: 0.7),
+              //     size: 24,
+              //   ),
+              //   tooltip: "Requests History",
+              // ),
+            ],
+            actionsPadding: EdgeInsets.only(right: 12),
+          ),
+
+          if (authSession == null)
+            _buildCenteredFallback(
+              icon: Icons.login_outlined,
+              message: "Login to create and view requests",
+            )
+          else if (state.isLoading)
+            const SliverFillRemaining(
+              child: Center(child: CircularProgressIndicator()),
+            )
+          else if (state.error != null)
+            _buildCenteredFallback(
+              icon: Icons.error_outline,
+              message: "Error: ${state.error}",
+            )
+          else if (active.isEmpty)
+            _buildCenteredFallback(
+              icon: Icons.description_outlined,
+              message: "No requests found",
+            )
+          else
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(24, 24, 24, 12),
+                child: Text(
+                  "ACTIVE REQUESTS",
+                  style: theme.textTheme.labelMedium,
                 ),
               ),
-              actions: [
-                IconButton(
+            ),
+
+          SliverPadding(
+            padding: const EdgeInsets.symmetric(horizontal: 24),
+            sliver: SliverList(
+              delegate: SliverChildBuilderDelegate((context, index) {
+                final r = active[index];
+                final requestOffers = offersByRequest[r.id] ?? [];
+                return Padding(
+                  padding: const EdgeInsets.only(bottom: 12),
+                  child: RequestWithOffers(
+                    request: r,
+                    offers: requestOffers,
+                    onCancel: () =>
+                        ref.read(requestProvider.notifier).cancelRequest(r.id),
+                  ),
+                );
+              }, childCount: active.length),
+            ),
+          ),
+
+          SliverPadding(
+            padding: const EdgeInsets.fromLTRB(20, 16, 20, 12),
+            sliver: SliverToBoxAdapter(
+              // Add this wrapper
+              child: SizedBox(
+                width: double.infinity,
+                height: 56,
+                child: ElevatedButton.icon(
                   onPressed: () => authSession == null
                       ? null
                       : context.push(AppRoutes.createRequest),
-                  icon: Icon(
-                    Icons.add,
-                    color: theme.colorScheme.onPrimary,
-                    size: 24,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: theme.primaryColor,
+                    foregroundColor: theme.colorScheme.onPrimary,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    elevation: 0,
                   ),
-                  tooltip: "Create Request",
-                ),
-                // IconButton(
-                //   onPressed: () => authSession == null
-                //       ? null
-                //       : context.push(AppRoutes.clientRequestHistory),
-                //   icon: Icon(
-                //     Icons.history_toggle_off_rounded,
-                //     color: theme.colorScheme.onPrimary.withValues(alpha: 0.7),
-                //     size: 24,
-                //   ),
-                //   tooltip: "Requests History",
-                // ),
-              ],
-              actionsPadding: EdgeInsets.only(right: 12),
-            ),
-
-            if (authSession == null)
-              _buildCenteredFallback(
-                icon: Icons.login_outlined,
-                message: "Login to create and view requests",
-              )
-            else if (state.isLoading)
-              const SliverFillRemaining(
-                child: Center(child: CircularProgressIndicator()),
-              )
-            else if (state.error != null)
-              _buildCenteredFallback(
-                icon: Icons.error_outline,
-                message: "Error: ${state.error}",
-              )
-            else if (active.isEmpty)
-              _buildCenteredFallback(
-                icon: Icons.description_outlined,
-                message: "No requests found",
-              )
-            else
-              SliverToBoxAdapter(
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(24, 24, 24, 12),
-                  child: Text(
-                    "ACTIVE REQUESTS",
-                    style: theme.textTheme.labelMedium,
-                  ),
-                ),
-              ),
-
-            SliverPadding(
-              padding: const EdgeInsets.symmetric(horizontal: 24),
-              sliver: SliverList(
-                delegate: SliverChildBuilderDelegate((context, index) {
-                  final r = active[index];
-                  final requestOffers = offersByRequest[r.id] ?? [];
-                  return Padding(
-                    padding: const EdgeInsets.only(bottom: 12),
-                    child: RequestWithOffers(
-                      request: r,
-                      offers: requestOffers,
-                      onCancel: () => ref
-                          .read(requestProvider.notifier)
-                          .cancelRequest(r.id),
-                    ),
-                  );
-                }, childCount: active.length),
-              ),
-            ),
-
-            SliverPadding(
-              padding: const EdgeInsets.fromLTRB(20, 16, 20, 12),
-              sliver: SliverToBoxAdapter(
-                // Add this wrapper
-                child: SizedBox(
-                  width: double.infinity,
-                  height: 56,
-                  child: ElevatedButton.icon(
-                    onPressed: () => authSession == null
-                        ? null
-                        : context.push(AppRoutes.createRequest),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: theme.primaryColor,
-                      foregroundColor: theme.colorScheme.onPrimary,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                      elevation: 0,
-                    ),
-                    icon: const Icon(
-                      Icons.add,
-                      size: 26,
-                    ),
-                    label: const Text(
-                      "CREATE A NEW REQUEST",
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        letterSpacing: 1.1,
-                      ),
+                  icon: const Icon(Icons.add, size: 26),
+                  label: const Text(
+                    "CREATE A NEW REQUEST",
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: 1.1,
                     ),
                   ),
                 ),
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

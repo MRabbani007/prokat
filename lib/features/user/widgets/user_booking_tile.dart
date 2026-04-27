@@ -1,16 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
-import 'package:prokat/core/router/app_routes.dart';
 import 'package:prokat/core/utils/format.dart';
 import 'package:prokat/features/bookings/models/booking_model.dart';
-import 'package:go_router/go_router.dart';
 import 'package:prokat/features/bookings/models/booking_status.dart';
 import 'package:prokat/features/bookings/state/booking_provider.dart';
 import 'package:prokat/features/bookings/widgets/booking_status_badge.dart';
 import 'package:prokat/features/bookings/widgets/cancel_booking_sheet.dart';
 import 'package:prokat/features/bookings/widgets/owner_booking_tile.dart';
 import 'package:prokat/features/bookings/widgets/show_location_sheet.dart';
+import 'package:prokat/features/chat/utils/chat_navigation.dart';
 
 class UserBookingTile extends ConsumerWidget {
   final BookingModel booking;
@@ -146,7 +145,8 @@ class UserBookingTile extends ConsumerWidget {
                       child: InfoTile(
                         label: 'Location',
                         value: booking.location.street,
-                        onTap: () => showLocationSheet(context, booking.location),
+                        onTap: () =>
+                            showLocationSheet(context, booking.location),
                       ),
                     ),
                     const SizedBox(width: 12),
@@ -202,20 +202,12 @@ class UserBookingTile extends ConsumerWidget {
                   children: [
                     Expanded(
                       child: _actionButton(Icons.chat, Colors.green, () async {
-                        // final notifier = ref.read(chatProvider.notifier);
-
-                        // final chatId = await notifier.getChatId(
-                        //   bookingId: booking.id,
-                        //   // OR requestId: request.id
-                        // );
-
-                        // if (chatId != null) {
-                        // context.push('${AppRoutes.chat}/${booking.id}');
-                        // } else {
-                        // optional: show error/snackbar
-                        // }
-
-                        context.push('${AppRoutes.chat}?${booking.id}');
+                        await openChatFromLink(
+                          context: context,
+                          ref: ref,
+                          isOwner: false,
+                          bookingId: booking.id,
+                        );
                       }),
                     ),
 

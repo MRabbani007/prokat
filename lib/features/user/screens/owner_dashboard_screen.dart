@@ -35,6 +35,8 @@ class _OwnerDashboardScreenState extends ConsumerState<OwnerDashboardScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     final activeRequests = ref
         .watch(requestProvider)
         .ownerRequests
@@ -60,9 +62,10 @@ class _OwnerDashboardScreenState extends ConsumerState<OwnerDashboardScreen> {
     final activeOrdersCount = upcomingJobs.length + pendingJobs.length;
 
     return Scaffold(
+      backgroundColor: theme.scaffoldBackgroundColor,
       body: CustomScrollView(
         slivers: [
-          SliverToBoxAdapter(child: OwnerDashboardHeader()),
+          const SliverToBoxAdapter(child: OwnerDashboardHeader()),
 
           SliverPadding(
             padding: const EdgeInsets.all(24),

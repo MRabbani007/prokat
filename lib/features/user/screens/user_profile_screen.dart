@@ -32,6 +32,7 @@ class _UserProfileScreenState extends ConsumerState<UserProfileScreen> {
     final theme = Theme.of(context);
     final state = ref.watch(userProfileProvider);
     final profileNotifier = ref.read(userProfileProvider.notifier);
+    final topInset = MediaQuery.of(context).padding.top;
 
     final username = state.userProfile?.username;
 
@@ -39,42 +40,61 @@ class _UserProfileScreenState extends ConsumerState<UserProfileScreen> {
       backgroundColor: theme.scaffoldBackgroundColor,
       body: CustomScrollView(
         slivers: [
-          SliverAppBar(
-            expandedHeight: 180.0,
-            automaticallyImplyLeading: false,
-            leading: IconButton(
-              icon: Icon(
-                Icons.arrow_back_ios_new_rounded,
-                size: 20,
-                color: theme.colorScheme.onPrimary,
-              ),
-              onPressed: () => context.pop(),
-            ),
-            pinned: false,
-            stretch: true,
-            flexibleSpace: FlexibleSpaceBar(
-              background: Container(
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: [
-                      theme.colorScheme.primary,
-                      theme.colorScheme.primary.withValues(alpha: 0.7),
-                    ],
+          // SliverAppBar(
+          //   expandedHeight: 180.0,
+          //   automaticallyImplyLeading: false,
+          // leading: IconButton(
+          //   icon: Icon(
+          //     Icons.arrow_back_ios_new_rounded,
+          //     size: 20,
+          //     color: theme.colorScheme.onPrimary,
+          //   ),
+          //   onPressed: () => context.pop(),
+          // ),
+          //   pinned: false,
+          //   stretch: true,
+          //   flexibleSpace: FlexibleSpaceBar(
+          //     background: Container(
+          //       decoration: BoxDecoration(
+          //         gradient: LinearGradient(
+          //           begin: Alignment.topLeft,
+          //           end: Alignment.bottomRight,
+          //           colors: [
+          //             theme.colorScheme.primary,
+          //             theme.colorScheme.primary.withValues(alpha: 0.7),
+          //           ],
+          //         ),
+          //       ),
+          //       child: SafeArea(
+          //         child: ,
+          //       ),
+          //     ),
+          //   ),
+          // ),
+          SliverToBoxAdapter(
+            child: Container(
+              decoration: BoxDecoration(color: theme.primaryColor),
+              padding: EdgeInsets.fromLTRB(20, topInset + 20, 20, 20),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  IconButton(
+                    icon: Icon(
+                      Icons.arrow_back_ios_new_rounded,
+                      size: 20,
+                      color: theme.colorScheme.onPrimary,
+                    ),
+                    onPressed: () => context.pop(),
                   ),
-                ),
-                child: SafeArea(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 24.0),
+
+                  const SizedBox(width: 20),
+
+                  Expanded(
                     child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        // Profile Image Stack
                         ProfileImagePicker(
                           onImageSelected: (file) async {
-                            print("image selected");
                             if (file != null) {
                               await profileNotifier.uploadProfileImage(file);
                             }
@@ -87,11 +107,53 @@ class _UserProfileScreenState extends ConsumerState<UserProfileScreen> {
                         // Name and Rating Info
                         // Note: Ensure _buildProfileInfo uses theme.colorScheme.onPrimary
                         // for text colors to be readable against the gradient.
-                        _buildProfileInfo(context, state),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const DisplayName(),
+                            Row(
+                              children: [
+                                const Icon(
+                                  Icons.star_rate_rounded,
+                                  size: 30,
+                                  color: Colors.amber,
+                                ),
+                                const SizedBox(width: 6),
+                                Text(
+                                  (state.userProfile?.ratingStars ?? 0)
+                                      .toStringAsFixed(1),
+                                  style: theme.textTheme.bodyMedium?.copyWith(
+                                    color: theme.colorScheme.onPrimary,
+                                  ),
+                                ),
+
+                                const SizedBox(width: 8),
+                                Text(
+                                  "- 2 Orders",
+                                  style: theme.textTheme.labelMedium?.copyWith(
+                                    fontWeight: FontWeight.w400,
+                                    color: theme.colorScheme.onPrimary
+                                        .withValues(alpha: 0.5),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            // if (state.userProfile?.createdAt != null)
+                            //   Text(
+                            //     "Member since ${DateFormat('MMMM yyyy').format(state.userProfile!.createdAt!)}",
+                            //     style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                            //       color: theme.colorScheme.onPrimary.withValues(alpha: 0.6),
+                            //     ),
+                            //   ),
+                          ],
+                        ),
                       ],
                     ),
                   ),
-                ),
+
+                  // Profile Image Stack
+                ],
               ),
             ),
           ),
@@ -182,46 +244,6 @@ class _UserProfileScreenState extends ConsumerState<UserProfileScreen> {
           ),
         ],
       ),
-    );
-  }
-
-  Widget _buildProfileInfo(BuildContext context, dynamic state) {
-    final theme = Theme.of(context);
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        const DisplayName(),
-        Row(
-          children: [
-            const Icon(Icons.star_rate_rounded, size: 30, color: Colors.amber),
-            const SizedBox(width: 6),
-            Text(
-              (state.userProfile?.ratingStars ?? 0).toStringAsFixed(1),
-              style: theme.textTheme.bodyMedium?.copyWith(
-                color: theme.colorScheme.onPrimary,
-              ),
-            ),
-
-            const SizedBox(width: 8),
-            Text(
-              "- 2 Orders",
-              style: theme.textTheme.labelMedium?.copyWith(
-                fontWeight: FontWeight.w400,
-                color: theme.colorScheme.onPrimary.withValues(alpha: 0.5),
-              ),
-            ),
-          ],
-        ),
-        // if (state.userProfile?.createdAt != null)
-        //   Text(
-        //     "Member since ${DateFormat('MMMM yyyy').format(state.userProfile!.createdAt!)}",
-        //     style: Theme.of(context).textTheme.bodySmall?.copyWith(
-        //       color: theme.colorScheme.onPrimary.withValues(alpha: 0.6),
-        //     ),
-        //   ),
-      ],
     );
   }
 }

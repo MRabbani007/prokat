@@ -54,6 +54,10 @@ class _LaunchScreenState extends State<LaunchScreen>
 
   @override
   void dispose() {
+    SystemChrome.setEnabledSystemUIMode(
+      SystemUiMode.manual,
+      overlays: SystemUiOverlay.values,
+    );
     _controller.dispose();
     super.dispose();
   }
@@ -183,13 +187,17 @@ class _LaunchScreenState extends State<LaunchScreen>
                       'INITIALIZING SYSTEMS...',
                       style: textTheme.labelSmall?.copyWith(
                         letterSpacing: 1.5,
-                        color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
+                        color: theme.colorScheme.onSurface.withValues(
+                          alpha: 0.5,
+                        ),
                       ),
                     ),
                     Text(
                       'v1.0.4', // Small detail makes it feel "real"
                       style: textTheme.labelMedium?.copyWith(
-                        color: theme.colorScheme.onSurface.withValues(alpha: 0.4),
+                        color: theme.colorScheme.onSurface.withValues(
+                          alpha: 0.4,
+                        ),
                       ),
                     ),
                   ],

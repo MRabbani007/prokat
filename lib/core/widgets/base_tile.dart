@@ -26,14 +26,12 @@ class BaseTile extends StatelessWidget {
         color: theme.cardColor,
         borderRadius: BorderRadius.circular(borderRadius),
         border: Border.all(
-          color: (color ?? theme.colorScheme.outline).withValues(
-            alpha: 0.2,
-          ),
+          color: (color ?? theme.colorScheme.outline).withValues(alpha: 0.2),
         ),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.15),
-            blurRadius:4,
+            blurRadius: 4,
             offset: const Offset(0, 3),
           ),
         ],

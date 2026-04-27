@@ -38,14 +38,13 @@ class MapAddressPreview extends StatelessWidget {
                   children: [
                     Text(
                       address!.street,
-                      style: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                      ),
+                      style: const TextStyle(fontWeight: FontWeight.bold),
                     ),
                     Text(
-                      [address!.city, address!.country]
-                          .where((e) => e != null && e.isNotEmpty)
-                          .join(", "),
+                      [
+                        address!.city,
+                        address!.country,
+                      ].where((e) => e != null && e.isNotEmpty).join(", "),
                     ),
                   ],
                 ),
@@ -58,7 +57,7 @@ class MapAddressPreview extends StatelessWidget {
                   onPressed: address == null ? null : onConfirm,
                   child: const Text("Confirm Location"),
                 ),
-              )
+              ),
             ],
           ),
         ),

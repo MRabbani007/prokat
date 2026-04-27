@@ -83,6 +83,10 @@ String formatPrice(dynamic price) {
 }
 
 String getPriceRate(dynamic priceRate) {
+  if (priceRate == null || priceRate.toString().isEmpty) {
+    return "";
+  }
+
   final temp = priceRate.toString().trim().replaceAll(" ", "_").toUpperCase();
 
   return temp == "PER_TRIP"

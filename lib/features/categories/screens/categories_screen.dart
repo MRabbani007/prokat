@@ -118,9 +118,7 @@ class _ServiceCard extends StatelessWidget {
       borderRadius: BorderRadius.circular(24),
       child: Container(
         decoration: BoxDecoration(
-          color: isSelected
-              ? accentColor.withValues(alpha: 0.15)
-              : cardColor,
+          color: isSelected ? accentColor.withValues(alpha: 0.15) : cardColor,
           borderRadius: BorderRadius.circular(24),
           border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
           boxShadow: [

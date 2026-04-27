@@ -73,7 +73,11 @@ class _SearchBoxState extends State<SearchBox> {
           hintStyle: theme.textTheme.bodyMedium?.copyWith(
             color: theme.colorScheme.onSurfaceVariant,
           ),
-          icon: Icon(Icons.tune_rounded, size: 20, color: theme.colorScheme.primary),
+          icon: Icon(
+            Icons.tune_rounded,
+            size: 20,
+            color: theme.colorScheme.primary,
+          ),
           suffixIcon: IconButton(
             icon: const Icon(Icons.arrow_forward),
             onPressed: () => _updateFilters({"query": _searchController.text}),

@@ -32,7 +32,7 @@ class LogoTile extends StatelessWidget {
             children: [
               RichText(
                 text: TextSpan(
-                  style: theme.textTheme.displayLarge, 
+                  style: theme.textTheme.displayLarge,
                   // TextStyle(
                   //   fontSize: 22,
                   //   fontWeight: FontWeight.w800,

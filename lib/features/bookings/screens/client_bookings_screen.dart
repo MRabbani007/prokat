@@ -42,123 +42,126 @@ class ClientBookingsScreenState extends ConsumerState<ClientBookingsScreen>
     final authSession = ref.watch(authProvider).session;
     final bookingState = ref.watch(bookingProvider);
 
+    print("client_orders");
+    print(bookingState.bookings.length);
+
     final upcoming = bookingState.bookings
-        .where((b) => b.status == "CREATED" || b.status == "CONFIRMED")
+        .where(
+          (b) =>
+              b.status.toUpperCase() == "CREATED" ||
+              b.status.toUpperCase() == "CONFIRMED",
+        )
         .toList();
 
     final draft = bookingState.bookings
-        .where((b) => b.status == "DRAFT")
+        .where((b) => b.status.toUpperCase() == "DRAFT")
         .toList();
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
-      body: SafeArea(
-        child: CustomScrollView(
-          slivers: [
-            SliverAppBar(
-              automaticallyImplyLeading: false,
-              expandedHeight: 60, // Adjust height as needed
-              floating: true, // AppBar reappears immediately when scrolling up
-              pinned: false, // AppBar hides completely when scrolling down
-              backgroundColor: theme.colorScheme.primary,
-              leading: IconButton(
-                icon: Icon(
-                  Icons.arrow_back_ios_new_rounded,
-                  size: 20,
-                  color: theme.colorScheme.onPrimary,
-                ),
-                onPressed: () => context.pop(),
+      body: CustomScrollView(
+        slivers: [
+          SliverAppBar(
+            automaticallyImplyLeading: false,
+            expandedHeight: 60, // Adjust height as needed
+            floating: true, // AppBar reappears immediately when scrolling up
+            pinned: false, // AppBar hides completely when scrolling down
+            backgroundColor: theme.colorScheme.primary,
+            leading: IconButton(
+              icon: Icon(
+                Icons.arrow_back_ios_new_rounded,
+                size: 20,
+                color: theme.colorScheme.onPrimary,
               ),
-              title: Text(
-                "My Orders",
-                style: theme.textTheme.titleLarge?.copyWith(
-                  color: theme.colorScheme.onPrimary,
-                ),
-              ),
-              centerTitle: false,
-              actions: [
-                IconButton(
-                  onPressed: () => context.push(
-                    "${AppRoutes.clientOrders}${AppRoutes.clientOrdersHistory}",
-                  ),
-                  icon: Icon(
-                    Icons.history,
-                    color: theme.colorScheme.onPrimary,
-                    size: 24,
-                  ),
-                  tooltip: "Order History",
-                ),
-              ],
+              onPressed: () => context.pop(),
             ),
-
-            // 1. High-Priority Draft Card (Refined Orange)
-            if (draft.isNotEmpty)
-              SliverToBoxAdapter(
-                child: _EnhancedDraftCard(booking: draft.first),
+            title: Text(
+              "My Orders",
+              style: theme.textTheme.titleLarge?.copyWith(
+                color: theme.colorScheme.onPrimary,
               ),
+            ),
+            centerTitle: false,
+            actions: [
+              IconButton(
+                onPressed: () => context.push(
+                  "${AppRoutes.clientOrders}${AppRoutes.clientOrdersHistory}",
+                ),
+                icon: Icon(
+                  Icons.history,
+                  color: theme.colorScheme.onPrimary,
+                  size: 24,
+                ),
+                tooltip: "Order History",
+              ),
+            ],
+          ),
 
-            // 1. Remove Expanded - Slivers don't work inside it
-            authSession == null
-                ? SliverFillRemaining(
-                    // Fills the rest of the screen to center content
-                    hasScrollBody: false,
-                    child: Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(
-                            Icons.login_outlined,
-                            size: 64,
-                            color: Colors.white.withValues(alpha: 0.2),
+          // 1. High-Priority Draft Card (Refined Orange)
+          if (draft.isNotEmpty)
+            SliverToBoxAdapter(child: _EnhancedDraftCard(booking: draft.first)),
+
+          // 1. Remove Expanded - Slivers don't work inside it
+          authSession == null
+              ? SliverFillRemaining(
+                  // Fills the rest of the screen to center content
+                  hasScrollBody: false,
+                  child: Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.login_outlined,
+                          size: 64,
+                          color: Colors.white.withValues(alpha: 0.2),
+                        ),
+                        const SizedBox(height: 16),
+                        Text(
+                          "Login to create and view bookings",
+                          style: TextStyle(
+                            color: Colors.white.withValues(alpha: 0.70),
                           ),
-                          const SizedBox(height: 16),
-                          Text(
-                            "Login to create and view bookings",
-                            style: TextStyle(
-                              color: Colors.white.withValues(alpha: 0.70),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  )
-                : upcoming.isEmpty
-                ? SliverFillRemaining(
-                    hasScrollBody: false,
-                    child: Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(
-                            Icons.inventory_2_outlined,
-                            size: 48,
-                            color: Colors.white.withValues(alpha: 0.05),
-                          ),
-                          const SizedBox(height: 16),
-                          Text(
-                            'No bookings found',
-                            style: TextStyle(
-                              color: Colors.white.withValues(alpha: 0.2),
-                              fontSize: 14,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  )
-                : SliverPadding(
-                    padding: const EdgeInsets.fromLTRB(20, 10, 20, 20),
-                    sliver: SliverList.separated(
-                      itemCount: upcoming.length,
-                      separatorBuilder: (_, _) => const SizedBox(height: 12),
-                      itemBuilder: (context, index) {
-                        final booking = upcoming[index];
-                        return BookingCard(booking: booking);
-                      },
+                        ),
+                      ],
                     ),
                   ),
-          ],
-        ),
+                )
+              : upcoming.isEmpty
+              ? SliverFillRemaining(
+                  hasScrollBody: false,
+                  child: Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.inventory_2_outlined,
+                          size: 48,
+                          color: Colors.white.withValues(alpha: 0.05),
+                        ),
+                        const SizedBox(height: 16),
+                        Text(
+                          'No bookings found',
+                          style: TextStyle(
+                            color: Colors.white.withValues(alpha: 0.2),
+                            fontSize: 14,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                )
+              : SliverPadding(
+                  padding: const EdgeInsets.fromLTRB(20, 10, 20, 20),
+                  sliver: SliverList.separated(
+                    itemCount: upcoming.length,
+                    separatorBuilder: (_, _) => const SizedBox(height: 12),
+                    itemBuilder: (context, index) {
+                      final booking = upcoming[index];
+                      return BookingCard(booking: booking);
+                    },
+                  ),
+                ),
+        ],
       ),
     );
   }

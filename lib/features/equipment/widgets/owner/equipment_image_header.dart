@@ -21,7 +21,7 @@ class EquipmentImageHeader extends StatelessWidget {
       children: [
         AspectRatio(
           aspectRatio: 16 / 9,
-          child: displayUrl.isNotEmpty 
+          child: displayUrl.isNotEmpty
               ? CachedNetworkImage(
                   imageUrl: displayUrl,
                   fit: BoxFit.cover,

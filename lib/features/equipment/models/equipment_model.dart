@@ -15,7 +15,7 @@ class Equipment {
   final String capacityUnit;
 
   final String? ownerComment;
-  final String rentCondition;
+  final String? rentCondition;
 
   final String status;
   final bool isVisible;
@@ -41,8 +41,10 @@ class Equipment {
 
     required this.capacity,
     required this.capacityUnit,
+
     this.ownerComment,
-    required this.rentCondition,
+    this.rentCondition,
+
     required this.status,
     this.imageUrl,
     required this.isVisible,
@@ -107,7 +109,7 @@ class Equipment {
         capacity: json["capacity"].toString(),
         capacityUnit: json["capacityUnit"]?.toString() ?? '',
 
-        ownerComment: json["ownerComment"],
+        ownerComment: json["ownerComment"] ?? "",
         rentCondition: json["rentCondition"],
 
         status: json["status"],
@@ -118,11 +120,11 @@ class Equipment {
 
         imageUrl: json["imageUrl"] as String?,
 
-        isVisible: json["isVisible"],
+        isVisible: parseBoolean(json["isVisible"]),
 
         owner: json["owner"] != null ? User.fromJson(json["owner"]) : null,
 
-        city: json["city"],
+        city: json["city"] ?? "",
         location: json['location'] != null
             ? EquipmentLocation.fromJson(json['location'])
             : null,

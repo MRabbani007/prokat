@@ -163,14 +163,10 @@ class _EquipmentListScreenState extends ConsumerState<EquipmentListScreen> {
 
             SliverToBoxAdapter(
               child: Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 24,
-                  vertical: 24,
-                ),
+                padding: const EdgeInsets.fromLTRB(24, 24, 24, 0),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // UserLocationTile(),
                     SearchBox(),
 
                     const SizedBox(height: 24),

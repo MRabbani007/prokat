@@ -4,10 +4,7 @@ import 'package:prokat/features/locations/models/location_model.dart';
 class AddressListTile extends StatelessWidget {
   final LocationModel location;
 
-  const AddressListTile({
-    super.key,
-    required this.location,
-  });
+  const AddressListTile({super.key, required this.location});
 
   @override
   Widget build(BuildContext context) {

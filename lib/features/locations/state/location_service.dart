@@ -25,9 +25,7 @@ class LocationService {
 
   Future<List<LocationModel>> getOwnerLocations({String? mode}) async {
     try {
-      final response = await _dio.get(
-        ApiRoutes.ownerLocations,
-      );
+      final response = await _dio.get(ApiRoutes.ownerLocations);
 
       return (response.data["data"] as List)
           .map((e) => LocationModel.fromJson(e))

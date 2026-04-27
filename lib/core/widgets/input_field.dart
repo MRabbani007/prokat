@@ -68,12 +68,10 @@ class InputField extends StatelessWidget {
                   decoration: InputDecoration(
                     hintText: hint,
                     hintStyle: theme.textTheme.bodyMedium?.copyWith(
-                      color:
-                          colorScheme.onSurface.withValues(alpha: 0.3),
+                      color: colorScheme.onSurface.withValues(alpha: 0.3),
                     ),
                     isDense: true,
-                    contentPadding:
-                        const EdgeInsets.symmetric(vertical: 8),
+                    contentPadding: const EdgeInsets.symmetric(vertical: 8),
                     border: InputBorder.none,
                     errorStyle: theme.textTheme.labelSmall?.copyWith(
                       color: colorScheme.error,

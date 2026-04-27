@@ -6,7 +6,7 @@ import 'package:prokat/features/categories/state/categories_state.dart';
 class CategoriesNotifier extends StateNotifier<CategoryState> {
   final CategoryService service;
 
-  CategoriesNotifier(this.service) : super(CategoryState()){
+  CategoriesNotifier(this.service) : super(CategoryState()) {
     // getCategories();
   }
 
@@ -14,7 +14,7 @@ class CategoriesNotifier extends StateNotifier<CategoryState> {
     state = state.copyWith(selectedCategory: category, showSelect: false);
   }
 
-  void clearCategory(){
+  void clearCategory() {
     state = state.copyWith(showSelect: true);
   }
 

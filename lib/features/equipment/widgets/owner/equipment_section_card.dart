@@ -4,8 +4,8 @@ class EquipmentSectionCard extends StatelessWidget {
   final String title;
   final List<Widget> children;
   final VoidCallback? onAction; // Renamed from onEdit for flexibility
-  final IconData actionIcon;     // Custom icon (edit or add)
-  final bool isActionEnabled;   // Controls the button state
+  final IconData actionIcon; // Custom icon (edit or add)
+  final bool isActionEnabled; // Controls the button state
 
   const EquipmentSectionCard({
     super.key,
@@ -13,7 +13,7 @@ class EquipmentSectionCard extends StatelessWidget {
     required this.children,
     this.onAction,
     this.actionIcon = Icons.edit_rounded, // Defaults to edit
-    this.isActionEnabled = true,          // Defaults to enabled
+    this.isActionEnabled = true, // Defaults to enabled
   });
 
   @override
@@ -36,9 +36,9 @@ class EquipmentSectionCard extends StatelessWidget {
                 Text(
                   title,
                   style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
-                        letterSpacing: 0.5,
-                      ),
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: 0.5,
+                  ),
                 ),
                 // Adaptive Action Button
                 IconButton.filledTonal(
@@ -46,7 +46,9 @@ class EquipmentSectionCard extends StatelessWidget {
                   // Button is visually disabled if isActionEnabled is false or onAction is null
                   onPressed: isActionEnabled ? onAction : null,
                   style: IconButton.styleFrom(
-                    disabledBackgroundColor: Theme.of(context).colorScheme.surfaceDim.withAlpha(10),
+                    disabledBackgroundColor: Theme.of(
+                      context,
+                    ).colorScheme.surfaceDim.withAlpha(10),
                   ),
                 ),
               ],

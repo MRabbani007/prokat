@@ -9,8 +9,9 @@ final locationApiProvider = Provider<LocationService>((ref) {
   return LocationService(apiClient);
 });
 
-final locationProvider =
-    StateNotifierProvider<LocationNotifier, LocationState>((ref) {
-  final api = ref.read(locationApiProvider);
-  return LocationNotifier(api, ref);
-}); 
+final locationProvider = StateNotifierProvider<LocationNotifier, LocationState>(
+  (ref) {
+    final api = ref.read(locationApiProvider);
+    return LocationNotifier(api, ref);
+  },
+);

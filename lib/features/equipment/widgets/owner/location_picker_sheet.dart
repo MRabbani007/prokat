@@ -5,10 +5,7 @@ import 'package:prokat/features/equipment/models/equipment_location.dart';
 class LocationPickerSheet extends StatelessWidget {
   final List<EquipmentLocation> locations;
 
-  const LocationPickerSheet({
-    super.key,
-    required this.locations,
-  });
+  const LocationPickerSheet({super.key, required this.locations});
 
   @override
   Widget build(BuildContext context) {
@@ -21,7 +18,6 @@ class LocationPickerSheet extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-
             const Text(
               "Select Equipment Location",
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
@@ -42,8 +38,7 @@ class LocationPickerSheet extends StatelessWidget {
                 ),
               ),
 
-            if (previewLocations.isNotEmpty)
-              const SizedBox(height: 8),
+            if (previewLocations.isNotEmpty) const SizedBox(height: 8),
 
             /// VIEW ALL
             if (locations.length > 2)

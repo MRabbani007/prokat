@@ -1,66 +1,132 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:prokat/core/router/app_routes.dart';
+import 'package:prokat/features/appstartup/app_startup_provider.dart';
+import 'package:prokat/features/auth/providers/auth_provider.dart';
 
-class ProkatNavigationBar extends StatelessWidget {
-  final StatefulNavigationShell navigationShell;
+final ownerNavItems = [
+  _NavItem(
+    icon: Icons.home_rounded,
+    label: 'Home',
+    path: AppRoutes.ownerDashboard,
+  ),
+  _NavItem(
+    icon: Icons.local_shipping_rounded,
+    label: 'My Fleet',
+    path: AppRoutes.ownerEquiment,
+  ),
+  _NavItem(
+    icon: Icons.list_alt_rounded,
+    label: 'Orders',
+    path: AppRoutes.ownerBookings,
+  ),
+  _NavItem(
+    icon: Icons.chat_bubble_rounded,
+    label: 'Chats',
+    path: AppRoutes.ownerChat,
+  ),
+];
 
-  const ProkatNavigationBar({super.key, required this.navigationShell});
+final clientNavItems = [
+  _NavItem(icon: Icons.home_rounded, label: 'Home', path: AppRoutes.dashboard),
+  _NavItem(
+    icon: Icons.search_rounded,
+    label: 'Search',
+    path: AppRoutes.searchList,
+  ),
+  _NavItem(
+    icon: Icons.add_box_rounded,
+    label: 'Create',
+    path: AppRoutes.createRequest,
+  ),
+  _NavItem(
+    icon: Icons.list_alt_rounded,
+    label: 'Orders',
+    path: AppRoutes.clientOrders,
+  ),
+  _NavItem(
+    icon: Icons.chat_bubble_rounded,
+    label: 'Chats',
+    path: AppRoutes.chat,
+  ),
+];
 
+class ProkatNavigationBar extends ConsumerStatefulWidget {
+  const ProkatNavigationBar({super.key});
+
+  @override
+  ConsumerState<ProkatNavigationBar> createState() =>
+      _ProkatNavigationBarState();
+}
+
+class _ProkatNavigationBarState extends ConsumerState<ProkatNavigationBar> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    // Determine the current tab based on the current URL
-    final String location = GoRouterState.of(context).path ?? "";
-    int currentIndex = 0;
+    final authState = ref.watch(authProvider);
+    final startupState = ref.watch(appStartupProvider);
 
-    if (location.startsWith('/search/list')) {
-      currentIndex = 1;
-    } else if (location.startsWith('/requests/create')) {
-      currentIndex = 2;
-    } else if (location.startsWith('/bookings')) {
-      currentIndex = 3;
-    } else if (location.startsWith('/chats')) {
-      currentIndex = 4;
-    } else {
-      currentIndex = 0; // default to dashboard
+    if (authState.session == null) {
+      return const SizedBox.shrink();
     }
 
-    return BottomNavigationBar(
-      currentIndex: currentIndex,
-      type: BottomNavigationBarType.fixed,
-      backgroundColor: theme.scaffoldBackgroundColor,
-      showSelectedLabels: false,
-      showUnselectedLabels: false,
-      selectedItemColor: theme.colorScheme.primary,
-      unselectedItemColor: theme.colorScheme.onBackground.withOpacity(0.5),
-      iconSize: 32, // make the icons bigger
-      onTap: (index) {
-        switch (index) {
-          case 0:
-            context.go('/dashboard');
-            break;
-          case 1:
-            context.go('/search/list');
-            break;
-          case 2:
-            context.go('/requests/create');
-            break;
-          case 3:
-            context.go(AppRoutes.booking);
-            break;
-          case 4:
-            context.go('/profile');
-            break;
-        }
-      },
-      items: const [
-        BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-        BottomNavigationBarItem(icon: Icon(Icons.search), label: 'Search'),
-        BottomNavigationBarItem(icon: Icon(Icons.add_box), label: 'Create'),
-        BottomNavigationBarItem(icon: Icon(Icons.list_alt), label: 'Orders'),
-        BottomNavigationBarItem(icon: Icon(Icons.chat), label: 'Chats'),
-      ],
+    final navItems = switch (startupState) {
+      AppStartupState.owner => ownerNavItems,
+      AppStartupState.client => clientNavItems,
+      _ => const <_NavItem>[],
+    };
+
+    if (navItems.isEmpty) {
+      return const SizedBox.shrink();
+    }
+
+    final String location = GoRouterState.of(context).uri.path;
+
+    int currentIndex = navItems.indexWhere(
+      (item) => location.startsWith(item.path),
+    );
+
+    if (currentIndex == -1) {
+      return const SizedBox.shrink();
+    }
+
+    return Container(
+      decoration: BoxDecoration(
+        border: Border(top: BorderSide(color: theme.dividerColor, width: 0.5)),
+      ),
+      child: BottomNavigationBar(
+        currentIndex: currentIndex,
+        type: BottomNavigationBarType.fixed,
+        elevation: 0,
+        backgroundColor: theme.scaffoldBackgroundColor,
+        showSelectedLabels:
+            true, // Labels help accessibility for different roles
+        showUnselectedLabels: true,
+        selectedFontSize: 10,
+        unselectedFontSize: 10,
+        selectedItemColor: theme.primaryColor,
+        unselectedItemColor: theme.hintColor,
+        onTap: (index) {
+          context.go(navItems[index].path);
+        },
+        items: navItems
+            .map(
+              (item) => BottomNavigationBarItem(
+                icon: Icon(item.icon, size: 28),
+                label: item.label,
+              ),
+            )
+            .toList(),
+      ),
     );
   }
+}
+
+// Simple helper class to keep the code dry
+class _NavItem {
+  final IconData icon;
+  final String label;
+  final String path;
+  _NavItem({required this.icon, required this.label, required this.path});
 }

@@ -41,7 +41,6 @@ class _OwnerEquipmentListScreenState
       backgroundColor: theme.scaffoldBackgroundColor,
       body: CustomScrollView(
         slivers: [
-          // 1. App Bar with Back Button
           SliverAppBar(
             floating: true,
             pinned: true,
@@ -77,7 +76,7 @@ class _OwnerEquipmentListScreenState
             actionsPadding: EdgeInsets.only(right: 12),
           ),
 
-          // 2. Stats and Add Button Section
+          // Stats and Add Button Section
           SliverToBoxAdapter(
             child: Padding(
               padding: const EdgeInsets.all(24),
@@ -88,7 +87,11 @@ class _OwnerEquipmentListScreenState
                       context,
                       label: "ONLINE",
                       count: state.ownerEquipment
-                          .where((e) => e.status.toLowerCase() == 'available')
+                          .where(
+                            (e) =>
+                                e.status.toLowerCase() == 'available' &&
+                                e.isVisible == true,
+                          )
                           .length,
                       color: Colors.greenAccent[700]!,
                     ),
@@ -100,7 +103,11 @@ class _OwnerEquipmentListScreenState
                       context,
                       label: "OFFLINE",
                       count: state.ownerEquipment
-                          .where((e) => e.status.toLowerCase() == 'booked')
+                          .where(
+                            (e) =>
+                                e.status.toLowerCase() == 'booked' ||
+                                e.isVisible == false,
+                          )
                           .length,
                       color: Colors.redAccent[400]!,
                     ),
@@ -207,9 +214,7 @@ class _OwnerEquipmentListScreenState
       padding: EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.15),
-        border: Border.all(
-          color: color.withValues(alpha: 0.3),
-        ),
+        border: Border.all(color: color.withValues(alpha: 0.3)),
         borderRadius: BorderRadius.circular(16),
       ),
       child: Column(

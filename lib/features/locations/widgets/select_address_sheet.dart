@@ -98,11 +98,15 @@ class SelectAddressSheet extends ConsumerWidget {
               ),
               style: OutlinedButton.styleFrom(
                 foregroundColor: theme.colorScheme.primary,
-                side: BorderSide(color: theme.colorScheme.outline.withValues(alpha: 0.3)),
+                side: BorderSide(
+                  color: theme.colorScheme.outline.withValues(alpha: 0.3),
+                ),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(16),
                 ),
-                backgroundColor: theme.colorScheme.primary.withValues(alpha: 0.05),
+                backgroundColor: theme.colorScheme.primary.withValues(
+                  alpha: 0.05,
+                ),
               ),
             ),
           ),

@@ -39,9 +39,9 @@ class MapControls extends ConsumerWidget {
               color: bgColor,
               iconColor: Colors.white,
             ),
-        
+
             const SizedBox(height: 24),
-        
+
             /// 2. ZOOM GROUP (Fused Button)
             Container(
               decoration: BoxDecoration(
@@ -76,9 +76,9 @@ class MapControls extends ConsumerWidget {
                 ],
               ),
             ),
-        
+
             const SizedBox(height: 20),
-        
+
             /// 3. MY LOCATION (Miniaturized)
             _MapControlButton(
               icon: Icons.my_location_rounded,

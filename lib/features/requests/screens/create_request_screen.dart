@@ -69,9 +69,6 @@ class _CreateRequestScreenState extends ConsumerState<CreateRequestScreen> {
           .firstOrNull;
 
       if (profileCategoryId != null && foundCategory != null) {
-        print("category update");
-        print(profileCategoryId.toString());
-        print(foundCategory.name);
         ref.read(requestProvider.notifier).selectCategory(foundCategory);
       }
     });
@@ -114,10 +111,10 @@ class _CreateRequestScreenState extends ConsumerState<CreateRequestScreen> {
 
                     Text(
                       "Delivery Location",
-                      style: theme.textTheme.bodyMedium,
+                      style: theme.textTheme.headlineMedium,
                     ),
 
-                    const SizedBox(height: 12),
+                    const SizedBox(height: 6),
                     AddressPickerCard(
                       selectedAddress: locationState.selectedAddress,
                       onTap: () => _openAddressSheet(context),
@@ -125,8 +122,12 @@ class _CreateRequestScreenState extends ConsumerState<CreateRequestScreen> {
 
                     const SizedBox(height: 24),
 
-                    Text("Equipment Specs", style: theme.textTheme.bodyMedium),
-                    const SizedBox(height: 12),
+                    Text(
+                      "Equipment Specs",
+                      style: theme.textTheme.headlineMedium,
+                    ),
+                    const SizedBox(height: 6),
+
                     IndustrialTextField(
                       controller: capacityController,
                       label: "Required Capacity",
@@ -135,6 +136,7 @@ class _CreateRequestScreenState extends ConsumerState<CreateRequestScreen> {
                       onChanged: (value) =>
                           ref.read(requestProvider.notifier).setCapacity(value),
                     ),
+
                     IndustrialTextField(
                       controller: rateController,
                       label: "Offered Rate",
@@ -143,10 +145,11 @@ class _CreateRequestScreenState extends ConsumerState<CreateRequestScreen> {
                       keyboardType: TextInputType.number,
                       onChanged: (value) {
                         final rate = int.tryParse(value);
-                        if (rate != null)
+                        if (rate != null) {
                           ref
                               .read(requestProvider.notifier)
                               .setOfferedRate(rate);
+                        }
                       },
                     ),
                     IndustrialTextField(
@@ -161,8 +164,8 @@ class _CreateRequestScreenState extends ConsumerState<CreateRequestScreen> {
 
                     const SizedBox(height: 24),
 
-                    Text("Date & Time", style: theme.textTheme.bodyMedium),
-                    const SizedBox(height: 12),
+                    Text("Date & Time", style: theme.textTheme.headlineMedium),
+                    const SizedBox(height: 6),
                     Row(
                       children: [
                         Expanded(
@@ -284,16 +287,8 @@ class _DateTimeButton extends StatelessWidget {
           color: theme.cardColor,
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
-            color: theme.colorScheme.outline.withValues(alpha: 0.6),
+            color: theme.colorScheme.outline.withValues(alpha: 0.3),
           ),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.25),
-              blurRadius: 20,
-              spreadRadius: 2,
-              offset: const Offset(0, 6),
-            ),
-          ],
         ),
         child: Row(
           children: [

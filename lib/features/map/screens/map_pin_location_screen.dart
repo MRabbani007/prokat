@@ -40,32 +40,32 @@ class _MapPinLocationScreenState extends ConsumerState<MapPinLocationScreen> {
   }
 
   Future<void> reverseGeocode() async {
-  if (mapboxMap == null) return;
+    if (mapboxMap == null) return;
 
-  setState(() {
-    loadingAddress = true;
-    selectedAddress = null; // Clear old address while loading
-  });
+    setState(() {
+      loadingAddress = true;
+      selectedAddress = null; // Clear old address while loading
+    });
 
-  try {
-    final result = await ref
-        .read(locationApiProvider)
-        .reverseGeocode(longitude, latitude);
+    try {
+      final result = await ref
+          .read(locationApiProvider)
+          .reverseGeocode(longitude, latitude);
 
-    // Only update if we actually got a result
-    if (result != null) {
+      // Only update if we actually got a result
+      if (result != null) {
+        setState(() {
+          selectedAddress = result;
+        });
+      }
+    } catch (e) {
+      debugPrint("Geocoding failed: $e");
+    } finally {
       setState(() {
-        selectedAddress = result;
+        loadingAddress = false;
       });
     }
-  } catch (e) {
-    debugPrint("Geocoding failed: $e");
-  } finally {
-    setState(() {
-      loadingAddress = false;
-    });
   }
-}
 
   void onCameraIdle(CameraChangedEventData data) {
     idleDebounce?.cancel();

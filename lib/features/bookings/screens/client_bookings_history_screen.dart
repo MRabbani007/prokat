@@ -15,7 +15,8 @@ class ClientBookingsHistoryScreen extends ConsumerStatefulWidget {
       ClientBookingsHistoryScreenState();
 }
 
-class ClientBookingsHistoryScreenState extends ConsumerState<ClientBookingsHistoryScreen>
+class ClientBookingsHistoryScreenState
+    extends ConsumerState<ClientBookingsHistoryScreen>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
 

@@ -1,11 +1,9 @@
 import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:prokat/core/router/app_routes.dart';
 import 'package:prokat/features/appstatic/widgets/category_card.dart';
-import 'package:prokat/features/appstatic/widgets/search_box.dart';
 import 'package:prokat/features/appstatic/widgets/show_language_sheet.dart';
 import 'package:prokat/features/categories/providers/category_provider.dart';
 import 'package:prokat/features/equipment/providers/equipment_provider.dart';
@@ -58,7 +56,6 @@ class MainScreen extends ConsumerStatefulWidget {
 }
 
 class _MainScreenState extends ConsumerState<MainScreen> {
-  String _selectedFilter = 'All';
   Timer? _debounce;
 
   @override
@@ -138,232 +135,185 @@ class _MainScreenState extends ConsumerState<MainScreen> {
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
       body: SafeArea(
-        child: CustomScrollView(
-          slivers: [
-            SliverAppBar(
-              automaticallyImplyLeading: false,
-              // 'pinned' keeps the small toolbar visible; 'false' hides it completely
-              pinned: false,
-              // 'floating' makes it reappear as soon as you scroll up
-              floating: true,
-              // 'snap' makes it animate fully into/out of view
-              snap: false,
-              // expandedHeight: 120.0, // Height when fully expanded
-              backgroundColor: theme.colorScheme.surface,
-              titleSpacing: 0,
-              title: Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 24.0,
-                  vertical: 8,
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    // LOGO
-                    GestureDetector(
-                      onTap: () {},
-                      child: RichText(
-                        softWrap: false,
-                        text: TextSpan(
-                          style: theme.textTheme.headlineMedium?.copyWith(
-                            fontWeight: FontWeight.bold,
+        child: ListView(
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(24, 12, 24, 12),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  GestureDetector(
+                    onTap: () {},
+                    child: RichText(
+                      softWrap: false,
+                      text: TextSpan(
+                        style: theme.textTheme.headlineMedium?.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
+                        children: [
+                          const TextSpan(text: 'PRO'),
+                          TextSpan(
+                            text: 'KAT',
+                            style: TextStyle(color: theme.colorScheme.primary),
                           ),
-                          children: [
-                            const TextSpan(text: 'PRO'),
-                            TextSpan(
-                              text: 'KAT',
-                              style: TextStyle(
-                                color: theme.colorScheme.primary,
-                              ),
-                            ),
-                          ],
-                        ),
+                        ],
                       ),
-                    ),
-
-                    // LANGUAGE BUTTON
-                    GestureDetector(
-                      onTap: () => showLanguageSheet(context),
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 14,
-                          vertical: 6,
-                        ),
-                        decoration: BoxDecoration(
-                          color: theme.colorScheme.primary,
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        child: Text(
-                          "EN",
-                          style: theme.textTheme.labelLarge?.copyWith(
-                            color: theme.colorScheme.onPrimary,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              // actionsPadding: EdgeInsets.only(right: 12),
-              // bottom: PreferredSize(
-              //   preferredSize: const Size.fromHeight(80),
-              //   child: Padding(
-              //     padding: const EdgeInsets.all(8.0),
-              //     child: SearchBox(), // The search box from earlier
-              //   ),
-              // ),
-            ),
-
-            // Hero Banner
-            SliverToBoxAdapter(
-              child: _HeroBanner(
-                city: selectedCity,
-                onCityTap: () => {
-                  showModalBottomSheet(
-                    context: context,
-                    backgroundColor: Colors.white,
-                    shape: const RoundedRectangleBorder(
-                      borderRadius: BorderRadius.vertical(
-                        top: Radius.circular(20),
-                      ),
-                    ),
-                    builder: (_) => _CityPickerSheet(
-                      selected: selectedCity,
-                      onSelect: (city) {
-                        // setState(() => _selectedCity = city);
-                        _updateFilters(context, {'city': city});
-
-                        Navigator.pop(context);
-                      },
                     ),
                   ),
-                },
+                  GestureDetector(
+                    onTap: () => showLanguageSheet(context),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 14,
+                        vertical: 6,
+                      ),
+                      decoration: BoxDecoration(
+                        color: theme.colorScheme.primary,
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Text(
+                        "EN",
+                        style: theme.textTheme.labelLarge?.copyWith(
+                          color: theme.colorScheme.onPrimary,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
+            _HeroBanner(
+              city: selectedCity,
+              onCityTap: () => {
+                showModalBottomSheet(
+                  context: context,
+                  backgroundColor: Colors.white,
+                  shape: const RoundedRectangleBorder(
+                    borderRadius: BorderRadius.vertical(
+                      top: Radius.circular(20),
+                    ),
+                  ),
+                  builder: (_) => _CityPickerSheet(
+                    selected: selectedCity,
+                    onSelect: (city) {
+                      // setState(() => _selectedCity = city);
+                      _updateFilters(context, {'city': city});
 
-            // Get Started
-            SliverToBoxAdapter(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 24,
-                  vertical: 24,
+                      Navigator.pop(context);
+                    },
+                  ),
                 ),
-                child: GestureDetector(
-                  onTap: () {
-                    context.push(AppRoutes.login);
-                  },
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(vertical: 14),
-                    decoration: BoxDecoration(
-                      color: theme.primaryColor,
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    alignment: Alignment.center,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          'Get Started',
-                          style: TextStyle(
-                            color: theme.colorScheme.onPrimary,
-                            fontSize: 16,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                        SizedBox(width: 10),
-                        Icon(
-                          Icons.login,
-                          size: 24,
+              },
+            ),
+
+            // Login
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
+              child: GestureDetector(
+                onTap: () {
+                  context.push(AppRoutes.login);
+                },
+                child: Container(
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  decoration: BoxDecoration(
+                    color: theme.primaryColor,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  alignment: Alignment.center,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        'Get Started',
+                        style: TextStyle(
                           color: theme.colorScheme.onPrimary,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
                         ),
-                      ],
-                    ),
+                      ),
+                      SizedBox(width: 10),
+                      Icon(
+                        Icons.login,
+                        size: 24,
+                        color: theme.colorScheme.onPrimary,
+                      ),
+                    ],
                   ),
                 ),
               ),
             ),
 
             // Services Header
-            SliverToBoxAdapter(
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(24, 0, 24, 12),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text("Services", style: theme.textTheme.titleLarge),
-                    GestureDetector(
-                      onTap: () {},
-                      child: const Text(
-                        'See all',
-                        style: TextStyle(fontSize: 12, color: kBlue),
-                      ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(24, 0, 24, 12),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text("Services", style: theme.textTheme.titleLarge),
+                  GestureDetector(
+                    onTap: () {},
+                    child: const Text(
+                      'See all',
+                      style: TextStyle(fontSize: 12, color: kBlue),
                     ),
-                  ],
-                ),
-              ),
-            ),
-
-            // Services
-            SliverPadding(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 24,
-                vertical: 0,
-              ), // Adjust padding as needed
-              sliver: SliverGrid(
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 4,
-                  mainAxisSpacing: 10,
-                  crossAxisSpacing: 10,
-                  childAspectRatio: 0.9,
-                ),
-                delegate: SliverChildBuilderDelegate(
-                  (context, i) => CategoryCard(
-                    isSelected:
-                        selectedCategory == categoriesState.categories[i].id,
-                    category: categoriesState.categories[i],
-                    onTap: () => _updateFilters(context, {
-                      'category': categoriesState.categories[i].id,
-                    }),
                   ),
-                  childCount: categoriesState.categories.length,
+                ],
+              ),
+            ),
+
+            // Categories / Services
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24),
+              child: SizedBox(
+                height: 110, // control height of the row
+                child: ListView.separated(
+                  scrollDirection: Axis.horizontal,
+                  itemCount: categoriesState.categories.length,
+                  separatorBuilder: (_, __) => const SizedBox(width: 10),
+                  itemBuilder: (context, i) {
+                    final category = categoriesState.categories[i];
+
+                    return CategoryCard(
+                      isSelected: selectedCategory == category.id,
+                      category: category,
+                      onTap: () =>
+                          _updateFilters(context, {'category': category.id}),
+                    );
+                  },
                 ),
               ),
             ),
 
-            // Popular / Top Ranked Rents
-            SliverToBoxAdapter(
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(24, 0, 24, 12),
-                child: Column(
-                  children: [
-                    const SizedBox(height: 20),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(24, 0, 24, 12),
+              child: Column(
+                children: [
+                  const SizedBox(height: 20),
 
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          "Popular rents",
-                          style: theme.textTheme.titleLarge,
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text("Popular rents", style: theme.textTheme.titleLarge),
+                    ],
+                  ),
+                ],
               ),
             ),
 
-            SliverPadding(
+            ListView.builder(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
               padding: const EdgeInsets.symmetric(horizontal: 24.0),
-              sliver: SliverList(
-                delegate: SliverChildBuilderDelegate((context, index) {
-                  final item = equipmentState.renterEquipment[index];
-                  return Padding(
-                    padding: const EdgeInsets.only(bottom: 12),
-                    child: GuestEquipmentCard(item: item),
-                  );
-                }, childCount: equipmentState.renterEquipment.length),
-              ),
+              itemCount: equipmentState.renterEquipment.length,
+              itemBuilder: (context, index) {
+                final item = equipmentState.renterEquipment[index];
+
+                return Padding(
+                  padding: const EdgeInsets.only(bottom: 12),
+                  child: GuestEquipmentCard(item: item),
+                );
+              },
             ),
           ],
         ),
@@ -461,53 +411,6 @@ class _HeroBanner extends StatelessWidget {
 
 // ─── Filter Pills ─────────────────────────────────────────────────────────────
 const List<String> kFilters = ['All', 'Daily', 'Weekly', 'Monthly', 'Near me'];
-
-class _FilterPills extends StatelessWidget {
-  final String selected;
-  final ValueChanged<String> onSelect;
-
-  const _FilterPills({required this.selected, required this.onSelect});
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      height: 36,
-      child: ListView.separated(
-        scrollDirection: Axis.horizontal,
-        padding: const EdgeInsets.symmetric(horizontal: 20),
-        itemCount: kFilters.length,
-        separatorBuilder: (_, _) => const SizedBox(width: 8),
-        itemBuilder: (_, i) {
-          final active = kFilters[i] == selected;
-          return GestureDetector(
-            onTap: () => onSelect(kFilters[i]),
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 6),
-              decoration: BoxDecoration(
-                color: active ? const Color(0xFFEFF6FF) : Colors.white,
-                borderRadius: BorderRadius.circular(20),
-                border: Border.all(
-                  color: active
-                      ? const Color(0xFFBFDBFE)
-                      : const Color(0xFFD1D5DB),
-                  width: 0.5,
-                ),
-              ),
-              child: Text(
-                kFilters[i],
-                style: TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w500,
-                  color: active ? kBlue : const Color(0xFF374151),
-                ),
-              ),
-            ),
-          );
-        },
-      ),
-    );
-  }
-}
 
 // ─── City Picker Bottom Sheet ─────────────────────────────────────────────────
 
